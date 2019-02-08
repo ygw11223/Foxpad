@@ -1,0 +1,23 @@
+{
+  "name": "Collaborative-Drawing",
+  "version": "1.0.0",
+  "description": "Collaborative Drawing Application",
+  "main": "index.js",
+  "keywords": [
+    "real-time",
+    "drawing"
+  ],
+  "dependencies": {
+    "express": "4.9.x",
+    "socket.io": "latest",
+    "short-id" : "latest"
+  },
+  "scripts": {
+    "start": "node index"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/ygw11223/Collaborative-Drawing/issues"
+  },
+  "homepage": "https://github.com/ygw11223/Collaborative-Drawing#readme",
+}
