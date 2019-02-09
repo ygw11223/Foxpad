@@ -8,9 +8,9 @@
     "drawing"
   ],
   "dependencies": {
-    "express": "4.9.x",
-    "socket.io": "latest",
-    "short-id" : "latest"
+    "express": "^4.16.4",
+    "short-id": "^0.1.0",
+    "socket.io": "latest"
   },
   "scripts": {
     "start": "node index"

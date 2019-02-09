@@ -1,28 +1,53 @@
 import React, {Component} from 'react';
-//openSocket = require ('socket.io-client');
-//const socket = openSocket();
+import openSocket from 'socket.io-client';
+const socket = openSocket('http://localhost:4000/');
 
 const style = {
   backgroundColor: 'white',
   borderStyle: 'solid'
 };
-//socket.on('drawing', onDrawingEvent);
 
-export default class Canvas extends Component {
+
+class Canvas extends Component {
     constructor(props) {
         super(props);
         this.state = { drawing: false };
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.onDrawingEvent = this.onDrawingEvent.bind(this);
+
         this.preX = -1;
         this.preY = -1;
+        socket.on('drawing', this.onDrawingEvent);
     }
 
     getContext() {
         return this.refs.canvas.getContext('2d');
     }
+    drawLine(x0,y0,x1,y1,color, emit) {
+        const ctx = this.getContext();
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = color;;
+        ctx.stroke();
+        if(!emit){return;}
+        socket.emit('drawing', {
+            x0: x0 ,
+            y0: y0,
+            x1: x1 ,
+            y1: y1,
+            color: color,
+        });
+    }
+    onDrawingEvent(data) {
+        console.log(data.x0);
 
+        this.drawLine(data.x0,data.y0,
+                    data.x1,data.y1,data.color)
+    }
     onMouseDown(e) {
         this.setState({ drawing: true });
         const ctx = this.getContext();
@@ -35,22 +60,12 @@ export default class Canvas extends Component {
         if (!this.state.drawing) {
             return;
         }
-        const ctx = this.getContext();
-        ctx.moveTo(this.preX,this.preY);
-        ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = this.props.color;
-        ctx.stroke();
+
+        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY,  '#FF0000', 1)
+
+
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
-
-        // socket.emit('drawing', {
-        //     x0: this.preX / this.props.width,
-        //     y0: this.preY / this.props.height,
-        //     x1: e.nativeEvent.offsetX / this.props.width,
-        //     y1: e.nativeEvent.offsetY / this.props.height,
-        //     color: this.props.color
-        // });
     }
 
     onMouseUp() {
@@ -73,3 +88,4 @@ export default class Canvas extends Component {
         );
     }
 }
+export default Canvas;

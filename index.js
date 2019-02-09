@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port = process.env.PORT || 3000;
+const port =  4000;
 const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
@@ -18,7 +18,7 @@ DATABASE = {}
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
-app.use('/static', express.static('public'))
+app.use('/static', express.static('client/public'))
 // Request for opening an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get session id.
@@ -72,7 +72,7 @@ function onConnection(socket){
             default:
                 console.log("Invalid command received.")
         }
-        
+
     });
 
     socket.on('disconnect', () => {
@@ -80,10 +80,9 @@ function onConnection(socket){
         console.log("One user left", socket.session_id);
     });
 
-    
+
 }
 
 io.on('connection', onConnection);
 
 http.listen(port, () => console.log('listening on port ' + port));
-
