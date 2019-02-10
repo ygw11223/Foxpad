@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port =  3000;
-//const hashes = require('short-id');
+const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -33,7 +33,7 @@ app.get('/canvas/*', function (req, res) {
 // Otherwise redirect to a new canvas page.
 app.get('/', function (req, res) {
     // Create a new session id.
-    var id = 111;//hashes.generate();
+    var id = hashes.generate();
     SESSION_IDS[id] = 0;
     DATABASE[id] = [];
 
