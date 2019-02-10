@@ -19,7 +19,14 @@ class Canvas extends Component {
 
         this.preX = -1;
         this.preY = -1;
+        console.log(this.props.match.params.id);
+        socket.emit('init', {
+            user_id: "111",
+            session_id: this.props.match.params.id,
+        });
         socket.on('drawing', this.onDrawingEvent);
+        socket.emit('command', 'update');
+
     }
 
     getContext() {
