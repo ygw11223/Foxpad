@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port =  4000;
-const hashes = require('short-id');
+const port =  3000;
+//const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -18,7 +18,7 @@ DATABASE = {}
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
-app.use('/static', express.static('client/public'))
+app.use('/static', express.static(__dirname + '/client/build'))
 // Request for opening an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get session id.
@@ -27,13 +27,13 @@ app.get('/canvas/*', function (req, res) {
     if (!(session_id in SESSION_IDS)) {
         res.status(400).send('Invalid Url!');
     } else {
-        res.sendFile(__dirname + '/public/index.html');
+        res.sendFile(__dirname + '/client/build/index.html');
     }
 });
 // Otherwise redirect to a new canvas page.
 app.get('/', function (req, res) {
     // Create a new session id.
-    var id = hashes.generate();
+    var id = 111;//hashes.generate();
     SESSION_IDS[id] = 0;
     DATABASE[id] = [];
 

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import openSocket from 'socket.io-client';
-const socket = openSocket('http://localhost:4000/');
+const socket = openSocket('http://localhost:3000/');
 
 const style = {
   backgroundColor: 'white',
