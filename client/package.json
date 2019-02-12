@@ -26,5 +26,8 @@
     "not op_mini all"
   ],
   "proxy": "http://localhost:3000",
-   "homepage": "http://localhost/static"
+  "homepage": "http://localhost/static",
+  "devDependencies": {
+    "fork-ts-checker-webpack-plugin": "^0.5.2"
+  }
 }

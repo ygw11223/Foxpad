@@ -1,0 +1,14 @@
+
+h3 {
+    color: red;
+}
+
+.inside {
+    height: 90vh;
+    display:flex;
+    align-items: center;
+}
+
+#bg-vertical-dropdown-1 {
+    color:red;
+}
