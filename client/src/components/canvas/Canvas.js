@@ -27,9 +27,7 @@ class Canvas extends Component {
         socket.emit('command', 'update');
 
     }
-    o
     getContext() {
-
         return this.refs.canvas.getContext('2d');
     }
     drawLine(x0,y0,x1,y1,color, emit) {
@@ -68,6 +66,7 @@ class Canvas extends Component {
         }
 
         this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, 1)
+
 
 
         this.preX = e.nativeEvent.offsetX;

@@ -6,6 +6,7 @@ class App extends Component {
   render() {
     return (
         <BrowserRouter>
+
             <div className="App" style={{ height:'100%', width:'100%'}}>
                 <Route path='/canvas/:id' component={CanvasBoard}/>
             </div>
