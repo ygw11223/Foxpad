@@ -11,7 +11,7 @@ const style = {
 class Canvas extends Component {
     constructor(props) {
         super(props);
-        this.state = { drawing: false };
+        this.state = { drawing: false, height: 700, width: 1000};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -19,17 +19,17 @@ class Canvas extends Component {
 
         this.preX = -1;
         this.preY = -1;
-        console.log(this.props.match.params.id);
         socket.emit('init', {
             user_id: "111",
-            session_id: this.props.match.params.id,
+            session_id:this.props.room_id,
         });
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
 
     }
-
+    o
     getContext() {
+
         return this.refs.canvas.getContext('2d');
     }
     drawLine(x0,y0,x1,y1,color, emit) {
@@ -50,7 +50,6 @@ class Canvas extends Component {
         });
     }
     onDrawingEvent(data) {
-        console.log(data.x0);
 
         this.drawLine(data.x0,data.y0,
                     data.x1,data.y1,data.color)
@@ -68,7 +67,7 @@ class Canvas extends Component {
             return;
         }
 
-        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY,  '#FF0000', 1)
+        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, 1)
 
 
         this.preX = e.nativeEvent.offsetX;
@@ -86,8 +85,8 @@ class Canvas extends Component {
             <canvas
                 ref="canvas"
                 style={style}
-                height = {800}
-                width  = {1000}
+                height = {this.state.height -10}
+                width  = {this.state.width -10}
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
