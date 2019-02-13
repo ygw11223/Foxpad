@@ -15,7 +15,7 @@ class Sidebar extends React.Component {
     render() {
         return (
             <ButtonGroup   vertical >
-                <Button eventKey="white" className='bg-light'> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
+                <Button eventKey="white" className='bg-light'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
                 <Button className='bg-light'> <i className="fas fa-pencil-alt" style={{color: 'black'}}></i></Button>
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDropright}
                                     toggle={()=>{this.setState({btnDropright: !this.state.btnDropright})}}>
