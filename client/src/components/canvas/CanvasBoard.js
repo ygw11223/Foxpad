@@ -20,7 +20,7 @@ class CanvasBoard extends Component {
                 <div >
                     <Sidebar onChangeColor={this.changeColor} />
                 </div>
-                    <div style={{  backgroundColor: 'gray', borderStyle: 'solid', flexGrow : 1}} >
+                    <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
                         <Canvas
                             width={this.state.width}
                             height={this.state.height}
