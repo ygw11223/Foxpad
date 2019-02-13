@@ -7,7 +7,7 @@ import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, Dropdo
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {btnDropright:false};
+        this.state = {btnDroprightColor:false, btnDroprightWidth:false};
     }
     // Todo: Anze
     //          rewrite DropdownItem into list
@@ -16,9 +16,24 @@ class Sidebar extends React.Component {
         return (
             <ButtonGroup   vertical >
                 <Button eventKey="white" className='bg-light'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
-                <Button className='bg-light'> <i className="fas fa-pencil-alt" style={{color: 'black'}}></i></Button>
-                <ButtonDropdown   direction="right" isOpen={this.state.btnDropright}
-                                    toggle={()=>{this.setState({btnDropright: !this.state.btnDropright})}}>
+
+
+                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
+                                    toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
+                    <DropdownToggle   si className='bg-light' >
+                        <i className="fas fa-pencil-alt" style={{color: 'black'}}></i>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem eventKey="black" onClick={() => this.props.onChangeWidth("2")} >2</DropdownItem>
+                        <DropdownItem eventKey="red" onClick={() => this.props.onChangeWidth("10")}>10</DropdownItem>
+                        <DropdownItem eventKey="blue" onClick={() => this.props.onChangeWidth("15")}>15</DropdownItem>
+                    </DropdownMenu>
+                </ButtonDropdown>
+
+
+
+                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightColor}
+                                    toggle={()=>{this.setState({btnDroprightColor: !this.state.btnDroprightColor})}}>
                     <DropdownToggle   si className='bg-light' >
                         <i className="fas fa-palette" style={{color: 'black'}}></i>
                     </DropdownToggle>

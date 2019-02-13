@@ -6,26 +6,32 @@ import Sidebar from '../layout/Sidebar'
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'red'};
+        this.state = {color: 'red', lineWidth: 5};
         this.changeColor = this.changeColor.bind(this);
+        this.changeWidth = this.changeWidth.bind(this);
     }
 
     changeColor(e) {
         this.setState({color: e})
     }
 
+    changeWidth(e) {
+        this.setState({lineWidth: e})
+    }
+
     render(){
         return(
             <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
                 <div >
-                    <Sidebar onChangeColor={this.changeColor} />
+                    <Sidebar onChangeColor={this.changeColor} onChangeWidth={this.changeWidth}/>
                 </div>
                     <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
                         <Canvas
                             width={this.state.width}
                             height={this.state.height}
                             color={this.state.color}
-                            room_id={this.props.match.params.id}/>
+                            room_id={this.props.match.params.id}
+                            lineWidth={this.state.lineWidth} />
                     </div>
             </div>
         );

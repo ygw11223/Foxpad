@@ -48,8 +48,8 @@ class Canvas extends Component {
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = color;;
+        ctx.lineWidth = this.props.lineWidth;
+        ctx.strokeStyle = color;
         ctx.stroke();
         if(!emit){return;}
         socket.emit('drawing', {
