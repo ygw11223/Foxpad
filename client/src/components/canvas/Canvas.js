@@ -43,7 +43,7 @@ class Canvas extends Component {
 
         return this.refs.canvas.getContext('2d');
     }
-    drawLine(x0,y0,x1,y1,color, emit, lineWidth) {
+    drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
         const ctx = this.getContext();
         ctx.beginPath();
         ctx.moveTo(x0, y0);
@@ -83,7 +83,7 @@ class Canvas extends Component {
             return;
         }
 
-        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, 1)
+        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
     }
