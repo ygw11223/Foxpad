@@ -24,9 +24,9 @@ class Sidebar extends React.Component {
                         <i className="fas fa-pencil-alt" style={{color: 'black'}}></i>
                     </DropdownToggle>
                     <DropdownMenu>
-                        <DropdownItem eventKey="black" onClick={() => this.props.onChangeWidth("2")} >2</DropdownItem>
-                        <DropdownItem eventKey="red" onClick={() => this.props.onChangeWidth("10")}>10</DropdownItem>
-                        <DropdownItem eventKey="blue" onClick={() => this.props.onChangeWidth("15")}>15</DropdownItem>
+                        <DropdownItem eventKey="2" onClick={() => this.props.onChangeWidth("2")} >2</DropdownItem>
+                        <DropdownItem eventKey="10" onClick={() => this.props.onChangeWidth("10")}>10</DropdownItem>
+                        <DropdownItem eventKey="15" onClick={() => this.props.onChangeWidth("15")}>15</DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>
 
