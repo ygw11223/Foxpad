@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {BrowserRouter, Route} from 'react-router-dom'
 import CanvasBoard from './components/canvas/CanvasBoard'
 
+
 class App extends Component {
   render() {
     return (

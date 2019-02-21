@@ -43,13 +43,13 @@ class Canvas extends Component {
 
         return this.refs.canvas.getContext('2d');
     }
-    drawLine(x0,y0,x1,y1,color, emit) {
+    drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
         const ctx = this.getContext();
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = color;;
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = color;
         ctx.stroke();
         if(!emit){return;}
         socket.emit('drawing', {
@@ -58,6 +58,7 @@ class Canvas extends Component {
             x1: x1/this.state.width ,
             y1: y1/this.state.height,
             color: color,
+            lineWidth: lineWidth,
         });
     }
     onDrawingEvent(data) {
@@ -66,7 +67,8 @@ class Canvas extends Component {
                       data.y0*this.state.height,
                       data.x1*this.state.width,
                       data.y1*this.state.height,
-                      data.color)
+                      data.color,
+                      data.lineWidth,)
     }
     onMouseDown(e) {
         this.setState({ drawing: true });
@@ -81,7 +83,7 @@ class Canvas extends Component {
             return;
         }
 
-        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, 1)
+        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
     }
