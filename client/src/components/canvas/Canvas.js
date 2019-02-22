@@ -16,6 +16,7 @@ class Canvas extends Component {
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
+        this.onUndoEvent = this.onUndoEvent.bind(this);
         this.preX = -1;
         this.preY = -1;
         socket.emit('init', {
@@ -77,9 +78,11 @@ class Canvas extends Component {
             ctx.clearRect(0, 0, this.state.width, this.state.height);
         }
     }
-    onUndoEvent() {
-        socket.emit('command', 'update');
+    onUndoEvent(e) {
+        const ctx = this.getContext();
+        ctx.clearRect(0, 0, this.state.width, this.state.height);
         socket.emit('command', 'undo');
+        socket.emit('command', 'update');
     }
     onMouseDown(e) {
         this.setState({ drawing: true });

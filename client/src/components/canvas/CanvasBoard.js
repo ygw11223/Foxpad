@@ -2,14 +2,12 @@ import React, {Component} from 'react';
 import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar'
 
-
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
         this.state = {color: 'red', lineWidth: 5};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
-        this.undo = this.undo.bind(this);
     }
 
     changeColor(e) {

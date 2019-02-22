@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port =  3000;
+const port =  2000;
 const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
@@ -66,7 +66,7 @@ function onConnection(socket){
         switch (cmd) {
             // Draw all previous strokes to the client
             case 'update':
-                for (var user = 0; user < DATABASE[socket.id].length; user++) {
+                for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
                         for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
                             socket.emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
@@ -77,7 +77,7 @@ function onConnection(socket){
             case 'undo':
                 DATABASE[socket.session_id][socket.id].pop();
                 socket.broadcast.in(socket.session_id).emit('command', 'clear');
-                for (var user = 0; users < DATABASE[socket.session_id].length; user++) {
+                for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
                         for (var seg = 0; seg < stroke < DATABASE[socket.session_id][user][stroke].length; seg++) {
                             socket.broadcast.in(socket.session_id).emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
