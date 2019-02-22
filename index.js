@@ -35,7 +35,7 @@ app.get('/', function (req, res) {
     // Create a new session id.
     var id = hashes.generate();
     SESSION_IDS[id] = 0;
-    DATABASE[id] = [];
+    DATABASE[id] = {};
 
     res.redirect('/canvas/' + id);
     console.log("New session created:", id);
@@ -49,6 +49,7 @@ function onConnection(socket){
         socket.join(socket.session_id);
         // Number of client in this session incremented.
         SESSION_IDS[auth_info.session_id] += 1;
+        DATABASE[socket.session_id][socket.id] = [];
 
         console.log("One user joined", socket.session_id);
     });
@@ -56,7 +57,8 @@ function onConnection(socket){
     // Save drawing data and broadcast to all of its peers
     socket.on('drawing', (data) => {
         // TODO(Guowei) : Update when connecting firebase to server.
-        DATABASE[socket.session_id].push(data);
+        var idx_last = DATABASE[socket.session_id][socket.id].length - 1;
+        DATABASE[socket.session_id][socket.id][idx_last].push(data);
         socket.broadcast.in(socket.session_id).emit('drawing', data);
     });
 
@@ -64,10 +66,27 @@ function onConnection(socket){
         switch (cmd) {
             // Draw all previous strokes to the client
             case 'update':
-                for (var i = 0; i < DATABASE[socket.session_id].length; i++) {
-                    socket.emit('drawing', DATABASE[socket.session_id][i]);
+                for (var user = 0; user < DATABASE[socket.id].length; user++) {
+                    for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
+                        for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
+                            socket.emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
+                        }
+                    }
                 }
-                console.log("Client strokes updated.");
+                break;
+            case 'undo':
+                DATABASE[socket.session_id][socket.id].pop();
+                socket.broadcast.in(socket.session_id).emit('command', 'clear');
+                for (var user = 0; users < DATABASE[socket.session_id].length; user++) {
+                    for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
+                        for (var seg = 0; seg < stroke < DATABASE[socket.session_id][user][stroke].length; seg++) {
+                            socket.broadcast.in(socket.session_id).emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
+                        }
+                    }
+                }
+                break;
+            case 'new_stroke':
+                DATABASE[socket.session_id][socket.id].push([]);
                 break;
             default:
                 console.log("Invalid command received.")
