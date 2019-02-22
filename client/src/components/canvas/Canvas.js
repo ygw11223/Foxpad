@@ -24,6 +24,7 @@ class Canvas extends Component {
         });
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
+        socket.on('command', this.onCommandEvent);
 
     }
 
@@ -70,12 +71,23 @@ class Canvas extends Component {
                       data.color,
                       data.lineWidth,)
     }
+    onCommandEvent(cmd) {
+        const ctx = this.getContext();
+        if (cmd === "clear") {
+            ctx.clearRect(0, 0, this.state.width, this.state.height);
+        }
+    }
+    onUndoEvent() {
+        socket.emit('command', 'update');
+        socket.emit('command', 'undo');
+    }
     onMouseDown(e) {
         this.setState({ drawing: true });
         const ctx = this.getContext();
         ctx.beginPath();
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
+        socket.emit('command', 'new_stroke');
     }
 
     onMouseMove(e) {

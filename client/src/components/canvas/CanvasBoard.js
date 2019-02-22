@@ -20,15 +20,11 @@ class CanvasBoard extends Component {
         this.setState({lineWidth: e})
     }
 
-    undo(e) {
-
-    }
-
     render(){
         return(
             <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
                 <div >
-                    <Sidebar onChangeColor={this.changeColor} onChangeWidth={this.changeWidth} onUndo={this.undo}/>
+                    <Sidebar onChangeColor={this.changeColor} onChangeWidth={this.changeWidth} onUndo={Canvas.onUndoEvent}/>
                 </div>
                     <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
                         <Canvas
