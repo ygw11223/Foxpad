@@ -79,7 +79,7 @@ function onConnection(socket){
                 socket.broadcast.in(socket.session_id).emit('command', 'clear');
                 for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
-                        for (var seg = 0; seg < stroke < DATABASE[socket.session_id][user][stroke].length; seg++) {
+                        for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
                             socket.broadcast.in(socket.session_id).emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
                         }
                     }
