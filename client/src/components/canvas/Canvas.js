@@ -28,13 +28,16 @@ class Canvas extends Component {
         socket.on('command', this.onCommandEvent);
 
     }
-
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
     componentDidMount() {
        window.addEventListener("resize", this.updateDimensions);
+       this.props.onRef(this)
     }
     componentWillMount() {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-44.5});
-        console.log(this.state);
+        //console.log(this.state);
     }
     updateDimensions() {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-44.5});
@@ -79,6 +82,7 @@ class Canvas extends Component {
         }
     }
     onUndoEvent(e) {
+        console.log('undo');
         const ctx = this.getContext();
         ctx.clearRect(0, 0, this.state.width, this.state.height);
         socket.emit('command', 'undo');
