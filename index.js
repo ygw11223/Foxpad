@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port =  2000;
+const port =  3000;
 const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
@@ -45,6 +45,8 @@ app.get('/', function (req, res) {
 function onConnection(socket){
     socket.on('init', (auth_info) => {
         // Initialize socket.
+        // TODO : Save infomation on socket object can potentially crash
+        // server. Need to investigate a better solution.
         socket.session_id = auth_info.session_id;
         socket.join(socket.session_id);
         // Number of client in this session incremented.
@@ -66,6 +68,7 @@ function onConnection(socket){
         switch (cmd) {
             // Draw all previous strokes to the client
             case 'update':
+                // TODO : Currently not considering order of strokes. Same for undo.
                 for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
                         for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
