@@ -46,6 +46,8 @@ class Sidebar extends React.Component {
 
                 <Button eventKey="undo" className='bg-light' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
 
+                <Button eventKey="mode" className='bg-light' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
+
             </ButtonGroup>
         );
     }

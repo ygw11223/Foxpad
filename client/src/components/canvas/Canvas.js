@@ -10,7 +10,7 @@ const style = {
 class Canvas extends Component {
     constructor(props) {
         super(props);
-        this.state = { drawing: false, height: 700, width: 1000};
+        this.state = { active: false, height: 700, width: 1000};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -18,6 +18,7 @@ class Canvas extends Component {
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onCommandEvent = this.onCommandEvent.bind(this);
+
         this.preX = -1;
         this.preY = -1;
         socket.emit('init', {
@@ -34,29 +35,26 @@ class Canvas extends Component {
     }
     componentDidMount() {
        window.addEventListener("resize", this.updateDimensions);
-       this.props.onRef(this)
+       this.props.onRef(this);
+       this.ctx = this.refs.canvas.getContext('2d');
     }
     componentWillMount() {
-        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-44.5});
-        //console.log(this.state);
+        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
     }
     updateDimensions() {
-        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-44.5});
+        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
         socket.emit('command', 'update');
     }
 
-    getContext() {
 
-        return this.refs.canvas.getContext('2d');
-    }
     drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
-        const ctx = this.getContext();
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = color;
-        ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(x0, y0);
+        this.ctx.lineTo(x1, y1);
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.strokeStyle = color;
+        this.ctx.stroke();
         if(!emit){return;}
         socket.emit('drawing', {
             x0: x0/this.state.width ,
@@ -77,41 +75,45 @@ class Canvas extends Component {
                       data.lineWidth,)
     }
     onCommandEvent(cmd) {
-        const ctx = this.getContext();
+
         if (cmd === "clear") {
-            ctx.clearRect(0, 0, this.state.width, this.state.height);
+            this.ctx.clearRect(0, 0, this.state.width, this.state.height);
         }
     }
     onUndoEvent(e) {
         console.log('undo');
-        const ctx = this.getContext();
-        ctx.clearRect(0, 0, this.state.width, this.state.height);
+        this.ctx.clearRect(0, 0, this.state.width, this.state.height);
         socket.emit('command', 'undo');
         socket.emit('command', 'update');
     }
     onMouseDown(e) {
-        this.setState({ drawing: true });
-        const ctx = this.getContext();
-        ctx.beginPath();
-        this.preX = e.nativeEvent.offsetX;
-        this.preY = e.nativeEvent.offsetY;
-        socket.emit('command', 'new_stroke');
+        this.setState({ active: true });
+        if(this.state.mode){
+
+        }
+        else {
+            this.preX = e.nativeEvent.offsetX;
+            this.preY = e.nativeEvent.offsetY;
+            socket.emit('command', 'new_stroke');
+        }
     }
 
     onMouseMove(e) {
-        if (!this.state.drawing) {
+        if (!this.state.active) {
             return;
         }
+        if(this.props.mode){
 
-        this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
-        this.preX = e.nativeEvent.offsetX;
-        this.preY = e.nativeEvent.offsetY;
+        }
+        else {
+            this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
+            this.preX = e.nativeEvent.offsetX;
+            this.preY = e.nativeEvent.offsetY;
+        }
     }
 
     onMouseUp() {
-        const ctx = this.getContext();
-        ctx.closePath();
-        this.setState({ drawing: false });
+        this.setState({ active: false });
     }
 
     render() {
