@@ -43,6 +43,9 @@ class Sidebar extends React.Component {
                         <DropdownItem eventKey="blue" onClick={() => this.props.onChangeColor("blue")}><i className="fas fa-square" style={{color:'blue',}}></i></DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>
+
+                <Button eventKey="undo" className='bg-light' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
+
             </ButtonGroup>
         );
     }
