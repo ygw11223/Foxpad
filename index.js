@@ -69,24 +69,28 @@ function onConnection(socket){
             // Draw all previous strokes to the client
             case 'update':
                 // TODO : Currently not considering order of strokes. Same for undo.
+                data_array = [];
                 for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
                         for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
-                            socket.emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
+                            data_array.push(DATABASE[socket.session_id][user][stroke][seg]);
                         }
                     }
                 }
+                socket.emit('redraw', data_array);
                 break;
             case 'undo':
                 DATABASE[socket.session_id][socket.id].pop();
-                socket.broadcast.in(socket.session_id).emit('command', 'clear');
+                data_array = [];
                 for (var user in DATABASE[socket.session_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.session_id][user].length; stroke++) {
                         for (var seg = 0; seg < DATABASE[socket.session_id][user][stroke].length; seg++) {
-                            socket.broadcast.in(socket.session_id).emit('drawing', DATABASE[socket.session_id][user][stroke][seg]);
+                            data_array.push(DATABASE[socket.session_id][user][stroke][seg]);
                         }
                     }
                 }
+                socket.emit('redraw', data_array);
+                socket.broadcast.in(socket.session_id).emit('redraw', data_array);
                 break;
             case 'new_stroke':
                 DATABASE[socket.session_id][socket.id].push([]);
