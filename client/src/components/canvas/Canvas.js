@@ -24,6 +24,9 @@ class Canvas extends Component {
             user_id: "111",
             canvas_id:this.props.room_id
         });
+        // On server, we save user and canvas id on the socket object, which
+        // will disappear when connection is lost. So we need to init again
+        // for reconections.
         socket.on('connect', function() {
             socket.emit('init', {
                 user_id: "111",
