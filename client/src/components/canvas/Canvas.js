@@ -53,14 +53,17 @@ class Canvas extends Component {
     componentWillUnmount() {
         this.props.onRef(null)
     }
+
     componentDidMount() {
        window.addEventListener("resize", this.updateDimensions);
        this.props.onRef(this);
        this.ctx = this.refs.canvas.getContext('2d');
     }
+
     componentWillMount() {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
     }
+
     updateDimensions() {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
         socket.emit('command', 'update');
@@ -85,6 +88,7 @@ class Canvas extends Component {
             lineWidth: lineWidth,
         });
     }
+
     onDrawingEvent(data) {
         this.drawLine(data.x0*this.state.width,
                       data.y0*this.state.height,
@@ -97,16 +101,19 @@ class Canvas extends Component {
         console.log('undo');
         socket.emit('command', 'undo');
     }
+
     onMouseDown(e) {
         this.setState({ active: true });
+        this.preX = e.nativeEvent.offsetX;
+        this.preY = e.nativeEvent.offsetY;
         if(this.state.mode){
 
         }
         else {
-            this.preX = e.nativeEvent.offsetX;
-            this.preY = e.nativeEvent.offsetY;
+
             socket.emit('command', 'new_stroke');
         }
+
     }
 
     onMouseMove(e) {
@@ -114,13 +121,21 @@ class Canvas extends Component {
             return;
         }
         if(this.props.mode){
-
+            let dx =  e.nativeEvent.offsetX - this.preX ;
+            let dy =  e.nativeEvent.offsetY - this.preY;
+            //console.log([this.preX, e.nativeEvent.offsetX]);
+            this.ctx.translate(dx,dy);
+            this.ctx.save();
+            this.ctx.setTransform(1,0,0,1,0,0);
+            this.ctx.clearRect(0,0,this.state.width,this.state.height);
+            this.ctx.restore();
+            socket.emit('command', 'update');
         }
         else {
             this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
-            this.preX = e.nativeEvent.offsetX;
-            this.preY = e.nativeEvent.offsetY;
         }
+        this.preX = e.nativeEvent.offsetX;
+        this.preY = e.nativeEvent.offsetY;
     }
 
     onMouseUp() {
