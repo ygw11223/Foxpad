@@ -22,7 +22,13 @@ class Canvas extends Component {
         this.preY = -1;
         socket.emit('init', {
             user_id: "111",
-            session_id:this.props.room_id,
+            canvas_id:this.props.room_id
+        });
+        socket.on('connect', function() {
+            socket.emit('init', {
+                user_id: "111",
+                canvas_id: this.props.room_id
+            });
         });
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
