@@ -17,7 +17,7 @@ class Canvas extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
-        this.onCommandEvent = this.onCommandEvent.bind(this);
+        this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.preX = -1;
         this.preY = -1;
         socket.emit('init', {
@@ -26,9 +26,21 @@ class Canvas extends Component {
         });
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
-        socket.on('command', this.onCommandEvent);
+        socket.on('redraw', this.onRedrawEvent);
 
     }
+
+    onRedrawEvent(data_array) {
+        const ctx = this.getContext();
+        ctx.clearRect(0, 0, this.state.width, this.state.height);
+        var i = 0;
+        for (i = 0; i < data_array.length; i++) {
+            console.log(data_array[i]);
+            this.onDrawingEvent(data_array[i]);
+        }
+    }
+
+
     componentWillUnmount() {
         this.props.onRef(null)
     }
@@ -68,7 +80,6 @@ class Canvas extends Component {
         });
     }
     onDrawingEvent(data) {
-
         this.drawLine(data.x0*this.state.width,
                       data.y0*this.state.height,
                       data.x1*this.state.width,
@@ -76,18 +87,9 @@ class Canvas extends Component {
                       data.color,
                       data.lineWidth,)
     }
-    onCommandEvent(cmd) {
-        const ctx = this.getContext();
-        if (cmd === "clear") {
-            ctx.clearRect(0, 0, this.state.width, this.state.height);
-        }
-    }
     onUndoEvent(e) {
         console.log('undo');
-        const ctx = this.getContext();
-        ctx.clearRect(0, 0, this.state.width, this.state.height);
         socket.emit('command', 'undo');
-        socket.emit('command', 'update');
     }
     onMouseDown(e) {
         this.setState({ drawing: true });
