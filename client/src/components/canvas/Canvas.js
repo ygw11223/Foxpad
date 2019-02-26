@@ -24,18 +24,9 @@ class Canvas extends Component {
             user_id: "111",
             session_id:this.props.room_id,
         });
-        socket.on('connect', function() { 
-            // When socket reconnect, server lose socket info. So we need to
-            // re-init.
-            socket.emit('init', {
-                user_id: "111",
-                session_id:this.props.room_id,
-            });
-        });
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
-
 
     }
 
