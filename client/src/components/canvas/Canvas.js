@@ -36,15 +36,18 @@ class Canvas extends Component {
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
-
+        this.offsetX = 0;
+        this.offsetY = 0;
     }
 
     onRedrawEvent(data_array) {
-        const ctx = this.getContext();
-        ctx.clearRect(0, 0, this.state.width, this.state.height);
+        this.ctx.save();
+        this.ctx.setTransform(1,0,0,1,0,0);
+        this.ctx.clearRect(0,0,this.state.width,this.state.height);
+        this.ctx.restore();
         var i = 0;
         for (i = 0; i < data_array.length; i++) {
-            console.log(data_array[i]);
+            //console.log(data_array[i]);
             this.onDrawingEvent(data_array[i]);
         }
     }
@@ -66,12 +69,12 @@ class Canvas extends Component {
 
     updateDimensions() {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
+        this.ctx.translate(-this.offsetX,-this.offsetY);
         socket.emit('command', 'update');
     }
 
 
     drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
-
         this.ctx.beginPath();
         this.ctx.moveTo(x0, y0);
         this.ctx.lineTo(x1, y1);
@@ -80,20 +83,20 @@ class Canvas extends Component {
         this.ctx.stroke();
         if(!emit){return;}
         socket.emit('drawing', {
-            x0: x0/this.state.width ,
-            y0: y0/this.state.height,
-            x1: x1/this.state.width ,
-            y1: y1/this.state.height,
+            x0: x0,
+            y0: y0,
+            x1: x1,
+            y1: y1,
             color: color,
             lineWidth: lineWidth,
         });
     }
 
     onDrawingEvent(data) {
-        this.drawLine(data.x0*this.state.width,
-                      data.y0*this.state.height,
-                      data.x1*this.state.width,
-                      data.y1*this.state.height,
+        this.drawLine(data.x0,
+                      data.y0,
+                      data.x1,
+                      data.y1,
                       data.color,
                       data.lineWidth,)
     }
@@ -103,6 +106,7 @@ class Canvas extends Component {
     }
 
     onMouseDown(e) {
+        console.log([this.offsetX, this.offsetY]);
         this.setState({ active: true });
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
@@ -125,14 +129,12 @@ class Canvas extends Component {
             let dy =  e.nativeEvent.offsetY - this.preY;
             //console.log([this.preX, e.nativeEvent.offsetX]);
             this.ctx.translate(dx,dy);
-            this.ctx.save();
-            this.ctx.setTransform(1,0,0,1,0,0);
-            this.ctx.clearRect(0,0,this.state.width,this.state.height);
-            this.ctx.restore();
+            this.offsetX -= dx;
+            this.offsetY -= dy;
             socket.emit('command', 'update');
         }
         else {
-            this.drawLine(this.preX,this.preY, e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.color, this.props.lineWidth, 1)
+            this.drawLine(this.preX + this.offsetX, this.preY + this.offsetY, e.nativeEvent.offsetX + this.offsetX, e.nativeEvent.offsetY+ this.offsetY, this.props.color, this.props.lineWidth, 1)
         }
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
