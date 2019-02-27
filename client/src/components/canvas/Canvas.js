@@ -8,7 +8,6 @@ const style = {
 
 class Canvas extends Component {
     constructor(props) {
-
         super(props);
         this.state = { active: false, height: 700, width: 1000};
         this.onMouseDown = this.onMouseDown.bind(this);
@@ -39,10 +38,10 @@ class Canvas extends Component {
         });
     }
     onRedrawEvent(data_array) {
-        this.ctx.save();
+        this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
-        this.ctx.clearRect(0,0,this.state.width,this.state.height);
-        this.ctx.restore();
+        this.ctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
+        this.ctx.restore(); // restore the translate offset
         var i = 0;
         for (i = 0; i < data_array.length; i++) {
             //console.log(data_array[i]);
@@ -108,14 +107,9 @@ class Canvas extends Component {
         this.setState({ active: true });
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
-        if(this.state.mode){
-
-        }
-        else {
-
+        if(!this.props.mode){
             socket.emit('command', 'new_stroke');
         }
-
     }
 
     onMouseMove(e) {

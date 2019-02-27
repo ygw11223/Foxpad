@@ -16,7 +16,6 @@ class Sidebar extends React.Component {
             <ButtonGroup   vertical >
                 <Button eventKey="white" className='bg-light tool-button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
 
-
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
                                     toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
                     <DropdownToggle   si className='bg-light tool-button' >
@@ -28,8 +27,6 @@ class Sidebar extends React.Component {
                         <DropdownItem eventKey="15" onClick={() => this.props.onChangeWidth("15")}>15</DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>
-
-
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightColor}
                                     toggle={()=>{this.setState({btnDroprightColor: !this.state.btnDroprightColor})}}>
@@ -46,9 +43,6 @@ class Sidebar extends React.Component {
                 <Button eventKey="undo" className='bg-light tool-button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
 
                 <Button eventKey="mode" className='bg-light tool-button' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
-
-                <Button eventKey="mode" className='bg-light' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
-
             </ButtonGroup>
         );
     }
