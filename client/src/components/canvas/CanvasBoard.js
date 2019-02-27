@@ -5,11 +5,11 @@ import Sidebar from '../layout/Sidebar'
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'red', lineWidth: 5};
+        this.state = {color: 'red', lineWidth: 5, mode: false};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
-        
+        this.onChangeMode = this.onChangeMode.bind(this);
     }
 
     changeColor(e) {
@@ -19,23 +19,33 @@ class CanvasBoard extends Component {
     changeWidth(e) {
         this.setState({lineWidth: e})
     }
+
     componentDidMount() {
       console.log(this.canvas.color);
     }
+
     onUndoEvent() {
         this.canvas.onUndoEvent();
     }
+
+    onChangeMode(){
+        this.setState({mode: !this.state.mode})
+    }
+
     render(){
         return(
             <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
                 <div >
-                    <Sidebar onChangeColor={this.changeColor}
+                    <Sidebar mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
+                             onChangeColor={this.changeColor}
                              onChangeWidth={this.changeWidth}
-                             onUndo={this.onUndoEvent}/>
+                             onUndo={this.onUndoEvent}
+                             onChangeMode={this.onChangeMode}/>
                 </div>
                     <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
                         <Canvas
                             onRef={ref => (this.canvas= ref)}
+                            mode={this.state.mode}
                             width={this.state.width}
                             height={this.state.height}
                             color={this.state.color}

@@ -1,7 +1,6 @@
 import React from 'react';
 import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu} from 'reactstrap';
-
-
+import './style.css'
 
 
 class Sidebar extends React.Component {
@@ -15,12 +14,11 @@ class Sidebar extends React.Component {
     render() {
         return (
             <ButtonGroup   vertical >
-                <Button eventKey="white" className='bg-light'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
-
+                <Button eventKey="white" className='bg-light tool-button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
                                     toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
-                    <DropdownToggle   si className='bg-light' >
+                    <DropdownToggle   si className='bg-light tool-button' >
                         <i className="fas fa-pencil-alt" style={{color: 'black'}}></i>
                     </DropdownToggle>
                     <DropdownMenu>
@@ -30,11 +28,9 @@ class Sidebar extends React.Component {
                     </DropdownMenu>
                 </ButtonDropdown>
 
-
-
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightColor}
                                     toggle={()=>{this.setState({btnDroprightColor: !this.state.btnDroprightColor})}}>
-                    <DropdownToggle   si className='bg-light' >
+                    <DropdownToggle   si className='bg-light tool-button' >
                         <i className="fas fa-palette" style={{color: 'black'}}></i>
                     </DropdownToggle>
                     <DropdownMenu>
@@ -44,8 +40,9 @@ class Sidebar extends React.Component {
                     </DropdownMenu>
                 </ButtonDropdown>
 
-                <Button eventKey="undo" className='bg-light' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
+                <Button eventKey="undo" className='bg-light tool-button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
 
+                <Button eventKey="mode" className='bg-light tool-button' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
             </ButtonGroup>
         );
     }
