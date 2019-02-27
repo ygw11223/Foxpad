@@ -6,10 +6,12 @@ const style = {
   backgroundColor: 'white',
 };
 
-
 class Canvas extends Component {
     constructor(props) {
+
         super(props);
+
+        console.log(this.props.room_id);
         this.state = { active: false, height: 700, width: 1000};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -18,28 +20,26 @@ class Canvas extends Component {
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
+        this.onInitCanvas = this.onInitCanvas.bind(this);
         this.preX = -1;
         this.preY = -1;
-        socket.emit('init', {
-            user_id: "111",
-            canvas_id:this.props.room_id
-        });
+        this.onInitCanvas();
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init again
         // for reconections.
-        socket.on('connect', function() {
-            socket.emit('init', {
-                user_id: "111",
-                canvas_id: this.props.room_id
-            });
-        });
+        socket.on('connect', this.onInitCanvas);
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
         this.offsetX = 0;
         this.offsetY = 0;
     }
-
+    onInitCanvas(){
+        socket.emit('init', {
+            user_id: "111",
+            canvas_id: this.props.room_id,
+        });
+    }
     onRedrawEvent(data_array) {
         this.ctx.save();
         this.ctx.setTransform(1,0,0,1,0,0);
