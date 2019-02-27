@@ -10,8 +10,6 @@ class Canvas extends Component {
     constructor(props) {
 
         super(props);
-
-        console.log(this.props.room_id);
         this.state = { active: false, height: 700, width: 1000};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
