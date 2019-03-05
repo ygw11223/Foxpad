@@ -134,6 +134,8 @@ class Canvas extends Component {
 
     onMouseUp() {
         this.setState({ active: false });
+        this.preX = -1;
+        this.preY = -1;
     }
 
     render() {
@@ -146,6 +148,11 @@ class Canvas extends Component {
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
+                onMouseOut={this.onMouseUp}
+                onTouchStart={this.onMouseDown}
+                onTouchMove={this.onMouseMove}
+                onTouchEnd={this.onMouseUp}
+                onTouchCancel={this.onMouseUp}
             />
         );
     }
