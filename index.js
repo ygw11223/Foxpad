@@ -4,6 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port =  3000;
 const hashes = require('short-id');
+var formidable = require('formidable');  
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -29,6 +30,19 @@ app.get('/canvas/*', function (req, res) {
     } else {
         res.sendFile(__dirname + '/client/build/index.html');
     }
+});
+// Post routing for handling image
+app.post('/image', function (req, res){
+    var form = new formidable.IncomingForm();
+    console.log(req);
+    form.parse(req); 
+    form.on('fileBegin', function (name, file){
+        console.log("uploading ", name);
+    });
+    form.on('end', function (){
+        console.log("uploading end.");
+    });
+    res.status(200).send("File received.");
 });
 // Otherwise redirect to a new canvas page.
 app.get('/', function (req, res) {

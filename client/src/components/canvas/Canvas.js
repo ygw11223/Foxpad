@@ -137,7 +137,7 @@ class Canvas extends Component {
             }`
         );
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/", true);
+        xhttp.open("POST", "/image", true);
         xhttp.onreadystatechange = function(err) {
             if (this.readyState === 4 && this.status === 200) {
                 console.log(xhttp.responseText);
