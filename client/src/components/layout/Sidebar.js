@@ -15,7 +15,7 @@ class Sidebar extends React.Component {
     render() {
         return (
             <ButtonGroup   vertical >
-                <Button eventKey="white" className='bg-light'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
+                <Button eventKey="white" className='bg-light'  onClick={() => this.props.onChangeColor("white")}> <i className="fas fa-eraser" style={{color: 'black'}}></i></Button>
 
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
@@ -44,7 +44,9 @@ class Sidebar extends React.Component {
                     </DropdownMenu>
                 </ButtonDropdown>
 
-                <Button eventKey="undo" className='bg-light' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
+                <Button eventKey="undo" className='bg-light' onClick={() => this.props.onUndo()} > <i className="fas fa-undo" style={{color: 'black'}}></i></Button>
+
+                <Button eventKey="upload" className='bg-light' onClick={() => this.props.showForm()} > <i className="fas fa-image" style={{color: 'black'}}></i></Button>
 
             </ButtonGroup>
         );

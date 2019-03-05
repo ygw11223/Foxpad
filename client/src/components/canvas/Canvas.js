@@ -18,8 +18,11 @@ class Canvas extends Component {
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onCommandEvent = this.onCommandEvent.bind(this);
+        this.onUploadEvent = this.onUploadEvent.bind(this);
+        this.showForm = this.showForm.bind(this);
         this.preX = -1;
         this.preY = -1;
+        this.fileInput = React.createRef();
         socket.emit('init', {
             user_id: "111",
             session_id:this.props.room_id,
@@ -89,6 +92,33 @@ class Canvas extends Component {
         socket.emit('command', 'undo');
         socket.emit('command', 'update');
     }
+    showForm(e) {
+        var form = document.getElementById("myform");
+        console.log("display form");
+        form.style.display="block";
+    }
+    onUploadEvent() {
+        console.log("upload");
+        //document.getElementById("myform").style.display="none";
+        var formData = new FormData();
+        formData.append(this.fileInput.current.files[0].name, this.fileInput.current.files[0]);
+        alert(
+            `Selected file - ${
+                this.fileInput.current.files[0].name
+            }`
+        );
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/", true);
+        xhttp.onreadystatechange = function(err) {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log(xhttp.responseText);
+            }
+            else {
+                console.log(err);
+            }
+        };
+        xhttp.send(formData);
+    }
     onMouseDown(e) {
         this.setState({ drawing: true });
         const ctx = this.getContext();
@@ -116,6 +146,7 @@ class Canvas extends Component {
 
     render() {
         return (
+            <div>
             <canvas
                 ref="canvas"
                 style={style}
@@ -125,6 +156,13 @@ class Canvas extends Component {
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
             />
+
+            <form id="myform" name="myform" style={{display:"none"}} onSubmit={this.onUploadEvent}>
+                <input type="file" name="image" accept="image/*" ref={this.fileInput}/>
+                <br />
+                <button type="submit">Upload</button>
+            </form>
+            </div>
         );
     }
 }
