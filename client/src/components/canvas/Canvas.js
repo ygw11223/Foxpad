@@ -19,7 +19,6 @@ class Canvas extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
-        this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
@@ -31,6 +30,9 @@ class Canvas extends Component {
         // will disappear when connection is lost. So we need to init again
         // for reconections.
         socket.on('connect', this.onInitCanvas);
+        this.onUploadEvent = this.onUploadEvent.bind(this);
+        this.showForm = this.showForm.bind(this);
+        this.fileInput = React.createRef();
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
@@ -116,7 +118,37 @@ class Canvas extends Component {
         console.log('undo');
         socket.emit('command', 'undo');
     }
+<<<<<<< HEAD
 
+=======
+    showForm(e) {
+        var form = document.getElementById("myform");
+        console.log("display form");
+        form.style.display="block";
+    }
+    onUploadEvent() {
+        console.log("upload");
+        //document.getElementById("myform").style.display="none";
+        var formData = new FormData();
+        formData.append(this.fileInput.current.files[0].name, this.fileInput.current.files[0]);
+        alert(
+            `Selected file - ${
+                this.fileInput.current.files[0].name
+            }`
+        );
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/", true);
+        xhttp.onreadystatechange = function(err) {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log(xhttp.responseText);
+            }
+            else {
+                console.log(err);
+            }
+        };
+        xhttp.send(formData);
+    }
+>>>>>>> image uploading in progress
     onMouseDown(e) {
         console.log([this.offsetX, this.offsetY]);
         this.setState({ active: true });
@@ -161,7 +193,7 @@ class Canvas extends Component {
     zoom(direction) {
         let dx =  this.scale*this.preX;
         let dy =  this.scale*this.preY;
-        let factor = Math.pow(2, direction);//set scale factor to 2 
+        let factor = Math.pow(2, direction);//set scale factor to 2
         // this.ctx.translate(-dx, -dy);
         // this.offsetX += dx;
         // this.offsetY += dy;
@@ -179,6 +211,7 @@ class Canvas extends Component {
     }
     render() {
         return (
+            <div>
             <canvas
                 ref="canvas"
                 style={style}
@@ -194,6 +227,13 @@ class Canvas extends Component {
                 onTouchCancel={this.onMouseUp}
                 //onWheel={this.onScrollEvent}
             />
+
+            <form id="myform" name="myform" style={{display:"none"}} onSubmit={this.onUploadEvent}>
+                <input type="file" name="image" accept="image/*" ref={this.fileInput}/>
+                <br />
+                <button type="submit">Upload</button>
+            </form>
+            </div>
         );
     }
 }
