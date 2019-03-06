@@ -44,7 +44,7 @@ class CanvasBoard extends Component {
                              onChangeColor={this.changeColor}
                              onChangeWidth={this.changeWidth}
                              onUndo={this.onUndoEvent}
-                             showForm={this.showForm}/>
+                             showForm={this.showForm}
                              onChangeMode={this.onChangeMode}/>
                 </div>
                     <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
