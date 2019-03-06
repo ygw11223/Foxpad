@@ -3,7 +3,9 @@ import openSocket from 'socket.io-client';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 const socket = openSocket();
+
 
 const style = {
   backgroundColor: 'white',
@@ -12,7 +14,7 @@ const style = {
 class Canvas extends Component {
     constructor(props) {
         super(props);
-        this.state = { active: false, height: 700, width: 1000};
+        this.state = { drawing: false, height: 700, width: 1000, modal: false};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -118,13 +120,13 @@ class Canvas extends Component {
         console.log('undo');
         socket.emit('command', 'undo');
     }
-<<<<<<< HEAD
-
-=======
     showForm(e) {
-        var form = document.getElementById("myform");
-        console.log("display form");
-        form.style.display="block";
+        // var form = document.getElementById("myform");
+        // console.log("display form");
+        // form.style.display="block";
+        this.setState(prevState => ({
+            modal: !prevState.modal
+        }));
     }
     onUploadEvent() {
         console.log("upload");
@@ -147,8 +149,9 @@ class Canvas extends Component {
             }
         };
         xhttp.send(formData);
+        alert(window.location.href);
+        window.location = window.location.href;
     }
->>>>>>> image uploading in progress
     onMouseDown(e) {
         console.log([this.offsetX, this.offsetY]);
         this.setState({ active: true });
@@ -212,6 +215,7 @@ class Canvas extends Component {
     render() {
         return (
             <div>
+<<<<<<< HEAD
             <canvas
                 ref="canvas"
                 style={style}
@@ -227,12 +231,31 @@ class Canvas extends Component {
                 onTouchCancel={this.onMouseUp}
                 //onWheel={this.onScrollEvent}
             />
+=======
+                <canvas
+                    ref="canvas"
+                    style={style}
+                    height = {this.state.height }
+                    width  = {this.state.width }
+                    onMouseDown={this.onMouseDown}
+                    onMouseMove={this.onMouseMove}
+                    onMouseUp={this.onMouseUp}
+                />
+>>>>>>> merging with master
 
-            <form id="myform" name="myform" style={{display:"none"}} onSubmit={this.onUploadEvent}>
-                <input type="file" name="image" accept="image/*" ref={this.fileInput}/>
-                <br />
-                <button type="submit">Upload</button>
-            </form>
+                <Modal isOpen={this.state.modal} toggle={this.showForm}>
+                    <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
+                    <ModalBody>
+                      <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
+                          <input type="file" name="image" accept="image/*" ref={this.fileInput}/>
+                          <br />
+                          <button type="submit">Upload</button>
+                      </form>
+                     </ModalBody>
+                     <ModalFooter>
+                        <Button color="secondary" onClick={this.showForm}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
             </div>
         );
     }
