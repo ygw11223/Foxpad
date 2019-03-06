@@ -40,13 +40,11 @@ class Sidebar extends React.Component {
                     </DropdownMenu>
                 </ButtonDropdown>
 
-<<<<<<< HEAD
                 <Button eventKey="undo" className='bg-light tool-button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
-                <Button eventKey="upload" className='bg-light' onClick={() => this.props.showForm()} > <i className="fas fa-image" style={{color: 'black'}}></i></Button>
-
                 <Button eventKey="mode" className='bg-light tool-button' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
                 <Button eventKey="zoom-in" className='bg-light tool-button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus" style={{color: 'black'}}></i></Button>
                 <Button eventKey="zoom-out" className='bg-light tool-button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus" style={{color: 'black'}}></i></Button>
+                <Button eventKey="upload" className='bg-light tool-button' onClick={() => this.props.showForm()} > <i className="fas fa-image" style={{color: 'black'}}></i></Button>
             </ButtonGroup>
         );
     }

@@ -215,7 +215,6 @@ class Canvas extends Component {
     render() {
         return (
             <div>
-<<<<<<< HEAD
             <canvas
                 ref="canvas"
                 style={style}
@@ -231,17 +230,6 @@ class Canvas extends Component {
                 onTouchCancel={this.onMouseUp}
                 //onWheel={this.onScrollEvent}
             />
-=======
-                <canvas
-                    ref="canvas"
-                    style={style}
-                    height = {this.state.height }
-                    width  = {this.state.width }
-                    onMouseDown={this.onMouseDown}
-                    onMouseMove={this.onMouseMove}
-                    onMouseUp={this.onMouseUp}
-                />
->>>>>>> merging with master
 
                 <Modal isOpen={this.state.modal} toggle={this.showForm}>
                     <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
