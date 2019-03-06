@@ -2,9 +2,9 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
-var formidable = require('formidable');  
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -20,6 +20,13 @@ DATABASE = {}
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
 app.use('/static', express.static(__dirname + '/client/build'))
+// Request for file uploading script
+app.get('/socket.io.js', (req, res, next) => {
+    return res.sendFile(__dirname + '/node_modules/socket.io-client/dist/socket.io.js');
+});
+app.get('/socket.io-file-client.js', (req, res, next) => {
+    return res.sendFile(__dirname + '/node_modules/socket.io-file-client/socket.io-file-client.js');
+});
 // Request for opening an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get session id.
@@ -30,19 +37,6 @@ app.get('/canvas/*', function (req, res) {
     } else {
         res.sendFile(__dirname + '/client/build/index.html');
     }
-});
-// Post routing for handling image
-app.post('/image', function (req, res){
-    var form = new formidable.IncomingForm();
-    console.log(req);
-    form.parse(req); 
-    form.on('fileBegin', function (name, file){
-        console.log("uploading ", name);
-    });
-    form.on('end', function (){
-        console.log("uploading end.");
-    });
-    res.status(200).send("File received.");
 });
 // Otherwise redirect to a new canvas page.
 app.get('/', function (req, res) {
@@ -120,7 +114,38 @@ function onConnection(socket){
         console.log("One user left", socket.canvas_id);
     });
 
-
+    var uploader = new SocketIOFile(socket, {
+        // uploadDir: {         // multiple directories
+        //  music: 'data/music',
+        //  document: 'data/document'
+        // },
+        uploadDir: 'images',
+        // TODO(Guowei) : Add accept format and adjust parameters later.
+        // accepts: [],
+        // maxFileSize: 4194304,
+        // transmissionDelay: 0,
+    });
+    uploader.on('start', (fileInfo) => {
+        console.log('Start uploading');
+        console.log(fileInfo);
+    });
+    uploader.on('stream', (fileInfo) => {
+        console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
+    });
+    uploader.on('complete', (fileInfo) => {
+        console.log('Upload Complete.');
+        console.log(fileInfo);
+        fs.readFile(__dirname + '/images/' + fileInfo.name, function(err, buf){
+            socket.broadcast.in(socket.canvas_id).emit('iamge', buf.toString('base64'));
+            console.log('Image file broadcasted');
+        });
+    });
+    uploader.on('error', (err) => {
+        console.log('Error!', err);
+    });
+    uploader.on('abort', (fileInfo) => {
+        console.log('Aborted: ', fileInfo);
+    });
 }
 
 io.on('connection', onConnection);
