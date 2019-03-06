@@ -11,7 +11,7 @@
     "express": "^4.16.4",
     "short-id": "0.1.0-1",
     "socket.io": "latest",
-    "formidable": "latest"
+    "socket.io-file": "latest"
   },
   "scripts": {
     "start": "node index"
