@@ -18,7 +18,6 @@ class Canvas extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
-        this.onCommandEvent = this.onCommandEvent.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.preX = -1;
