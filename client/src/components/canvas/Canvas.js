@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import openSocket from 'socket.io-client';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import SocketIO from 'socket.io-client';
+import SocketIOFileClient from 'socket.io-file-client';
 const socket = openSocket();
 
 
@@ -109,36 +111,18 @@ class Canvas extends Component {
         socket.emit('command', 'undo');
     }
     showForm(e) {
-        // var form = document.getElementById("myform");
-        // console.log("display form");
-        // form.style.display="block";
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
     }
-    onUploadEvent() {
+    onUploadEvent(e) {
+        e.preventDefault();
+        var socket = SocketIO('http://localhost:3000');
+        var uploader = new SocketIOFileClient(socket);
         console.log("upload");
-        //document.getElementById("myform").style.display="none";
-        var formData = new FormData();
-        formData.append(this.fileInput.current.files[0].name, this.fileInput.current.files[0]);
-        alert(
-            `Selected file - ${
-                this.fileInput.current.files[0].name
-            }`
-        );
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/image", true);
-        xhttp.onreadystatechange = function(err) {
-            if (this.readyState === 4 && this.status === 200) {
-                console.log(xhttp.responseText);
-            }
-            else {
-                console.log(err);
-            }
-        };
-        xhttp.send(formData);
-        alert(window.location.href);
-        window.location = window.location.href;
+        var file = document.getElementById("file");
+        var id = uploader.upload(file);
+        console.log(id);
     }
     onMouseDown(e) {
         console.log([this.offsetX, this.offsetY]);
@@ -191,9 +175,8 @@ class Canvas extends Component {
                     <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
                     <ModalBody>
                       <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                          <input type="file" name="image" accept="image/*" ref={this.fileInput}/>
-                          <br />
-                          <button type="submit">Upload</button>
+                        <input type="file" id="file" multiple />
+                        <input type="submit" value="Upload" />
                       </form>
                      </ModalBody>
                      <ModalFooter>
