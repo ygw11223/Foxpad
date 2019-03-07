@@ -20,13 +20,6 @@ DATABASE = {}
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
 app.use('/static', express.static(__dirname + '/client/build'))
-// Request for file uploading script
-app.get('/socket.io.js', (req, res, next) => {
-    return res.sendFile(__dirname + '/node_modules/socket.io-client/dist/socket.io.js');
-});
-app.get('/socket.io-file-client.js', (req, res, next) => {
-    return res.sendFile(__dirname + '/node_modules/socket.io-file-client/socket.io-file-client.js');
-});
 // Request for opening an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get session id.
@@ -136,10 +129,6 @@ function onConnection(socket){
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
         console.log(fileInfo);
-        fs.readFile(__dirname + '/images/' + fileInfo.name, function(err, buf){
-            socket.broadcast.in(socket.canvas_id).emit('iamge', buf.toString('base64'));
-            console.log('Image file broadcasted');
-        });
     });
     uploader.on('error', (err) => {
         console.log('Error!', err);
