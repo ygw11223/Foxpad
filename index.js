@@ -49,19 +49,21 @@ function onConnection(socket){
         // TODO : Save infomation on socket object can potentially crash
         // server. Need to investigate a better solution.
         socket.canvas_id = auth_info.canvas_id;
+        socket.user_id = auth_info.user_id
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
-        DATABASE[socket.canvas_id][socket.id] = [];
-
+	if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+            DATABASE[socket.canvas_id][socket.user_id] = [];
+        }
         console.log("One user joined", socket.canvas_id);
     });
 
     // Save drawing data and broadcast to all of its peers
     socket.on('drawing', (data) => {
         // TODO(Guowei) : Update when connecting firebase to server.
-        var idx_last = DATABASE[socket.canvas_id][socket.id].length - 1;
-        DATABASE[socket.canvas_id][socket.id][idx_last].push(data);
+        var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
+        DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
     });
 
@@ -81,7 +83,7 @@ function onConnection(socket){
                 socket.emit('redraw', data_array);
                 break;
             case 'undo':
-                DATABASE[socket.canvas_id][socket.id].pop();
+                DATABASE[socket.canvas_id][socket.user_id].pop();
                 data_array = [];
                 for (var user in DATABASE[socket.canvas_id]) {
                     for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
@@ -94,12 +96,11 @@ function onConnection(socket){
                 socket.broadcast.in(socket.canvas_id).emit('redraw', data_array);
                 break;
             case 'new_stroke':
-                DATABASE[socket.canvas_id][socket.id].push([]);
+                DATABASE[socket.canvas_id][socket.user_id].push([]);
                 break;
             default:
                 console.log("Invalid command received.")
         }
-
     });
 
     socket.on('disconnect', () => {
