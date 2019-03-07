@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import openSocket from 'socket.io-client';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import SocketIO from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
-const socket = openSocket();
 
+const socket = openSocket();
+const uploader = new SocketIOFileClient(socket);
 
 const style = {
   backgroundColor: 'white',
@@ -117,8 +117,6 @@ class Canvas extends Component {
     }
     onUploadEvent(e) {
         e.preventDefault();
-        var socket = SocketIO('http://localhost:3000');
-        var uploader = new SocketIOFileClient(socket);
         console.log("upload");
         var file = document.getElementById("file");
         var id = uploader.upload(file);
