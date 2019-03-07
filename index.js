@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port =  3000;
+const port =  2000;
 const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
@@ -52,8 +52,9 @@ function onConnection(socket){
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
-        DATABASE[socket.canvas_id][socket.user_id] = [];
-
+	if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+            DATABASE[socket.canvas_id][socket.user_id] = [];
+        }
         console.log("One user joined", socket.canvas_id);
     });
 
@@ -99,7 +100,6 @@ function onConnection(socket){
             default:
                 console.log("Invalid command received.")
         }
-
     });
 
     socket.on('disconnect', () => {
