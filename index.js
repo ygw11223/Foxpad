@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port =  2000;
+const port =  3000;
 const hashes = require('short-id');
 
 // Maintain infomation on active sessions. Currently only conatins number of
