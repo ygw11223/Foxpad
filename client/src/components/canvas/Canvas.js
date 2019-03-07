@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import openSocket from 'socket.io-client';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 const socket = openSocket();
 
 const style = {
@@ -31,12 +34,21 @@ class Canvas extends Component {
         this.offsetX = 0;
         this.offsetY = 0;
     }
+
     onInitCanvas(){
+        let id = cookies.get('cd_user_name');
+        if (id == undefined) {
+            // TODO : This is not guaranteed unique. Look for better id generator.
+            id = Math.random().toString(36).substr(2, 9);
+            cookies.set('cd_user_name', id);
+            console.log(id)
+        }
         socket.emit('init', {
-            user_id: "111",
+            user_id: id,
             canvas_id: this.props.room_id,
         });
     }
+
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
@@ -48,7 +60,6 @@ class Canvas extends Component {
             this.onDrawingEvent(data_array[i]);
         }
     }
-
 
     componentWillUnmount() {
         this.props.onRef(null)
