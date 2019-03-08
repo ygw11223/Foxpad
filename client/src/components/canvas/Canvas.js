@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import openSocket from 'socket.io-client';
+import SocketIOFileClient from 'socket.io-file-client';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
@@ -23,6 +25,7 @@ class Canvas extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
+        this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);

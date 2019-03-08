@@ -9,12 +9,9 @@ class CanvasBoard extends Component {
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
-<<<<<<< HEAD
+        this.showForm = this.showForm.bind(this);
         this.onChangeMode = this.onChangeMode.bind(this);
         this.onZoom = this.onZoom.bind(this);
-=======
-        this.showForm = this.showForm.bind(this);
->>>>>>> image uploading in progress
     }
 
     changeColor(e) {
@@ -31,6 +28,9 @@ class CanvasBoard extends Component {
 
     onUndoEvent() {
         this.canvas.onUndoEvent();
+    }
+    showForm() {
+        this.canvas.showForm();
     }
 
     onZoom(direction) {
