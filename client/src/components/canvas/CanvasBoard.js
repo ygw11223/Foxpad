@@ -41,10 +41,6 @@ class CanvasBoard extends Component {
         this.setState({mode: !this.state.mode})
     }
 
-    showForm() {
-        this.canvas.showForm();
-    }
-
     render(){
         return(
             <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
