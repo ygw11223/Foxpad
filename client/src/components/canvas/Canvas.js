@@ -1,13 +1,10 @@
 import React, {Component} from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
 import Cookies from 'universal-cookie';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import SocketIOFileClient from 'socket.io-file-client';
-
 const socket = openSocket();
 const uploader = new SocketIOFileClient(socket);
 
