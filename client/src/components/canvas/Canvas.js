@@ -21,6 +21,9 @@ class Canvas extends Component {
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
+        //this.onScrollEvent = this.onScrollEvent.bind(this);
+        this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
+        this.zoom = this.zoom.bind(this);
         this.preX = -1;
         this.preY = -1;
         this.onInitCanvas();
@@ -33,6 +36,7 @@ class Canvas extends Component {
         socket.on('redraw', this.onRedrawEvent);
         this.offsetX = 0;
         this.offsetY = 0;
+        this.scale = 1;
     }
 
     onInitCanvas(){
@@ -122,7 +126,9 @@ class Canvas extends Component {
             socket.emit('command', 'new_stroke');
         }
     }
-
+    mapWindowToCanvas(x, offset) {
+        return x*this.scale+offset;
+    }
     onMouseMove(e) {
         if (!this.state.active) {
             return;
@@ -137,7 +143,13 @@ class Canvas extends Component {
             socket.emit('command', 'update');
         }
         else {
-            this.drawLine(this.preX + this.offsetX, this.preY + this.offsetY, e.nativeEvent.offsetX + this.offsetX, e.nativeEvent.offsetY+ this.offsetY, this.props.color, this.props.lineWidth, 1)
+            this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
+                          this.mapWindowToCanvas(this.preY, this.offsetY),
+                          this.mapWindowToCanvas(e.nativeEvent.offsetX, this.offsetX),
+                          this.mapWindowToCanvas(e.nativeEvent.offsetY, this.offsetY),
+                          this.props.color,
+                          this.props.lineWidth,
+                          1)
         }
         this.preX = e.nativeEvent.offsetX;
         this.preY = e.nativeEvent.offsetY;
@@ -146,7 +158,25 @@ class Canvas extends Component {
     onMouseUp() {
         this.setState({ active: false });
     }
+    zoom(direction) {
+        let dx =  this.scale*this.preX;
+        let dy =  this.scale*this.preY;
+        let factor = Math.pow(2, direction);//set scale factor to 2 
+        // this.ctx.translate(-dx, -dy);
+        // this.offsetX += dx;
+        // this.offsetY += dy;
+        this.ctx.scale(factor,factor);
+        //linear algebra
+        this.scale /= factor;
+        this.offsetX /= factor;
+        this.offsetY/= factor;
+        // this.ctx.translate(dx, dy);
+        // this.offsetX -= dx;
+        // this.offsetY -= dy;
 
+        //console.log([this.offsetX,this.offsetY]);
+        socket.emit('command', 'update');
+    }
     render() {
         return (
             <canvas
@@ -157,6 +187,12 @@ class Canvas extends Component {
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
+                onMouseOut={this.onMouseUp}
+                onTouchStart={this.onMouseDown}
+                onTouchMove={this.onMouseMove}
+                onTouchEnd={this.onMouseUp}
+                onTouchCancel={this.onMouseUp}
+                //onWheel={this.onScrollEvent}
             />
         );
     }
