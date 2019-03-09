@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
 import openSocket from 'socket.io-client';
+import SocketIOFileClient from 'socket.io-file-client';
 import Cookies from 'universal-cookie';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
 const socket = openSocket();
+const uploader = new SocketIOFileClient(socket);
 
 const style = {
   backgroundColor: 'white',
@@ -12,7 +15,7 @@ const style = {
 class Canvas extends Component {
     constructor(props) {
         super(props);
-        this.state = { active: false, height: 700, width: 1000};
+        this.state = { drawing: false, height: 700, width: 1000, modal: false};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -31,6 +34,9 @@ class Canvas extends Component {
         // will disappear when connection is lost. So we need to init again
         // for reconections.
         socket.on('connect', this.onInitCanvas);
+        this.onUploadEvent = this.onUploadEvent.bind(this);
+        this.showForm = this.showForm.bind(this);
+        this.fileInput = React.createRef();
         socket.on('drawing', this.onDrawingEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
@@ -116,7 +122,18 @@ class Canvas extends Component {
         console.log('undo');
         socket.emit('command', 'undo');
     }
-
+    showForm(e) {
+        this.setState(prevState => ({
+            modal: !prevState.modal
+        }));
+    }
+    onUploadEvent(e) {
+        e.preventDefault();
+        console.log("upload");
+        var file = document.getElementById("file");
+        var id = uploader.upload(file);
+        console.log(id);
+    }
     onMouseDown(e) {
         console.log([this.offsetX, this.offsetY]);
         this.setState({ active: true });
@@ -161,7 +178,7 @@ class Canvas extends Component {
     zoom(direction) {
         let dx =  this.scale*this.preX;
         let dy =  this.scale*this.preY;
-        let factor = Math.pow(2, direction);//set scale factor to 2 
+        let factor = Math.pow(2, direction);//set scale factor to 2
         // this.ctx.translate(-dx, -dy);
         // this.offsetX += dx;
         // this.offsetY += dy;
@@ -179,6 +196,7 @@ class Canvas extends Component {
     }
     render() {
         return (
+            <div>
             <canvas
                 ref="canvas"
                 style={style}
@@ -194,6 +212,20 @@ class Canvas extends Component {
                 onTouchCancel={this.onMouseUp}
                 //onWheel={this.onScrollEvent}
             />
+
+                <Modal isOpen={this.state.modal} toggle={this.showForm}>
+                    <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
+                    <ModalBody>
+                      <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
+                        <input type="file" id="file" multiple />
+                        <input type="submit" value="Upload" />
+                      </form>
+                     </ModalBody>
+                     <ModalFooter>
+                        <Button color="secondary" onClick={this.showForm}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+            </div>
         );
     }
 }
