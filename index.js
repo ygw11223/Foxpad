@@ -5,8 +5,12 @@ const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
+<<<<<<< 07a6d86a013f53bf70ae26f117762c6ceb522df5
 const cv = require('opencv4nodejs');
 const MaxImageLevel = 3;
+=======
+const fs = require('fs');
+>>>>>>> add image broadcasting on server
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -19,6 +23,8 @@ CANVAS_IDS = {};
 DATABASE = {};
 
 IMAGES = {};
+
+IMAGES = {}
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"

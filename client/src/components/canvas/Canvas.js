@@ -177,6 +177,7 @@ class Canvas extends Component {
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
     }
+
     onUndoEvent(e) {
         console.log('undo');
         socket.emit('command', 'undo');
