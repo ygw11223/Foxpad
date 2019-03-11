@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
+const fs = require('fs');
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -15,6 +16,8 @@ CANVAS_IDS = {}
 // TODO(Guowei) : Update when connecting firebase to server.
 // TODO(Guowei) : Maybe need a r/w lock.
 DATABASE = {}
+
+IMAGES = {}
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
@@ -37,7 +40,6 @@ app.get('/', function (req, res) {
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
-
     res.redirect('/canvas/' + id);
     console.log("New session created:", id);
 });
@@ -53,7 +55,7 @@ function onConnection(socket){
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
-	if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+        if (!(socket.user_id in DATABASE[socket.canvas_id])) {
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
         console.log("One user joined", socket.canvas_id);
@@ -65,6 +67,12 @@ function onConnection(socket){
         var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
         DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
+    });
+
+    socket.on('image', (position) => {
+        if (socket.session in IMAGES) {
+            // TODO(Guowei) : add image broadcasting.
+        }
     });
 
     socket.on('command', (cmd) => {
@@ -128,6 +136,11 @@ function onConnection(socket){
     });
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
+        fs.readFile(fileInfo.uploadDir, function read(err, data) {
+            IMAGES[socket.canvas_id] = data.toString('base64');
+            socket.emit('image', IMAGES[socket.canvas_id]);
+            socket.broadcast.in(socket.canvas_id).emit('image',  IMAGES[socket.canvas_id]);
+        });
         console.log(fileInfo);
     });
     uploader.on('error', (err) => {

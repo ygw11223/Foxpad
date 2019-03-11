@@ -26,6 +26,7 @@ class Canvas extends Component {
         this.onInitCanvas = this.onInitCanvas.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
+        this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.preX = -1;
         this.preY = -1;
@@ -38,6 +39,7 @@ class Canvas extends Component {
         this.showForm = this.showForm.bind(this);
         this.fileInput = React.createRef();
         socket.on('drawing', this.onDrawingEvent);
+        socket.on('image', this.onImageEvent);
         socket.emit('command', 'update');
         socket.on('redraw', this.onRedrawEvent);
         this.offsetX = 0;
@@ -117,6 +119,17 @@ class Canvas extends Component {
                       data.color,
                       data.lineWidth,)
     }
+
+    onImageEvent(data) {
+        this.props.onRef(this);
+        var ctx = this.refs.canvas.getContext('2d');
+        var img = new Image();
+        img.src = 'data:image/jpeg;base64,' + data;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        }
+    }
+
     onUndoEvent(e) {
         console.log('undo');
         socket.emit('command', 'undo');
