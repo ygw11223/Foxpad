@@ -5,7 +5,7 @@ import Cookies from 'universal-cookie';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
-const socket = openSocket();
+const socket;
 const uploader = new SocketIOFileClient(socket);
 
 const style = {
@@ -26,11 +26,11 @@ class Canvas extends Component {
         this.onInitCanvas = this.onInitCanvas.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
+        this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.fileInput = React.createRef();
-
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
@@ -39,7 +39,8 @@ class Canvas extends Component {
 
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init again
-        // for reconections.        
+        // for reconections.
+        socket = openSocket();
         socket.on('connect', this.onInitCanvas);
     }
 
@@ -125,6 +126,17 @@ class Canvas extends Component {
                       data.color,
                       data.lineWidth,)
     }
+
+    onImageEvent(data) {
+        this.props.onRef(this);
+        var ctx = this.refs.canvas.getContext('2d');
+        var img = new Image();
+        img.src = 'data:image/jpeg;base64,' + data;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        }
+    }
+
     onUndoEvent(e) {
         console.log('undo');
         socket.emit('command', 'undo');
