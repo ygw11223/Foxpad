@@ -52,6 +52,9 @@ app.get('/new_canvas', function (req, res) {
 app.get('/*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 });
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/client/build/login.html');
+});
 
 
 function onConnection(socket){
