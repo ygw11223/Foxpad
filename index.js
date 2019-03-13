@@ -31,8 +31,7 @@ app.get('/canvas/*', function (req, res) {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
-// Otherwise redirect to a new canvas page.
-app.get('/', function (req, res) {
+app.get('/new_canvas', function (req, res) {
     // Create a new session id.
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
@@ -40,6 +39,9 @@ app.get('/', function (req, res) {
 
     res.redirect('/canvas/' + id);
     console.log("New session created:", id);
+});
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/client/build/login.html');
 });
 
 
