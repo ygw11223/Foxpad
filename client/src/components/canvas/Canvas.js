@@ -182,11 +182,13 @@ class Canvas extends Component {
         console.log('undo');
         socket.emit('command', 'undo');
     }
+
     showForm(e) {
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
     }
+
     onUploadEvent(e) {
         e.preventDefault();
         console.log("upload");
@@ -194,6 +196,7 @@ class Canvas extends Component {
         var id = uploader.upload(file);
         console.log(id);
     }
+
     onMouseDown(e) {
 
         this.setState({ active: true });
