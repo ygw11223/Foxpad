@@ -8,8 +8,19 @@ const cookies = new Cookies();
 const socket;
 const uploader = new SocketIOFileClient(socket);
 
-const style = {
-  backgroundColor: 'white',
+const styleCanvas = {
+  zIndex: '2',
+  position:'absolute',
+  left:'54px',
+  top:'4px',
+};
+
+const stylePicture = {
+    backgroundColor: 'white',
+    zIndex: '1',
+    position:'absolute',
+    left:'54px',
+    top:'4px',
 };
 
 class Canvas extends Component {
@@ -87,6 +98,7 @@ class Canvas extends Component {
        window.addEventListener("resize", this.updateDimensions);
        this.props.onRef(this);
        this.ctx = this.refs.canvas.getContext('2d');
+       this.pctx = this.refs.picture.getContext('2d');
     }
 
     componentWillMount() {
@@ -128,8 +140,9 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
+        console.log("image");
         this.props.onRef(this);
-        var ctx = this.refs.canvas.getContext('2d');
+        var ctx = this.refs.picture.getContext('2d');
         var img = new Image();
         img.src = 'data:image/jpeg;base64,' + data;
         img.onload = function () {
@@ -244,7 +257,7 @@ class Canvas extends Component {
             <div>
             <canvas
                 ref="canvas"
-                style={style}
+                style={styleCanvas}
                 height = {this.state.height }
                 width  = {this.state.width }
                 onMouseDown={this.onMouseDown}
@@ -256,6 +269,12 @@ class Canvas extends Component {
                 onTouchEnd={this.onMouseUp}
                 onTouchCancel={this.onMouseUp}
                 //onWheel={this.onScrollEvent}
+            />
+            <canvas
+                ref="picture"
+                style={stylePicture}
+                height = {this.state.height }
+                width  = {this.state.width }
             />
 
                 <Modal isOpen={this.state.modal} toggle={this.showForm}>
