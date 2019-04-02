@@ -35,6 +35,7 @@ class Canvas extends Component {
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
+        this.onEmitImg = this.onEmitImg.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
@@ -45,17 +46,19 @@ class Canvas extends Component {
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init again
         // for reconections.
-        socket.on('connect', this.onInitCanvas);
+
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.fileInput = React.createRef();
-        socket.on('drawing', this.onDrawingEvent);
-        socket.on('image', this.onImageEvent);
-        socket.emit('command', 'update');
-        socket.on('redraw', this.onRedrawEvent);
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
+        socket.on('drawing', this.onDrawingEvent);
+        socket.on('image', this.onImageEvent);
+        socket.on('update', (cmd)=>{ if(cmd === "image_ready") {this.onEmitImg();}});
+        socket.on('redraw', this.onRedrawEvent);
+        socket.on('connect', this.onInitCanvas);
+        socket.emit('command', 'update');
     }
 
     onInitCanvas(){
@@ -70,8 +73,13 @@ class Canvas extends Component {
             user_id: id,
             canvas_id: this.props.room_id,
         });
+        this.onEmitImg();
     }
 
+    onEmitImg(){
+        console.log('emit image');
+        socket.emit('image',{x:this.offsetX, y: this.offsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+    }
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
@@ -102,6 +110,7 @@ class Canvas extends Component {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
         this.ctx.translate(-this.offsetX,-this.offsetY);
         socket.emit('command', 'update');
+        this.onEmitImg();
     }
 
 
@@ -136,9 +145,11 @@ class Canvas extends Component {
         console.log("image");
         this.props.onRef(this);
         var ctx = this.refs.picture.getContext('2d');
+        var state = this.state;
         var img = new Image();
         img.src = 'data:image/jpeg;base64,' + data;
         img.onload = function () {
+            ctx.clearRect(0,0, state.width, state.height);
             ctx.drawImage(img, 0, 0);
         }
     }
@@ -211,6 +222,7 @@ class Canvas extends Component {
             this.offsetX -= dx;
             this.offsetY -= dy;
             socket.emit('command', 'update');
+            this.onEmitImg();
         }
         else {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -245,6 +257,7 @@ class Canvas extends Component {
         // this.offsetY -= dy;
 
         socket.emit('command', 'update');
+        this.onEmitImg();
     }
     render() {
         return (
