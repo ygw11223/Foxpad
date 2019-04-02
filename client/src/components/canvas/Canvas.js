@@ -167,6 +167,7 @@ class Canvas extends Component {
         console.log(id);
     }
     onMouseDown(e) {
+
         this.setState({ active: true });
         let currentX = 0;
         let currentY = 0;
@@ -199,7 +200,7 @@ class Canvas extends Component {
 
         let currentX = 0;
         let currentY = 0;
-        
+
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;

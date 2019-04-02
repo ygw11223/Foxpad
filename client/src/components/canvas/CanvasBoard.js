@@ -22,10 +22,6 @@ class CanvasBoard extends Component {
         this.setState({lineWidth: e})
     }
 
-    componentDidMount() {
-      console.log(this.canvas.color);
-    }
-
     onUndoEvent() {
         this.canvas.onUndoEvent();
     }
