@@ -5,16 +5,8 @@ const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
-<<<<<<< eaa87cced5a7b8f5089e0b36400906d818161976
-<<<<<<< 07a6d86a013f53bf70ae26f117762c6ceb522df5
 const cv = require('opencv4nodejs');
 const MaxImageLevel = 3;
-=======
-const fs = require('fs');
->>>>>>> add image broadcasting on server
-=======
-const cv = require('opencv4nodejs');
->>>>>>> add image pyr with 3 levels
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -85,7 +77,6 @@ function onConnection(socket){
     });
 
     socket.on('image', (pos) => {
-<<<<<<< eaa87cced5a7b8f5089e0b36400906d818161976
         // We assume each canvas only have one background image.
         if (socket.canvas_id in IMAGES) {
             // Find the proper default resolution level of the image,
@@ -108,33 +99,6 @@ function onConnection(socket){
             if (level >= 0 && level <= MaxImageLevel) {
                 socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
                 console.log('Image sent.');
-=======
-        if (socket.session in IMAGES) {
-            var level = 2;
-            while (level > 0) {
-                var nRows = IMAGES[socket.canvas_id][level].rows;
-                var nCols = IMAGES[socket.canvas_id][level].cols;
-                if (pos.w >= nCols && pos.h >= nRows) {
-                    break;
-                }
-                level -= 1;
-            }
-            level += pos.l;
-            if (level > 3) l = 3;
-            if (level < 1) l = 1;
-
-            if (pos.x + pos.w > IMAGES[socket.canvas_id][level].cols) {
-                pos.w = IMAGES[socket.canvas_id][level].cols - pos.x;
-            }
-            if (pos.y + pos.h > IMAGES[socket.canvas_id][level].rows) {
-                pos.h = IMAGES[socket.canvas_id][level].rows - pos.y;
-            }
-            if (pos.w > 0 && pos.h > 0) {
-                const region = IMAGES[socket.canvas_id][i].getRegion(new cv.Rect(pos.x, pos.y, pos.w, pos.h));
-                socket.emit('image', cv.imencode('.jpg', region).toString('base64'));
-            } else {
-                socket.emit('image', 'NA');
->>>>>>> add image pyr with 3 levels
             }
         }
     });
