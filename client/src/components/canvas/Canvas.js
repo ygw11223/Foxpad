@@ -151,8 +151,8 @@ class Canvas extends Component {
             return;
         }
         if(this.props.mode){
-            let dx =  e.nativeEvent.offsetX - this.preX ;
-            let dy =  e.nativeEvent.offsetY - this.preY;
+            let dx =  this.mapWindowToCanvas(e.nativeEvent.offsetX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
+            let dy =  this.mapWindowToCanvas(e.nativeEvent.offsetY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
             //console.log([this.preX, e.nativeEvent.offsetX]);
             this.ctx.translate(dx,dy);
             this.offsetX -= dx;
