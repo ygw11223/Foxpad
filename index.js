@@ -73,7 +73,7 @@ function onConnection(socket){
     });
 
     socket.on('image', (pos) => {
-        if (socket.session in IMAGES) {
+        if (socket.canvas_id in IMAGES) {
             var level = 2;
             while (level > 0) {
                 var nRows = IMAGES[socket.canvas_id][level].rows;
@@ -83,10 +83,10 @@ function onConnection(socket){
                 }
                 level -= 1;
             }
-            level += pos.l;
-            if (level > 3) l = 3;
-            if (level < 1) l = 1;
-
+            level -= pos.l;
+            if (level > 2) level = 2;
+            if (level < 0) level = 0;
+            console.log([level, pos.l]);
             if (pos.x + pos.w > IMAGES[socket.canvas_id][level].cols) {
                 pos.w = IMAGES[socket.canvas_id][level].cols - pos.x;
             }
@@ -94,11 +94,13 @@ function onConnection(socket){
                 pos.h = IMAGES[socket.canvas_id][level].rows - pos.y;
             }
             if (pos.w > 0 && pos.h > 0) {
-                const region = IMAGES[socket.canvas_id][i].getRegion(new cv.Rect(pos.x, pos.y, pos.w, pos.h));
+                const region = IMAGES[socket.canvas_id][level].getRegion(new cv.Rect(pos.x, pos.y, pos.w, pos.h));
                 socket.emit('image', cv.imencode('.jpg', region).toString('base64'));
             } else {
                 socket.emit('image', 'NA');
+
             }
+            console.log('send images');
         }
     });
 
@@ -165,6 +167,7 @@ function onConnection(socket){
             IMAGES[socket.canvas_id].push(mat.pyrUp());
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
+            console.log('image_ready');
         })
         console.log(fileInfo);
     });

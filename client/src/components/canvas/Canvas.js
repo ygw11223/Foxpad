@@ -35,12 +35,14 @@ class Canvas extends Component {
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
+        this.onEmitImg = this.onEmitImg.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
+
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -79,6 +81,10 @@ class Canvas extends Component {
         socket.emit('command', 'update');
     }
 
+    onEmitImg(){
+        console.log('emit image');
+        socket.emit('image',{x:this.offsetX, y: this.offsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+    }
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
@@ -109,6 +115,7 @@ class Canvas extends Component {
         this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
         this.ctx.translate(-this.offsetX,-this.offsetY);
         socket.emit('command', 'update');
+        this.onEmitImg();
     }
 
 
@@ -143,9 +150,11 @@ class Canvas extends Component {
         console.log("image");
         this.props.onRef(this);
         var ctx = this.refs.picture.getContext('2d');
+        var state = this.state;
         var img = new Image();
         img.src = 'data:image/jpeg;base64,' + data;
         img.onload = function () {
+            ctx.clearRect(0,0, state.width, state.height);
             ctx.drawImage(img, 0, 0);
         }
     }
@@ -218,6 +227,7 @@ class Canvas extends Component {
             this.offsetX -= dx;
             this.offsetY -= dy;
             socket.emit('command', 'update');
+            this.onEmitImg();
         }
         else {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -252,6 +262,7 @@ class Canvas extends Component {
         // this.offsetY -= dy;
 
         socket.emit('command', 'update');
+        this.onEmitImg();
     }
     render() {
         return (
