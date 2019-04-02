@@ -5,7 +5,7 @@ const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
-const fs = require('fs');
+const cv = require('opencv4nodejs');
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
@@ -69,9 +69,33 @@ function onConnection(socket){
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
     });
 
-    socket.on('image', (position) => {
+    socket.on('image', (pos) => {
         if (socket.session in IMAGES) {
-            // TODO(Guowei) : add image broadcasting.
+            var level = 2;
+            while (level > 0) {
+                var nRows = IMAGES[socket.canvas_id][level].rows;
+                var nCols = IMAGES[socket.canvas_id][level].cols;
+                if (pos.w >= nCols && pos.h >= nRows) {
+                    break;
+                }
+                level -= 1;
+            }
+            level += pos.l;
+            if (level > 3) l = 3;
+            if (level < 1) l = 1;
+
+            if (pos.x + pos.w > IMAGES[socket.canvas_id][level].cols) {
+                pos.w = IMAGES[socket.canvas_id][level].cols - pos.x;
+            }
+            if (pos.y + pos.h > IMAGES[socket.canvas_id][level].rows) {
+                pos.h = IMAGES[socket.canvas_id][level].rows - pos.y;
+            }
+            if (pos.w > 0 && pos.h > 0) {
+                const region = IMAGES[socket.canvas_id][i].getRegion(new cv.Rect(pos.x, pos.y, pos.w, pos.h));
+                socket.emit('image', cv.imencode('.jpg', region).toString('base64'));
+            } else {
+                socket.emit('image', 'NA');
+            }
         }
     });
 
@@ -136,11 +160,14 @@ function onConnection(socket){
     });
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
-        fs.readFile(fileInfo.uploadDir, function read(err, data) {
-            IMAGES[socket.canvas_id] = data.toString('base64');
-            socket.emit('image', IMAGES[socket.canvas_id]);
-            socket.broadcast.in(socket.canvas_id).emit('image',  IMAGES[socket.canvas_id]);
-        });
+        cv.imreadAsync(fileInfo.uploadDir, (err, mat) => {
+            IMAGES[socket.canvas_id] = [];
+            IMAGES[socket.canvas_id].push(mat.pyrDown());
+            IMAGES[socket.canvas_id].push(mat);
+            IMAGES[socket.canvas_id].push(mat.pyrUp());
+            socket.emit('update', 'image_ready');
+            socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
+        })
         console.log(fileInfo);
     });
     uploader.on('error', (err) => {
