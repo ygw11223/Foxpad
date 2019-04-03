@@ -135,10 +135,23 @@ class Canvas extends Component {
         console.log(id);
     }
     onMouseDown(e) {
-        console.log([this.offsetX, this.offsetY]);
+        //console.log([this.offsetX, this.offsetY]);
         this.setState({ active: true });
-        this.preX = e.nativeEvent.offsetX;
-        this.preY = e.nativeEvent.offsetY;
+        let currentX = 0;
+        let currentY = 0;
+        console.log(e.type);
+        if(e.type === "mousedown") {
+            currentX = e.nativeEvent.offsetX;
+            currentY = e.nativeEvent.offsetY;
+
+        }
+        else if(e.type === "touchstart"){
+            let rect = this.refs.canvas.getBoundingClientRect();
+            currentX = e.touches[0].clientX - rect.left;
+            currentY = e.touches[0].clientY - rect.top;
+        }
+        this.preX = currentX;
+        this.preY = currentY;
         if(!this.props.mode){
             socket.emit('command', 'new_stroke');
         }
@@ -150,10 +163,22 @@ class Canvas extends Component {
         if (!this.state.active) {
             return;
         }
+        let currentX = 0;
+        let currentY = 0;
+        if(e.type === "mousemove") {
+            currentX = e.nativeEvent.offsetX;
+            currentY = e.nativeEvent.offsetY;
+        }
+        else if(e.type === "touchmove"){
+            let rect = this.refs.canvas.getBoundingClientRect();
+            currentX = e.touches[0].clientX - rect.left;
+            currentY = e.touches[0].clientY - rect.top;
+        }
+        //console.log([e.pageX,e.pageY]);
         if(this.props.mode){
-            let dx =  this.mapWindowToCanvas(e.nativeEvent.offsetX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
-            let dy =  this.mapWindowToCanvas(e.nativeEvent.offsetY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
-            //console.log([this.preX, e.nativeEvent.offsetX]);
+            let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
+            let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
+            //console.log([this.preX, currentX]);
             this.ctx.translate(dx,dy);
             this.offsetX -= dx;
             this.offsetY -= dy;
@@ -162,14 +187,14 @@ class Canvas extends Component {
         else {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
-                          this.mapWindowToCanvas(e.nativeEvent.offsetX, this.offsetX),
-                          this.mapWindowToCanvas(e.nativeEvent.offsetY, this.offsetY),
+                          this.mapWindowToCanvas(currentX, this.offsetX),
+                          this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
                           this.props.lineWidth,
                           1)
         }
-        this.preX = e.nativeEvent.offsetX;
-        this.preY = e.nativeEvent.offsetY;
+        this.preX = currentX;
+        this.preY = currentY;
     }
 
     onMouseUp() {
