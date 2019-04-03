@@ -73,8 +73,12 @@ function onConnection(socket){
     });
 
     socket.on('image', (pos) => {
+        // We assume each canvas only have one background image.
         if (socket.canvas_id in IMAGES) {
-            var level = 2;
+            // Find the proper default resolution level of the image,
+            // which is the image of biggest size that can fit into the canvas.
+            let max_level = IMAGES[socket.canvas_id].length - 1;
+            var level = max_level;
             while (level > 0) {
                 var nRows = IMAGES[socket.canvas_id][level].rows;
                 var nCols = IMAGES[socket.canvas_id][level].cols;
@@ -83,24 +87,14 @@ function onConnection(socket){
                 }
                 level -= 1;
             }
+            // Substract the relative zooming level of the canvas.
             level -= pos.l;
-            if (level > 2) level = 2;
-            if (level < 0) level = 0;
-            console.log([level, pos.l]);
-            if (pos.x + pos.w > IMAGES[socket.canvas_id][level].cols) {
-                pos.w = IMAGES[socket.canvas_id][level].cols - pos.x;
-            }
-            if (pos.y + pos.h > IMAGES[socket.canvas_id][level].rows) {
-                pos.h = IMAGES[socket.canvas_id][level].rows - pos.y;
-            }
-            if (pos.w > 0 && pos.h > 0) {
-                const region = IMAGES[socket.canvas_id][level].getRegion(new cv.Rect(pos.x, pos.y, pos.w, pos.h));
-                socket.emit('image', cv.imencode('.jpg', region).toString('base64'));
-            } else {
-                socket.emit('image', 'NA');
 
+            // Update client only if the corresponding level exists in the image pyramid
+            if (level >= 0 && level <= max_level) {
+                socket.emit('image', cv.imencode('.png', IMAGES[socket.canvas_id][level]).toString('base64'));
             }
-            console.log('send images');
+            console.log('Image sent.');
         }
     });
 
@@ -147,6 +141,9 @@ function onConnection(socket){
 
     var uploader = new SocketIOFile(socket, {
         uploadDir: 'images',
+        rename: function(filename, fileInfo) {
+            // Make sure of unique file name.
+            return socket.canvas_id + filename;},
         // TODO(Guowei) : Add accept format and adjust parameters later.
         // accepts: [],
         maxFileSize: 50000000,
@@ -160,16 +157,17 @@ function onConnection(socket){
     });
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
+        // Build image pyramid for multiple resolutions
         cv.imreadAsync(fileInfo.uploadDir, (err, mat) => {
             IMAGES[socket.canvas_id] = [];
+            IMAGES[socket.canvas_id].push(mat.pyrDown().pyrDown());
             IMAGES[socket.canvas_id].push(mat.pyrDown());
             IMAGES[socket.canvas_id].push(mat);
             IMAGES[socket.canvas_id].push(mat.pyrUp());
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
-            console.log('image_ready');
+            console.log('Image uploaded.');
         })
-        console.log(fileInfo);
     });
     uploader.on('error', (err) => {
         console.log('Error!', err);
