@@ -24,8 +24,12 @@ IMAGES = {};
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
+<<<<<<< HEAD
 app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
+=======
+app.use('/static', express.static(__dirname + '/client/build'))
+>>>>>>> update server router
 // Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get canvas id.
@@ -53,7 +57,7 @@ app.get('/*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 });
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/client/build/login.html');
+    res.sendFile(__dirname + '/client/build/index.html');
 });
 
 
