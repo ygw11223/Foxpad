@@ -27,22 +27,20 @@ class Canvas extends Component {
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.zoom = this.zoom.bind(this);
-        this.preX = -1;
-        this.preY = -1;
-        this.onInitCanvas();
-        // On server, we save user and canvas id on the socket object, which
-        // will disappear when connection is lost. So we need to init again
-        // for reconections.
-        socket.on('connect', this.onInitCanvas);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.fileInput = React.createRef();
-        socket.on('drawing', this.onDrawingEvent);
-        socket.emit('command', 'update');
-        socket.on('redraw', this.onRedrawEvent);
+
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
+        this.preX = -1;
+        this.preY = -1;
+
+        // On server, we save user and canvas id on the socket object, which
+        // will disappear when connection is lost. So we need to init again
+        // for reconections.        
+        socket.on('connect', this.onInitCanvas);
     }
 
     onInitCanvas(){
@@ -57,6 +55,16 @@ class Canvas extends Component {
             user_id: id,
             canvas_id: this.props.room_id,
         });
+        socket.on('drawing', this.onDrawingEvent);
+        socket.on('image', this.onImageEvent);
+        socket.on('update', (cmd)=>{
+            if(cmd === "image_ready") {
+                this.onEmitImg();
+            }
+        });
+        socket.on('redraw', this.onRedrawEvent);
+        this.onEmitImg();
+        socket.emit('command', 'update');
     }
 
     onRedrawEvent(data_array) {
