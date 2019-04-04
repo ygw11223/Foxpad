@@ -98,7 +98,7 @@ class Canvas extends Component {
 
     onEmitImg(){
         console.log('emit image');
-        socket.emit('image',{x:this.offsetX, y: this.offsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+        socket.emit('image',{x:this.pictureOffsetX, y: this.pictureOffsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
@@ -267,6 +267,7 @@ class Canvas extends Component {
             }
             this.ctx.translate(dx,dy);
             socket.emit('command', 'update');
+
             this.onEmitImg();
         }
         else {
@@ -300,6 +301,8 @@ class Canvas extends Component {
         this.offsetY/= factor;
         this.imageHight *= factor;
         this.imageWidth *= factor;
+        this.pictureOffsetX /= factor;
+        this.pictureOffsetY /= factor;
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
