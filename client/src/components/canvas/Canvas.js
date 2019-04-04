@@ -64,7 +64,8 @@ class Canvas extends Component {
         });
         socket.on('redraw', this.onRedrawEvent);
         this.onEmitImg();
-        socket.emit('command', 'update');    }
+        socket.emit('command', 'update');
+    }
 
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
