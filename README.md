@@ -1,14 +1,21 @@
 # Collaborative-Drawing
 
-To run the server. First build front end.
+## Requirements
+
+- cmake
+
+## Start server
+
+First build front end.
 ```
 cd client
 npm i && npm run build
 ```
-Then in the root directory start server.
+Then go back to root directory and run server.
 ```
+cd ..
 npm i && npm start
 ```
 The server will listen to port 3000.
 
-Visit http://host:3000 will redirect to a new canvas of which the link can be used to share.
+Visit http://host:3000 and start drawing!
