@@ -46,6 +46,8 @@ class Canvas extends Component {
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
+        this.pictureOffsetX = 0;
+        this.pictureOffsetY = 0;
         this.scale = 1;
         this.preX = -1;
         this.preY = -1;
@@ -83,7 +85,7 @@ class Canvas extends Component {
 
     onEmitImg(){
         console.log('emit image');
-        socket.emit('image',{x:this.offsetX, y: this.offsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+        socket.emit('image',{x:this.pictureOffsetX, y: this.pictureOffsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
@@ -117,7 +119,6 @@ class Canvas extends Component {
         socket.emit('command', 'update');
         this.onEmitImg();
     }
-
 
     drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
         this.ctx.beginPath();
@@ -223,13 +224,29 @@ class Canvas extends Component {
         if(this.props.mode){
             let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
             let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
+            this.pictureOffsetX -= currentX - this.preX;
+            this.pictureOffsetY -= currentY - this.preY;
+            if(this.pictureOffsetX < 0) {
+                this.pictureOffsetX = 0;
+                dx = this.offsetX;
+                this.offsetX = 0;
+            } else {
+                this.offsetX -= dx;
+            }
+            if(this.pictureOffsetY < 0) {
+                this.pictureOffsetY = 0;
+                dy = this.offsetY;
+                this.offsetY = 0;
+            } else {
+                this.offsetY -= dy;
+            }
             this.ctx.translate(dx,dy);
-            this.offsetX -= dx;
-            this.offsetY -= dy;
             socket.emit('command', 'update');
+
             this.onEmitImg();
         }
         else {
+            console.log(this.offsetX);
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
@@ -257,6 +274,8 @@ class Canvas extends Component {
         this.scale /= factor;
         this.offsetX /= factor;
         this.offsetY/= factor;
+        this.pictureOffsetX /= factor;
+        this.pictureOffsetY /= factor;
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
