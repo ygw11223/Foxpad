@@ -20,9 +20,9 @@ DATABASE = {}
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
 app.use('/static', express.static(__dirname + '/client/build'))
-// Request for opening an canvas should be "/canvas/VALID_ID".
+// Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
-    // Get session id.
+    // Get canvas id.
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
     if (!(canvas_id in CANVAS_IDS)) {
@@ -32,16 +32,18 @@ app.get('/canvas/*', function (req, res) {
     }
 });
 app.get('/new_canvas', function (req, res) {
-    // Create a new session id.
+    // Create a new canvas id.
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
 
-    res.redirect('/canvas/' + id);
-    console.log("New session created:", id);
+    res.status(200);
+    res.type("text/json");
+    res.send(id);
+    console.log("New canvas created:", id);
 });
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/client/build/login.html');
+    res.sendFile(__dirname + '/client/build/index.html');
 });
 
 
@@ -55,7 +57,7 @@ function onConnection(socket){
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
-	if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+    if (!(socket.user_id in DATABASE[socket.canvas_id])) {
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
         console.log("One user joined", socket.canvas_id);
