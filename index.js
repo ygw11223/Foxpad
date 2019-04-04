@@ -46,10 +46,13 @@ app.get('/', function (req, res) {
 function onConnection(socket){
     socket.on('init', (auth_info) => {
         // Initialize socket.
-        // TODO : Save infomation on socket object can potentially crash
-        // server. Need to investigate a better solution.
         socket.canvas_id = auth_info.canvas_id;
         socket.user_id = auth_info.user_id
+        // Check if canvas id is valid.
+        if (!(socket.canvas_id in DATABASE)) {
+            DATABASE[socket.canvas_id] = {};
+            console.log("New canvas_id encountered when init socket.");
+        }
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
@@ -109,15 +112,10 @@ function onConnection(socket){
     });
 
     var uploader = new SocketIOFile(socket, {
-        // uploadDir: {         // multiple directories
-        //  music: 'data/music',
-        //  document: 'data/document'
-        // },
         uploadDir: 'images',
         // TODO(Guowei) : Add accept format and adjust parameters later.
         // accepts: [],
-        // maxFileSize: 4194304,
-        // transmissionDelay: 0,
+        maxFileSize: 50000000,
     });
     uploader.on('start', (fileInfo) => {
         console.log('Start uploading');
