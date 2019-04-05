@@ -2,7 +2,10 @@ import React, {Component} from 'react'
 import Card from 'react-bootstrap/Card'
 import CardDeck from 'react-bootstrap/CardDeck'
 import  { Redirect } from 'react-router-dom'
+<<<<<<< HEAD
 import Cookies from 'universal-cookie'
+=======
+>>>>>>> redirect to new canvas
 import './dashboard.css'
 
 const cookies = new Cookies();
@@ -10,13 +13,18 @@ const cookies = new Cookies();
 class Dashboard extends Component {
     constructor(props) {
         super(props);
+<<<<<<< HEAD
         this.state = {toCanvas: false, toLogin: false, id: null};
+=======
+        this.state = {toDashboard: false, id: null};
+>>>>>>> redirect to new canvas
         this.newCanvas = this.newCanvas.bind(this);
         this.onReadyStateChange = this.onReadyStateChange.bind(this);
         this.xmlHttp = new XMLHttpRequest();
         this.xmlHttp.onreadystatechange = this.onReadyStateChange;
     }
 
+<<<<<<< HEAD
     componentDidMount() {
         if (cookies.get('cd_user_name') == undefined) {
             this.setState({toLogin: true});
@@ -36,6 +44,17 @@ class Dashboard extends Component {
         if (this.xmlHttp.readyState == 4 && this.xmlHttp.status == 200) {
             var id = this.xmlHttp.responseText;
             this.setState({toCanvas: true, id: id});
+=======
+    newCanvas() {
+        this.xmlHttp.open("GET", '/new_canvas', true);
+        this.xmlHttp.send(null);
+    }
+
+    onReadyStateChange() {
+        if (this.xmlHttp.readyState == 4 && this.xmlHttp.status == 200) {
+            var id = this.xmlHttp.responseText;
+            this.setState({toDashboard: true, id: id});
+>>>>>>> redirect to new canvas
         }
     }
 
