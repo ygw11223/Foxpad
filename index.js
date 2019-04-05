@@ -77,8 +77,8 @@ function onConnection(socket){
             // Find the proper default resolution level of the image,
             // which is the image of biggest size that can fit into the canvas.
             var level = MaxImageLevel;
-            var width = IMAGES[socket.canvas_id].w * 2;
-            var height = IMAGES[socket.canvas_id].h * 2;
+            var width = IMAGES[socket.canvas_id].w;
+            var height = IMAGES[socket.canvas_id].h;
             while (level > 0) {
                 if (pos.w >= width && pos.h >= height) {
                     break;
@@ -93,8 +93,8 @@ function onConnection(socket){
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
                 socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
+                console.log('Image sent.');
             }
-            console.log('Image sent.');
         }
     });
 
