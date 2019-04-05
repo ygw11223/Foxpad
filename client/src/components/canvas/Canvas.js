@@ -286,7 +286,8 @@ class Canvas extends Component {
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
-
+        this.pctx.clearRect(0, 0, this.state.width, this.state.height);
+        this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
         socket.emit('command', 'update');
         this.onEmitImg();
     }

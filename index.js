@@ -168,10 +168,10 @@ function onConnection(socket){
                 'name': fileInfo.uploadDir
             };
             console.log(IMAGES[socket.canvas_id]);
-            cv.imwrite(fileInfo.uploadDir + '0.png', mat.pyrDown().pyrDown());
-            cv.imwrite(fileInfo.uploadDir + '1.png', mat.pyrDown());
-            cv.imwrite(fileInfo.uploadDir + '2.png', mat);
-            cv.imwrite(fileInfo.uploadDir + '3.png', mat.pyrUp());
+            cv.imwrite(fileInfo.uploadDir + '0.png', mat.pyrDown().pyrDown().pyrDown());
+            cv.imwrite(fileInfo.uploadDir + '1.png', mat.pyrDown().pyrDown());
+            cv.imwrite(fileInfo.uploadDir + '2.png', mat.pyrDown());
+            cv.imwrite(fileInfo.uploadDir + '3.png', mat);
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
             console.log('Image uploaded.');
