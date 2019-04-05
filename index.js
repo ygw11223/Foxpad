@@ -17,10 +17,13 @@ CANVAS_IDS = {};
 // TODO(Guowei) : Update when connecting firebase to server.
 // TODO(Guowei) : Maybe need a r/w lock.
 DATABASE = {};
+<<<<<<< d00574c7d4389d04f847afb6d89eecf4100a9ca6
 
 IMAGES = {};
+=======
+>>>>>>> save img on disk
 
-IMAGES = {}
+IMAGES = {};
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
@@ -81,6 +84,7 @@ function onConnection(socket){
         if (socket.canvas_id in IMAGES) {
             // Find the proper default resolution level of the image,
             // which is the image of biggest size that can fit into the canvas.
+<<<<<<< d00574c7d4389d04f847afb6d89eecf4100a9ca6
 <<<<<<< f2ca51d0417bccda3e628355d1cf62b676075191
             var level = MaxImageLevel;
             var width = IMAGES[socket.canvas_id].w;
@@ -89,6 +93,11 @@ function onConnection(socket){
             let max_level = IMAGES[socket.canvas_id].length - 1;
             var level = max_level;
 >>>>>>> server send the whole image
+=======
+            var level = MaxImageLevel;
+            var width = IMAGES[socket.canvas_id].w * 2;
+            var height = IMAGES[socket.canvas_id].h * 2;
+>>>>>>> save img on disk
             while (level > 0) {
                 if (pos.w >= width && pos.h >= height) {
                     break;
@@ -101,6 +110,7 @@ function onConnection(socket){
             level -= pos.l;
 
             // Update client only if the corresponding level exists in the image pyramid
+<<<<<<< d00574c7d4389d04f847afb6d89eecf4100a9ca6
 <<<<<<< f2ca51d0417bccda3e628355d1cf62b676075191
             if (level >= 0 && level <= MaxImageLevel) {
                 socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
@@ -109,6 +119,10 @@ function onConnection(socket){
 =======
             if (level >= 0 && level <= max_level) {
                 socket.emit('image', cv.imencode('.png', IMAGES[socket.canvas_id][level]).toString('base64'));
+=======
+            if (level >= 0 && level <= MaxImageLevel) {
+                socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
+>>>>>>> save img on disk
             }
             console.log('Image sent.');
 >>>>>>> server send the whole image
