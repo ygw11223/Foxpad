@@ -267,7 +267,6 @@ class Canvas extends Component {
             }
             this.ctx.translate(dx,dy);
             socket.emit('command', 'update');
-            this.onDrawImage();
         }
         else {
             console.log(this.offsetX);
