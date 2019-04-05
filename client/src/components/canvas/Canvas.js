@@ -100,6 +100,7 @@ class Canvas extends Component {
         console.log('emit image');
         socket.emit('image',{x:this.pictureOffsetX, y: this.pictureOffsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
+
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
@@ -181,7 +182,6 @@ class Canvas extends Component {
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
     }
-
     onUndoEvent(e) {
         console.log('undo');
         socket.emit('command', 'undo');
@@ -267,8 +267,7 @@ class Canvas extends Component {
             }
             this.ctx.translate(dx,dy);
             socket.emit('command', 'update');
-
-            this.onEmitImg();
+            this.onDrawImage();
         }
         else {
             console.log(this.offsetX);
@@ -287,6 +286,7 @@ class Canvas extends Component {
     onMouseUp() {
         this.setState({ active: false });
     }
+
     zoom(direction) {
         let dx =  this.scale*this.preX;
         let dy =  this.scale*this.preY;
