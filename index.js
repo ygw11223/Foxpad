@@ -6,23 +6,25 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
+const MaxImageLevel = 3;
 
 // Maintain infomation on active sessions. Currently only conatins number of
 // users per seesion.
 // TODO(Guowei) : Come up with a better format.
-CANVAS_IDS = {}
+CANVAS_IDS = {};
 
 // Maintain stroke info per session.
 // TODO(Guowei) : Update when connecting firebase to server.
 // TODO(Guowei) : Maybe need a r/w lock.
-DATABASE = {}
+DATABASE = {};
 
-IMAGES = {}
+IMAGES = {};
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
-app.use('/static', express.static(__dirname + '/client/build'))
+app.use('/static', express.static(__dirname + '/client/build'));
+app.use('/canvas/images', express.static(__dirname + '/images'));
 // Request for opening an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get session id.
@@ -77,22 +79,23 @@ function onConnection(socket){
         if (socket.canvas_id in IMAGES) {
             // Find the proper default resolution level of the image,
             // which is the image of biggest size that can fit into the canvas.
-            let max_level = IMAGES[socket.canvas_id].length - 1;
-            var level = max_level;
+            var level = MaxImageLevel;
+            var width = IMAGES[socket.canvas_id].w * 2;
+            var height = IMAGES[socket.canvas_id].h * 2;
             while (level > 0) {
-                var nRows = IMAGES[socket.canvas_id][level].rows;
-                var nCols = IMAGES[socket.canvas_id][level].cols;
-                if (pos.w >= nCols && pos.h >= nRows) {
+                if (pos.w >= width && pos.h >= height) {
                     break;
                 }
                 level -= 1;
+                width /= 2;
+                height /= 2;
             }
             // Substract the relative zooming level of the canvas.
             level -= pos.l;
 
             // Update client only if the corresponding level exists in the image pyramid
-            if (level >= 0 && level <= max_level) {
-                socket.emit('image', cv.imencode('.png', IMAGES[socket.canvas_id][level]).toString('base64'));
+            if (level >= 0 && level <= MaxImageLevel) {
+                socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
             }
             console.log('Image sent.');
         }
@@ -159,11 +162,16 @@ function onConnection(socket){
         console.log('Upload Complete.');
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(fileInfo.uploadDir, (err, mat) => {
-            IMAGES[socket.canvas_id] = [];
-            IMAGES[socket.canvas_id].push(mat.pyrDown().pyrDown());
-            IMAGES[socket.canvas_id].push(mat.pyrDown());
-            IMAGES[socket.canvas_id].push(mat);
-            IMAGES[socket.canvas_id].push(mat.pyrUp());
+            IMAGES[socket.canvas_id] = {
+                'w': mat.cols,
+                'h': mat.rows,
+                'name': fileInfo.uploadDir
+            };
+            console.log(IMAGES[socket.canvas_id]);
+            cv.imwrite(fileInfo.uploadDir + '0.png', mat.pyrDown().pyrDown());
+            cv.imwrite(fileInfo.uploadDir + '1.png', mat.pyrDown());
+            cv.imwrite(fileInfo.uploadDir + '2.png', mat);
+            cv.imwrite(fileInfo.uploadDir + '3.png', mat.pyrUp());
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
             console.log('Image uploaded.');
