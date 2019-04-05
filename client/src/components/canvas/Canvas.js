@@ -309,6 +309,7 @@ class Canvas extends Component {
         socket.emit('command', 'update');
         this.onEmitImg();
     }
+
     render() {
         return (
             <div>
