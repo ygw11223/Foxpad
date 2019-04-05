@@ -147,7 +147,8 @@ class Canvas extends Component {
         var ctx = this.refs.picture.getContext('2d');
         var state = this.state;
         var img = new Image();
-        img.src = 'data:image/jpeg;base64,' + data;
+        img.src = data;
+        console.log(img.src);
         img.onload = function () {
             ctx.clearRect(0,0, state.width, state.height);
             ctx.drawImage(img, 0, 0);
