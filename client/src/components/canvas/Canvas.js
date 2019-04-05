@@ -36,6 +36,7 @@ class Canvas extends Component {
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.onEmitImg = this.onEmitImg.bind(this);
+        this.onDrawImage = this.onDrawImage.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
@@ -51,6 +52,10 @@ class Canvas extends Component {
         this.scale = 1;
         this.preX = -1;
         this.preY = -1;
+        this.imageWidth = -1;
+        this.imageHight = -1;
+        this.image = new Image();
+        this.image.onload = this.onDrawImage;
 
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init again
@@ -87,6 +92,7 @@ class Canvas extends Component {
         console.log('emit image');
         socket.emit('image',{x:this.pictureOffsetX, y: this.pictureOffsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
+
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
@@ -149,18 +155,19 @@ class Canvas extends Component {
 
     onImageEvent(data) {
         console.log("image");
-        this.props.onRef(this);
-        var ctx = this.refs.picture.getContext('2d');
-        var state = this.state;
-        var img = new Image();
-        img.src = data;
-        console.log(img.src);
-        img.onload = function () {
-            ctx.clearRect(0,0, state.width, state.height);
-            ctx.drawImage(img, 0, 0);
-        }
+        this.image.src = data;
+        console.log([this.image.width,this.image.height]);
     }
-
+    onDrawImage() {
+        if (this.imageHight === -1) {
+            this.imageHight = this.image.height;
+            this.imageWidth = this.image.width;
+        }
+        console.log("draw image");
+        console.log(this.image);
+        this.pctx.clearRect(0, 0, this.state.width, this.state.height);
+        this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
+    }
     onUndoEvent(e) {
         console.log('undo');
         socket.emit('command', 'undo');
@@ -243,8 +250,7 @@ class Canvas extends Component {
             }
             this.ctx.translate(dx,dy);
             socket.emit('command', 'update');
-
-            this.onEmitImg();
+            this.onDrawImage();
         }
         else {
             console.log(this.offsetX);
@@ -275,8 +281,8 @@ class Canvas extends Component {
         this.scale /= factor;
         this.offsetX /= factor;
         this.offsetY/= factor;
-        this.pictureOffsetX /= factor;
-        this.pictureOffsetY /= factor;
+        this.imageHight *= factor;
+        this.imageWidth *= factor;
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
