@@ -102,6 +102,7 @@ class Canvas extends Component {
         for (i = 0; i < data_array.length; i++) {
             this.onDrawingEvent(data_array[i]);
         }
+        this.onDrawImage();
     }
 
     componentWillUnmount() {
@@ -159,7 +160,7 @@ class Canvas extends Component {
         console.log([this.image.width,this.image.height]);
     }
     onDrawImage() {
-        if (this.imageHight === -1) {
+        if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
         }
@@ -250,7 +251,6 @@ class Canvas extends Component {
             }
             this.ctx.translate(dx,dy);
             socket.emit('command', 'update');
-            this.onDrawImage();
         }
         else {
             console.log(this.offsetX);
@@ -286,8 +286,6 @@ class Canvas extends Component {
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
-        this.pctx.clearRect(0, 0, this.state.width, this.state.height);
-        this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
         socket.emit('command', 'update');
         this.onEmitImg();
     }
