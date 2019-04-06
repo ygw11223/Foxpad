@@ -41,6 +41,7 @@ class Canvas extends Component {
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
+        this.onLoadNextImage = this.onLoadNextImage.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
 
@@ -55,7 +56,9 @@ class Canvas extends Component {
         this.imageWidth = -1;
         this.imageHight = -1;
         this.image = new Image();
+        this.nextImage = new Image();
         this.image.onload = this.onDrawImage;
+        this.nextImage.onload = this.onLoadNextImage;
 
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init again
@@ -156,9 +159,14 @@ class Canvas extends Component {
 
     onImageEvent(data) {
         console.log("image");
-        this.image.src = data;
+        this.nextImage.src = data;
         console.log([this.image.width,this.image.height]);
     }
+
+    onLoadNextImage() {
+        this.image.src = this.nextImage.src;
+    } 
+
     onDrawImage() {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
