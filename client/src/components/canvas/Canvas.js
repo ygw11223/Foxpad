@@ -41,6 +41,7 @@ class Canvas extends Component {
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
+        this.onLoadNextImage = this.onLoadNextImage.bind(this);
         this.preX = -1;
         this.preY = -1;
         this.onInitCanvas();
@@ -58,14 +59,17 @@ class Canvas extends Component {
         this.scale = 1;
         this.imageWidth = -1;
         this.imageHight = -1;
+        this.image = new Image();
+        this.nextImage = new Image();
+        this.image.onload = this.onDrawImage;
+        this.nextImage.onload = this.onLoadNextImage;
+
         socket.on('drawing', this.onDrawingEvent);
         socket.on('image', this.onImageEvent);
         socket.on('update', (cmd)=>{ if(cmd === "image_ready") {this.onEmitImg();}});
         socket.on('redraw', this.onRedrawEvent);
         socket.on('connect', this.onInitCanvas);
         socket.emit('command', 'update');
-        this.image = new Image();
-        this.image.onload = this.onDrawImage;
     }
 
     onInitCanvas(){
@@ -151,9 +155,14 @@ class Canvas extends Component {
 
     onImageEvent(data) {
         console.log("image");
-        this.image.src = data;
+        this.nextImage.src = data;
         console.log([this.image.width,this.image.height]);
     }
+
+    onLoadNextImage() {
+        this.image.src = this.nextImage.src;
+    } 
+
     onDrawImage() {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
