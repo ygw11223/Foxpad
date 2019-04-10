@@ -17,11 +17,6 @@ CANVAS_IDS = {};
 // TODO(Guowei) : Update when connecting firebase to server.
 // TODO(Guowei) : Maybe need a r/w lock.
 DATABASE = {};
-<<<<<<< d00574c7d4389d04f847afb6d89eecf4100a9ca6
-
-IMAGES = {};
-=======
->>>>>>> save img on disk
 
 IMAGES = {};
 
