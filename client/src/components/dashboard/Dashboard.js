@@ -1,17 +1,30 @@
-import React, {Component} from 'react';
+import React, {Component} from 'react'
 import Card from 'react-bootstrap/Card'
 import CardDeck from 'react-bootstrap/CardDeck'
 import  { Redirect } from 'react-router-dom'
+import Cookies from 'universal-cookie'
 import './dashboard.css'
 
-class Dashboard extends React.Component {
+const cookies = new Cookies();
+
+class Dashboard extends Component {
     constructor(props) {
         super(props);
-        this.state = {toDashboard: false, id: null};
+        this.state = {toCanvas: false, toLogin: false, id: null};
         this.newCanvas = this.newCanvas.bind(this);
         this.onReadyStateChange = this.onReadyStateChange.bind(this);
         this.xmlHttp = new XMLHttpRequest();
         this.xmlHttp.onreadystatechange = this.onReadyStateChange;
+    }
+
+    componentDidMount() {
+        if (cookies.get('cd_user_name') == undefined) {
+            this.setState({toLogin: true});
+        }
+        else {
+            var name = cookies.get('cd_user_name');
+            document.getElementById('header').innerHTML = "Welcome " + name;
+        }
     }
 
     newCanvas() {
@@ -22,7 +35,7 @@ class Dashboard extends React.Component {
     onReadyStateChange() {
         if (this.xmlHttp.readyState == 4 && this.xmlHttp.status == 200) {
             var id = this.xmlHttp.responseText;
-            this.setState({toDashboard: true, id: id});
+            this.setState({toCanvas: true, id: id});
         }
     }
 
@@ -43,13 +56,16 @@ class Dashboard extends React.Component {
     // }
 
     render() {
-        if (this.state.toDashboard === true) {
+        if (this.state.toCanvas === true) {
             return <Redirect to={'/canvas/'+this.state.id} />
+        }
+        else if (this.state.toLogin === true) {
+            return <Redirect to={'/login'} />
         }
         return (
             <div id="wrapper">
                 <div id="welcome">
-                    <h1 id="header">Welcome Alice</h1>
+                    <h1 id="header"></h1>
                 </div>
                 <div id="parent">
                     <CardDeck>
