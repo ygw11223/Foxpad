@@ -93,11 +93,21 @@ class Canvas extends Component {
 
     drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
         this.ctx.beginPath();
+        if (this.props.eraser) {
+            this.ctx.globalCompositeOperation="destination-out";
+            // this.ctx.arc(x0,y0,16,0,Math.PI*2,false);
+            // this.ctx.fill();
+        }
+        else {
+            this.ctx.globalCompositeOperation="source-over";
+        }
         this.ctx.moveTo(x0, y0);
         this.ctx.lineTo(x1, y1);
+        this.ctx.lineCap = "round";
         this.ctx.lineWidth = lineWidth;
         this.ctx.strokeStyle = color;
         this.ctx.stroke();
+
         if(!emit){return;}
         socket.emit('drawing', {
             x0: x0,
@@ -131,6 +141,9 @@ class Canvas extends Component {
         console.log("upload");
         var file = document.getElementById("file");
         var id = uploader.upload(file);
+        this.setState(prevState => ({
+            modal: !prevState.modal
+        }));
         console.log(id);
     }
     onMouseDown(e) {
@@ -166,7 +179,7 @@ class Canvas extends Component {
 
         let currentX = 0;
         let currentY = 0;
-        
+
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;

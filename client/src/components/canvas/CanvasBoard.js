@@ -5,13 +5,14 @@ import Sidebar from '../layout/Sidebar'
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'red', lineWidth: 5, mode: false};
+        this.state = {color: 'red', lineWidth: 5, mode: false, eraser: false};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.onChangeMode = this.onChangeMode.bind(this);
         this.onZoom = this.onZoom.bind(this);
+        this.onEraser = this.onEraser.bind(this);
     }
 
     changeColor(e) {
@@ -19,7 +20,7 @@ class CanvasBoard extends Component {
     }
 
     changeWidth(e) {
-        this.setState({lineWidth: e})
+        this.setState({lineWidth: e, eraser: false})
     }
 
     componentDidMount() {
@@ -41,6 +42,10 @@ class CanvasBoard extends Component {
         this.setState({mode: !this.state.mode})
     }
 
+    onEraser(e) {
+        this.setState({lineWidth: e, eraser: true})
+    }
+
     render(){
         return(
             <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
@@ -51,7 +56,8 @@ class CanvasBoard extends Component {
                              onUndo={this.onUndoEvent}
                              onChangeMode={this.onChangeMode}
                              onZoom={this.onZoom}
-                             showForm={this.showForm}/>
+                             showForm={this.showForm}
+                             onEraser={this.onEraser}/>
                 </div>
                     <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
                         <Canvas
@@ -61,7 +67,8 @@ class CanvasBoard extends Component {
                             height={this.state.height}
                             color={this.state.color}
                             room_id={this.props.match.params.id}
-                            lineWidth={this.state.lineWidth} />
+                            lineWidth={this.state.lineWidth}
+                            eraser={this.state.eraser} />
                     </div>
             </div>
         );
