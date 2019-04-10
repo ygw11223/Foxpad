@@ -6,6 +6,7 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
+// Max level of multi-resolution image pyramid.
 const MaxImageLevel = 3;
 
 // Maintain infomation on active sessions. Currently only conatins number of
@@ -151,13 +152,16 @@ function onConnection(socket){
         // accepts: [],
         maxFileSize: 50000000,
     });
+
     uploader.on('start', (fileInfo) => {
         console.log('Start uploading');
         console.log(fileInfo);
     });
+
     uploader.on('stream', (fileInfo) => {
         console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
     });
+
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
         // Build image pyramid for multiple resolutions
@@ -168,18 +172,23 @@ function onConnection(socket){
                 'name': fileInfo.uploadDir
             };
             console.log(IMAGES[socket.canvas_id]);
+            // Hardcoded building up 4 levels from lowest to highest resolution.
+            // TODO : Decide levels based on image size.
             cv.imwrite(fileInfo.uploadDir + '0.png', mat.pyrDown().pyrDown().pyrDown());
             cv.imwrite(fileInfo.uploadDir + '1.png', mat.pyrDown().pyrDown());
             cv.imwrite(fileInfo.uploadDir + '2.png', mat.pyrDown());
             cv.imwrite(fileInfo.uploadDir + '3.png', mat);
+
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
             console.log('Image uploaded.');
         })
     });
+
     uploader.on('error', (err) => {
         console.log('Error!', err);
     });
+
     uploader.on('abort', (fileInfo) => {
         console.log('Aborted: ', fileInfo);
     });

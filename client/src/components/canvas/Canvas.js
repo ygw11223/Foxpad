@@ -56,13 +56,15 @@ class Canvas extends Component {
         this.imageWidth = -1;
         this.imageHight = -1;
         this.image = new Image();
-        this.nextImage = new Image();
         this.image.onload = this.onDrawImage;
+        // Buffer for next level of resolution of image. Needed for smooth
+        // zooming
+        this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
 
         // On server, we save user and canvas id on the socket object, which
-        // will disappear when connection is lost. So we need to init again
-        // for reconections.
+        // will disappear when connection is lost. So we need to init upon
+        // each connection.
         socket = openSocket();
         socket.on('connect', this.onInitCanvas);
         uploader = new SocketIOFileClient(socket);
@@ -76,25 +78,27 @@ class Canvas extends Component {
             cookies.set('cd_user_name', id);
             console.log(id)
         }
+
         socket.emit('init', {
             user_id: id,
             canvas_id: this.props.room_id,
         });
         socket.on('drawing', this.onDrawingEvent);
         socket.on('image', this.onImageEvent);
+        socket.on('redraw', this.onRedrawEvent);
         socket.on('update', (cmd)=>{
             if(cmd === "image_ready") {
                 this.onEmitImg();
             }
         });
-        socket.on('redraw', this.onRedrawEvent);
+        // Get image and strokes from server.
         this.onEmitImg();
         socket.emit('command', 'update');
     }
 
     onEmitImg(){
         console.log('emit image');
-        socket.emit('image',{x:this.pictureOffsetX, y: this.pictureOffsetY, w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+        socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
 
     onRedrawEvent(data_array) {
@@ -199,7 +203,6 @@ class Canvas extends Component {
     }
 
     onMouseDown(e) {
-
         this.setState({ active: true });
         let currentX = 0;
         let currentY = 0;
@@ -222,9 +225,11 @@ class Canvas extends Component {
             socket.emit('command', 'new_stroke');
         }
     }
+
     mapWindowToCanvas(x, offset) {
         return x*this.scale+offset;
     }
+
     onMouseMove(e) {
         if (!this.state.active) {
             return;
