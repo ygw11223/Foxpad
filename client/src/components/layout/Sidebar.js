@@ -6,7 +6,7 @@ import './style.css'
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {btnDroprightColor:false, btnDroprightWidth:false};
+        this.state = {btnDroprightColor:false, btnDroprightWidth:false, btnDroprightEraser: false};
     }
     // Todo: Anze
     //          rewrite DropdownItem into list
@@ -14,7 +14,17 @@ class Sidebar extends React.Component {
     render() {
         return (
             <ButtonGroup   vertical >
-                <Button eventKey="white" className='bg-light tool-button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser" style={{color: 'black'}}></i></Button>
+                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightEraser}
+                                    toggle={()=>{this.setState({btnDroprightEraser: !this.state.btnDroprightEraser})}}>
+                    <DropdownToggle   si className='bg-light tool-button' >
+                        <i className="fas fa-eraser" style={{color: 'black'}}></i>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem eventKey="2" onClick={() => this.props.onEraser("2")} >2</DropdownItem>
+                        <DropdownItem eventKey="10" onClick={() => this.props.onEraser("10")}>10</DropdownItem>
+                        <DropdownItem eventKey="15" onClick={() => this.props.onEraser("15")}>15</DropdownItem>
+                    </DropdownMenu>
+                </ButtonDropdown>
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
                                     toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
