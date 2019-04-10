@@ -5,8 +5,8 @@ import Cookies from 'universal-cookie';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
-const socket;
-const uploader = new SocketIOFileClient(socket);
+var socket; // Not const because we want to open it in canvas constructor.
+var uploader;
 
 const styleCanvas = {
   zIndex: '2',
@@ -65,6 +65,7 @@ class Canvas extends Component {
         // for reconections.
         socket = openSocket();
         socket.on('connect', this.onInitCanvas);
+        uploader = new SocketIOFileClient(socket);
     }
 
     onInitCanvas(){
