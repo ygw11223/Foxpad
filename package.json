@@ -9,9 +9,10 @@
   ],
   "dependencies": {
     "express": "^4.16.4",
-    "short-id": "0.1.0-1",
+    "short-id": "latest",
     "socket.io": "latest",
-    "socket.io-file": "latest"
+    "socket.io-file": "latest",
+    "opencv4nodejs": "latest"
   },
   "scripts": {
     "start": "node index"
