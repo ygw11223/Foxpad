@@ -26,9 +26,9 @@ IMAGES = {};
 // All static files should be in "/public" on server.
 app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
-// Request for opening an canvas should be "/canvas/VALID_ID".
+// Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
-    // Get session id.
+    // Get canvas id.
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
     if (!(canvas_id in CANVAS_IDS)) {
@@ -37,14 +37,20 @@ app.get('/canvas/*', function (req, res) {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
-// Otherwise redirect to a new canvas page.
-app.get('/', function (req, res) {
-    // Create a new session id.
+app.get('/new_canvas', function (req, res) {
+    // Create a new canvas id.
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
-    res.redirect('/canvas/' + id);
-    console.log("New session created:", id);
+
+    res.status(200);
+    res.type("text/json");
+    res.send(id);
+    console.log("New canvas created:", id);
+});
+// Otherwise redirect to a new canvas page.
+app.get('/*', function (req, res) {
+    res.sendFile(__dirname + '/client/build/index.html');
 });
 
 
