@@ -53,7 +53,6 @@ app.get('/new_canvas', function (req, res) {
     console.log("New canvas created:", id);
 <<<<<<< HEAD
 });
-// Otherwise redirect to a new canvas page.
 app.get('/*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 =======
