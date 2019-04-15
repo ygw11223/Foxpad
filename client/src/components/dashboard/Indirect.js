@@ -14,11 +14,13 @@ class Indirect extends React.Component {
         if (cookies.get('cd_user_name') == undefined) {
             this.setState({toLogin: true});
         }
+        else {
+            this.setState({toLogin: false});
+        }
     }
-
     render() {
-        return this.state.toLogin === true ? <Redirect to={'/dashboard'} />
-                                           : <Redirect to={'/login'} />;
+        return this.state.toLogin === true ? <Redirect to={'/login'} />
+                                           : <Redirect to={'/dashboard'} />;
     }
 }
 export default Indirect;

@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
-const port =  3000;
+const port =  2000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 // Max level of multi-resolution image pyramid.
@@ -29,6 +29,7 @@ app.use('/canvas/images', express.static(__dirname + '/images'));
 // Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get canvas id.
+    console.log(req.url);
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
     if (!(canvas_id in CANVAS_IDS)) {
@@ -37,8 +38,10 @@ app.get('/canvas/*', function (req, res) {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
+
 app.get('/new_canvas', function (req, res) {
     // Create a new canvas id.
+    console.log(req.url);
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
@@ -51,8 +54,6 @@ app.get('/new_canvas', function (req, res) {
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 });
-
-
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {

@@ -11,10 +11,11 @@ class App extends Component {
     return (
         <BrowserRouter>
             <div className="App" style={{ height:'100%', width:'100%'}}>
-                <Route path='/canvas/:id' component={CanvasBoard} />
-                <Route path='/' component={Indirect}/>
-                <Route path='/dashboard' component={Dashboard}/>
-                <Route path='/login' component={Login}/>
+                <Route exact path='/' component={Indirect}/>
+                <Route exact path='/canvas/:id' component={CanvasBoard} />
+                <Route exact path='/dashboard' component={Dashboard}/>
+                <Route exact path='/login' component={Login}/>
+
             </div>
         </BrowserRouter>
     );
