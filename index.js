@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
-const port =  3000;
+const port =  2000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 // Max level of multi-resolution image pyramid.
@@ -24,15 +24,13 @@ IMAGES = {};
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
 // All static files should be in "/public" on server.
-<<<<<<< HEAD
 app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
-=======
-app.use('/static', express.static(__dirname + '/client/build'))
->>>>>>> update server router
+
 // Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get canvas id.
+    console.log(req.url);
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
     if (!(canvas_id in CANVAS_IDS)) {
@@ -41,8 +39,10 @@ app.get('/canvas/*', function (req, res) {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
+
 app.get('/new_canvas', function (req, res) {
     // Create a new canvas id.
+    console.log(req.url);
     var id = hashes.generate();
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
@@ -51,16 +51,16 @@ app.get('/new_canvas', function (req, res) {
     res.type("text/json");
     res.send(id);
     console.log("New canvas created:", id);
-<<<<<<< HEAD
 });
-app.get('/*', function (req, res) {
+
+app.get('*', function (req, res) {
+    console.log(req.url);
     res.sendFile(__dirname + '/client/build/index.html');
-=======
->>>>>>> update server router
+
 });
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/client/build/index.html');
-});
+// app.get('/', function (req, res) {
+//     res.sendFile(__dirname + '/client/build/index.html');
+// });
 
 
 function onConnection(socket){
@@ -76,11 +76,8 @@ function onConnection(socket){
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
-<<<<<<< HEAD
         if (!(socket.user_id in DATABASE[socket.canvas_id])) {
-=======
-    if (!(socket.user_id in DATABASE[socket.canvas_id])) {
->>>>>>> update server router
+
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
         console.log("One user joined", socket.canvas_id);
