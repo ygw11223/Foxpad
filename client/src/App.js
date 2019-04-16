@@ -15,7 +15,6 @@ class App extends Component {
                 <Route exact path='/canvas/:id' component={CanvasBoard} />
                 <Route exact path='/dashboard' component={Dashboard}/>
                 <Route exact path='/login' component={Login}/>
-
             </div>
         </BrowserRouter>
     );
