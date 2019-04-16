@@ -50,6 +50,7 @@ app.get('/new_canvas', function (req, res) {
     res.type("text/json");
     res.send(id);
     console.log("New canvas created:", id);
+});
 
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
