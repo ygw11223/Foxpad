@@ -36,7 +36,6 @@ class Dashboard extends Component {
     onReadyStateChange() {
         if (this.xmlHttp.readyState == 4 && this.xmlHttp.status == 200) {
             var id = this.xmlHttp.responseText;
-            console.log(id);
             this.setState({toCanvas: true, id: id});
         }
     }

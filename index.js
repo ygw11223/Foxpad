@@ -26,6 +26,7 @@ IMAGES = {};
 // All static files should be in "/public" on server.
 app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
+
 // Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get canvas id.
@@ -54,7 +55,7 @@ app.get('/new_canvas', function (req, res) {
 
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
-});
+}
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
@@ -70,6 +71,7 @@ function onConnection(socket){
         // Number of client in this session incremented.
         CANVAS_IDS[auth_info.canvas_id] += 1;
         if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
         console.log("One user joined", socket.canvas_id);
