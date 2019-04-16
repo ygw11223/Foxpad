@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
-const port =  2000;
+const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 // Max level of multi-resolution image pyramid.
@@ -58,10 +58,6 @@ app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 
 });
-// app.get('/', function (req, res) {
-//     res.sendFile(__dirname + '/client/build/index.html');
-// });
-
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
