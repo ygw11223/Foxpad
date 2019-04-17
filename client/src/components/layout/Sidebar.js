@@ -13,23 +13,13 @@ class Sidebar extends React.Component {
     //
     render() {
         return (
-            <ButtonGroup   vertical >
-                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightEraser}
-                                    toggle={()=>{this.setState({btnDroprightEraser: !this.state.btnDroprightEraser})}}>
-                    <DropdownToggle   si className='bg-light tool-button' >
-                        <i className="fas fa-eraser" style={{color: 'black'}}></i>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        <DropdownItem eventKey="2" onClick={() => this.props.onEraser("2")} >2</DropdownItem>
-                        <DropdownItem eventKey="10" onClick={() => this.props.onEraser("10")}>10</DropdownItem>
-                        <DropdownItem eventKey="15" onClick={() => this.props.onEraser("15")}>15</DropdownItem>
-                    </DropdownMenu>
-                </ButtonDropdown>
+            <ButtonGroup   vertical id="buttonGroup" >
+                <Button eventKey="white" id="eraser" className='tool-button button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser fa-2x" style={{color: 'white'}}></i></Button>
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
                                     toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
-                    <DropdownToggle   si className='bg-light tool-button' >
-                        <i className="fas fa-pencil-alt" style={{color: 'black'}}></i>
+                    <DropdownToggle   si id="penWidth" className='tool-button' >
+                        <i className="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i>
                     </DropdownToggle>
                     <DropdownMenu>
                         <DropdownItem eventKey="2" onClick={() => this.props.onChangeWidth("2")} >2</DropdownItem>
@@ -40,8 +30,8 @@ class Sidebar extends React.Component {
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightColor}
                                     toggle={()=>{this.setState({btnDroprightColor: !this.state.btnDroprightColor})}}>
-                    <DropdownToggle   si className='bg-light tool-button' >
-                        <i className="fas fa-palette" style={{color: 'black'}}></i>
+                    <DropdownToggle   si id="palette" className='tool-button button' >
+                        <i className="fas fa-palette fa-2x" style={{color: 'white'}}></i>
                     </DropdownToggle>
                     <DropdownMenu>
                         <DropdownItem eventKey="black" onClick={() => this.props.onChangeColor("black")} ><i className="fas fa-square" style={{color:'black',}}></i></DropdownItem>
@@ -50,11 +40,11 @@ class Sidebar extends React.Component {
                     </DropdownMenu>
                 </ButtonDropdown>
 
-                <Button eventKey="undo" className='bg-light tool-button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo" style={{color: 'black'}}></i></Button>
-                <Button eventKey="mode" className='bg-light tool-button' onClick={() => this.props.onChangeMode()} > <i class={"fas "+this.props.mode} style={{color: 'black'}}></i></Button>
-                <Button eventKey="zoom-in" className='bg-light tool-button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus" style={{color: 'black'}}></i></Button>
-                <Button eventKey="zoom-out" className='bg-light tool-button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus" style={{color: 'black'}}></i></Button>
-                <Button eventKey="upload" className='bg-light tool-button' onClick={() => this.props.showForm()} > <i className="fas fa-image" style={{color: 'black'}}></i></Button>
+                <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="mode" id="changeMode" className='tool-button button' onClick={() => this.props.onChangeMode()} > <i class={"fa-2x fas "+this.props.mode} style={{color: 'white'}}></i></Button>
+                <Button eventKey="zoom-in" id="zoomIn" className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="zoom-out" id="zoomOut" className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="upload" id="image" className='tool-button button' onClick={() => this.props.showForm()} > <i className="fas fa-image fa-2x" style={{color: 'white'}}></i></Button>
             </ButtonGroup>
         );
     }
