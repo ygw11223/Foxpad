@@ -1,6 +1,12 @@
 import React, {Component} from 'react';
 import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar'
+const styleSideBar = {
+  zIndex: '5',
+  position:'absolute',
+  left:'0px',
+  top:'0px',
+};
 
 class CanvasBoard extends Component {
     constructor(props) {
@@ -44,28 +50,28 @@ class CanvasBoard extends Component {
 
     render(){
         return(
-            <div style = {{ display: 'flex', flexDirection: 'row', height:'100%'}}>
-                <div >
-                    <Sidebar mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
-                             onChangeColor={this.changeColor}
-                             onChangeWidth={this.changeWidth}
-                             onUndo={this.onUndoEvent}
-                             onChangeMode={this.onChangeMode}
-                             onZoom={this.onZoom}
-                             showForm={this.showForm}
-                             onEraser={this.onEraser}/>
-                </div>
-                    <div style={{  backgroundColor: 'gray', border: 'solid 4px', flexGrow : 1}} >
-                        <Canvas
-                            onRef={ref => (this.canvas= ref)}
-                            mode={this.state.mode}
-                            width={this.state.width}
-                            height={this.state.height}
-                            color={this.state.color}
-                            room_id={this.props.match.params.id}
-                            lineWidth={this.state.lineWidth}
-                            eraser={this.state.eraser} />
-                    </div>
+            <div style = {{height:'100%'}}>
+                <Canvas
+                        onRef={ref => (this.canvas= ref)}
+                        mode={this.state.mode}
+                        width={this.state.width}
+                        height={this.state.height}
+                        color={this.state.color}
+                        room_id={this.props.match.params.id}
+                        lineWidth={this.state.lineWidth}
+                        eraser={this.state.eraser} />
+
+                <Sidebar style={styleSideBar}
+                         mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
+                         onChangeColor={this.changeColor}
+                         onChangeWidth={this.changeWidth}
+                         onUndo={this.onUndoEvent}
+                         onChangeMode={this.onChangeMode}
+                         onZoom={this.onZoom}
+                         showForm={this.showForm}
+                         onEraser={this.onEraser}/>
+
+
             </div>
         );
     }
