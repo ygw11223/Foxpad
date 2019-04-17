@@ -55,7 +55,7 @@ app.get('/new_canvas', function (req, res) {
 
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
-}
+});
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
