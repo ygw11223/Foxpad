@@ -1,3 +1,85 @@
 .tool-button {
-    width: 50px
+    width: 50px;
+    cursor: pointer;
+    height: 80px;
+    background-color: #c5c5c5;
+    /* pointer-events: none; */
 }
+
+.tool-button:hover {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.tool-button:focus {
+    background-color: #4C94CE;
+    border: none;
+}
+
+
+#image {
+    border-radius: 0px 0px 25px 0px;
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+}
+
+
+#eraser {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+}
+
+#eraser:focus {
+    border:none;
+    outline:none;
+}
+
+#eraser::after {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 50%; /* Change this to whatever width you want. */
+    padding-top: 30px; /* This creates some space between the element and the border. */
+    border-bottom: 3px solid white; /* This creates the border. Replace black with whatever color you want. */
+}
+
+#penWidth {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+#penWidth:focus {
+    border:none;
+    outline:none;
+}
+
+#palette {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+#undo {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+#changeMode {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+#zoomIn {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+#zoomOut {
+    background-color: #c5c5c5;
+    border: none;
+}
+
+.fa-2x {
+  font-size: 2em !important;}
