@@ -135,9 +135,9 @@ class Canvas extends Component {
         this.onEmitImg();
     }
 
-    drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
+    drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
         this.ctx.beginPath();
-        if (this.props.eraser) {
+        if (isEraser) {
             this.ctx.globalCompositeOperation="destination-out";
             // this.ctx.arc(x0,y0,16,0,Math.PI*2,false);
             // this.ctx.fill();
@@ -160,6 +160,7 @@ class Canvas extends Component {
             y1: y1,
             color: color,
             lineWidth: lineWidth,
+            isEraser: this.props.eraser,
         });
     }
 
@@ -169,7 +170,8 @@ class Canvas extends Component {
                       data.x1,
                       data.y1,
                       data.color,
-                      data.lineWidth,)
+                      data.lineWidth,
+                      data.isEraser)
     }
 
     onImageEvent(data) {
@@ -180,7 +182,7 @@ class Canvas extends Component {
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
-    } 
+    }
 
     onDrawImage() {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
@@ -284,13 +286,13 @@ class Canvas extends Component {
             socket.emit('command', 'update');
         }
         else {
-            console.log(this.offsetX);
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
                           this.props.lineWidth,
+                          this.props.eraser,
                           1)
         }
         this.preX = currentX;
