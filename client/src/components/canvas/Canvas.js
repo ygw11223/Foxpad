@@ -135,13 +135,23 @@ class Canvas extends Component {
         this.onEmitImg();
     }
 
-    drawLine(x0,y0,x1,y1,color, lineWidth, emit) {
+    drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
         this.ctx.beginPath();
+        if (isEraser) {
+            this.ctx.globalCompositeOperation="destination-out";
+            // this.ctx.arc(x0,y0,16,0,Math.PI*2,false);
+            // this.ctx.fill();
+        }
+        else {
+            this.ctx.globalCompositeOperation="source-over";
+        }
         this.ctx.moveTo(x0, y0);
         this.ctx.lineTo(x1, y1);
+        this.ctx.lineCap = "round";
         this.ctx.lineWidth = lineWidth;
         this.ctx.strokeStyle = color;
         this.ctx.stroke();
+
         if(!emit){return;}
         socket.emit('drawing', {
             x0: x0,
@@ -150,6 +160,7 @@ class Canvas extends Component {
             y1: y1,
             color: color,
             lineWidth: lineWidth,
+            isEraser: this.props.eraser,
         });
     }
 
@@ -159,7 +170,8 @@ class Canvas extends Component {
                       data.x1,
                       data.y1,
                       data.color,
-                      data.lineWidth,)
+                      data.lineWidth,
+                      data.isEraser)
     }
 
     onImageEvent(data) {
@@ -170,7 +182,7 @@ class Canvas extends Component {
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
-    } 
+    }
 
     onDrawImage() {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
@@ -199,6 +211,9 @@ class Canvas extends Component {
         console.log("upload");
         var file = document.getElementById("file");
         var id = uploader.upload(file);
+        this.setState(prevState => ({
+            modal: !prevState.modal
+        }));
         console.log(id);
     }
 
@@ -271,13 +286,13 @@ class Canvas extends Component {
             socket.emit('command', 'update');
         }
         else {
-            console.log(this.offsetX);
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
                           this.props.lineWidth,
+                          this.props.eraser,
                           1)
         }
         this.preX = currentX;
