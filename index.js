@@ -1,3 +1,4 @@
+const firebase = require('./firebase.js');
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -18,8 +19,11 @@ CANVAS_IDS = {};
 // TODO(Guowei) : Update when connecting firebase to server.
 // TODO(Guowei) : Maybe need a r/w lock.
 DATABASE = {};
-
 IMAGES = {};
+var db = firebase.database();
+var ref = db.ref("Canvas");
+var usersRef = db.ref("Users");
+var strokesRef = db.ref("Strokes");
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
@@ -33,7 +37,20 @@ app.get('/canvas/*', function (req, res) {
     console.log(req.url);
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
-    if (!(canvas_id in CANVAS_IDS)) {
+    // if (!(canvas_id in CANVAS_IDS)) {
+    //     res.status(400).send('Invalid Url!');
+    // } else {
+    //     res.sendFile(__dirname + '/client/build/index.html');
+    // }
+
+    var hasCanvas = false;
+    ref.equalTo(canvas_id).once("value")
+    .then(function(snapshot) {
+      hasCanvas = snapshot.hasChild(canvas_id); // true
+      console.log("Canvas has been found.");
+    });
+
+      if (hasCanvas) {
         res.status(400).send('Invalid Url!');
     } else {
         res.sendFile(__dirname + '/client/build/index.html');
@@ -47,9 +64,17 @@ app.get('/new_canvas', function (req, res) {
     CANVAS_IDS[id] = 0;
     DATABASE[id] = {};
 
+    var canvas = ref.push();
+    var id = canvas.key;
+    ref.child(id).set({
+      Users: "",
+      Strokes: "",
+    });
     res.status(200);
     res.type("text/json");
     res.send(id);
+
+
     console.log("New canvas created:", id);
 });
 
@@ -63,25 +88,44 @@ function onConnection(socket){
         socket.canvas_id = auth_info.canvas_id;
         socket.user_id = auth_info.user_id
         // Check if canvas id is valid.
-        if (!(socket.canvas_id in DATABASE)) {
-            DATABASE[socket.canvas_id] = {};
-            console.log("New canvas_id encountered when init socket.");
-        }
+        // if (!(socket.canvas_id in DATABASE)) {
+        //     DATABASE[socket.canvas_id] = {};
+        //     console.log("New canvas_id encountered when init socket.");
+        // }
         socket.join(socket.canvas_id);
         // Number of client in this session incremented.
-        CANVAS_IDS[auth_info.canvas_id] += 1;
-        if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+        // CANVAS_IDS[auth_info.canvas_id] += 1;
+        // if (!(socket.user_id in DATABASE[socket.canvas_id])) {
+        //
+        //     DATABASE[socket.canvas_id][socket.user_id] = [];
+        // }
 
-            DATABASE[socket.canvas_id][socket.user_id] = [];
+
+        var hasUser = false;
+        ref.child(socket.canvas_id).child("Users").once("value")
+        .then(function(snapshot) {
+          hasUser = snapshot.hasChild(socket.user_id);
+        });
+        if (!hasUser){
+          ref.child(socket.canvas_id).child("Users").update({
+            [socket.user_id]: true
+          });
         }
+
         console.log("One user joined", socket.canvas_id);
     });
 
     // Save drawing data and broadcast to all of its peers
     socket.on('drawing', (data) => {
         // TODO(Guowei) : Update when connecting firebase to server.
-        var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
-        DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
+        // var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
+        // DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
+
+        var query = strokesRef.child(socket.canvas_id).orderByChild("author").equalTo(socket.user_id).limitToLast(1);
+        query.once("child_added", function(snapshot) {
+          snapshot.ref.push(data)
+        });
+
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
     });
 
@@ -118,30 +162,94 @@ function onConnection(socket){
             case 'update':
                 // TODO : Currently not considering order of strokes. Same for undo.
                 data_array = [];
-                for (var user in DATABASE[socket.canvas_id]) {
-                    for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
-                            data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
-                        }
-                    }
-                }
-                socket.emit('redraw', data_array);
+                // for (var user in DATABASE[socket.canvas_id]) {
+                //     for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
+                //         for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
+                //             data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
+                //         }
+                //     }
+                // }
+
+                var query = strokesRef.child(socket.canvas_id);
+
+                // canvas in Strokes
+                query.once("value", function(canvas) {
+                  // stroke in canvas
+                  canvas.forEach(function(stroke) {
+                    // strokeSeg in stroke
+                    stroke.forEach(function(strokeSeg) {
+                      var strokeSegKey = strokeSeg.key;
+                      var strokeSegData = strokeSeg.val();
+                      if (strokeSegKey != "author" && strokeSegKey != "time") {
+                        // console.log("CCdata:", strokeSegData);
+                        data_array.push(strokeSegData);
+                        // console.log("within query data:", data_array);
+                      }
+                    });
+                  });
+                  socket.emit('redraw', data_array);
+                });
+
+                // socket.emit('redraw', data_array);
                 break;
             case 'undo':
-                DATABASE[socket.canvas_id][socket.user_id].pop();
+                // DATABASE[socket.canvas_id][socket.user_id].pop();
                 data_array = [];
-                for (var user in DATABASE[socket.canvas_id]) {
-                    for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
-                            data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
-                        }
+                // for (var user in DATABASE[socket.canvas_id]) {
+                //     for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
+                //         for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
+                //             data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
+                //         }
+                //     }
+                // }
+                // socket.emit('redraw', data_array);
+                // socket.broadcast.in(socket.canvas_id).emit('redraw', data_array);
+
+                var hasStroke = false;
+
+                strokesRef.child(socket.canvas_id).once("value")
+                .then(function(canvas) {
+                  canvas.forEach(function(stroke) {
+                    if (stroke.val().author == socket.user_id) {
+                      hasStroke = true;
                     }
-                }
-                socket.emit('redraw', data_array);
-                socket.broadcast.in(socket.canvas_id).emit('redraw', data_array);
+                  });
+
+                  if (hasStroke) {
+                    strokesRef.child(socket.canvas_id).orderByChild("author").equalTo(socket.user_id).limitToLast(1).once("child_added", function(snapshot) {
+                        snapshot.ref.remove();
+                        console.log(snapshot.key, "removed");
+                      });
+
+                    var query = strokesRef.child(socket.canvas_id);
+                    // canvas in Strokes
+                    query.once("value", function(canvas) {
+                      // stroke in canvas
+                      canvas.forEach(function(stroke) {
+                        // strokeSeg in stroke
+                        stroke.forEach(function(strokeSeg) {
+                          var strokeSegKey = strokeSeg.key;
+                          var strokeSegData = strokeSeg.val();
+                          if (strokeSegKey != "author" && strokeSegKey != "time") {
+                            data_array.push(strokeSegData);
+                          }
+                        });
+                      });
+                      socket.emit('redraw', data_array);
+                      socket.broadcast.in(socket.canvas_id).emit('redraw', data_array);
+                      data_array = [];
+                    });
+                  }
+                });
                 break;
             case 'new_stroke':
-                DATABASE[socket.canvas_id][socket.user_id].push([]);
+                // DATABASE[socket.canvas_id][socket.user_id].push([]);
+
+                strokesRef.child(socket.canvas_id).push({
+                  author: socket.user_id,
+                  time: firebase.database.ServerValue.TIMESTAMP
+                });
+
                 break;
             default:
                 console.log("Invalid command received.")
@@ -149,7 +257,7 @@ function onConnection(socket){
     });
 
     socket.on('disconnect', () => {
-        CANVAS_IDS[socket.canvas_id] -= 1;
+        // CANVAS_IDS[socket.canvas_id] -= 1;
         console.log("One user left", socket.canvas_id);
     });
 

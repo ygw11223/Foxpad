@@ -9,10 +9,11 @@
   ],
   "dependencies": {
     "express": "^4.16.4",
+    "firebase": "^5.9.4",
+    "opencv4nodejs": "latest",
     "short-id": "latest",
     "socket.io": "latest",
-    "socket.io-file": "latest",
-    "opencv4nodejs": "latest"
+    "socket.io-file": "latest"
   },
   "scripts": {
     "start": "node index"
