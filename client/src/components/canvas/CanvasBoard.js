@@ -8,8 +8,8 @@ const cookies = new Cookies();
 const styleSideBar = {
   zIndex: '5',
   position:'absolute',
-  left:'0px',
-  top:'0px',
+  left:'100px',
+  top:'100px',
 };
 
 class CanvasBoard extends Component {
