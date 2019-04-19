@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
-import  { Redirect } from 'react-router-dom'
+import  { Route, Redirect } from 'react-router-dom'
 import './login.css'
 
 const logo = require('./foxy2.png');
@@ -9,9 +9,14 @@ const cookies = new Cookies();
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {user_name: '', toDashboard: false};
+        this.state = {user_name: '', toDashboard: false, toCanvas: false, fromCanvas: false};
         this.onSubmit = this.onSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+    }
+
+    componentDidMount() {
+        console.log("In componentdidmount");
+        console.log(this.props.location);
     }
 
     handleChange(event) {
@@ -20,12 +25,21 @@ class Login extends React.Component {
 
     onSubmit() {
         cookies.set('cd_user_name', this.state.user_name);
-        this.setState({toDashboard: true});
+        console.log(this.props.location);
+        if (this.props.location.state === undefined) {
+            this.setState({toDashboard: true});
+        }
+        else {
+            this.setState({toCanvas: true});
+        }
     }
 
     render() {
         if (this.state.toDashboard === true) {
             return <Redirect to={'/dashboard'} />
+        }
+        else if (this.state.toCanvas === true) {
+            return <Redirect to={'/canvas/'+this.props.location.state.room_id} />
         }
         return (
             <div class="parent-container" id="gradient">
@@ -45,4 +59,5 @@ class Login extends React.Component {
         );
     }
 }
+
 export default Login;
