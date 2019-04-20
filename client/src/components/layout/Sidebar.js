@@ -2,6 +2,12 @@ import React from 'react';
 import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu} from 'reactstrap';
 import './style.css'
 
+const styleSideBar = {
+  zIndex: '4',
+  position:'absolute',
+  left:'0px',
+  top:'100px',
+};
 
 class Sidebar extends React.Component {
     constructor(props) {
@@ -13,7 +19,7 @@ class Sidebar extends React.Component {
     //
     render() {
         return (
-            <ButtonGroup   vertical >
+            <ButtonGroup vertical style={styleSideBar}>
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightEraser}
                                     toggle={()=>{this.setState({btnDroprightEraser: !this.state.btnDroprightEraser})}}>
                     <DropdownToggle   si className='bg-light tool-button' >
