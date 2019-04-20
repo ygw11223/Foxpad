@@ -2,9 +2,13 @@ import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
 import  { Route, Redirect } from 'react-router-dom';
 import Canvas from './Canvas';
+<<<<<<< HEAD
 import Sidebar from '../layout/Sidebar';
 
 const cookies = new Cookies();
+=======
+import Sidebar from '../layout/Sidebar'
+>>>>>>> 7c0c15ebec3f8c46f097a7deacfbc66fda5bdeb3
 const styleSideBar = {
   zIndex: '5',
   position:'absolute',
