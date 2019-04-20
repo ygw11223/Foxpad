@@ -2,7 +2,6 @@ import React from 'react';
 import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu} from 'reactstrap';
 import './style.css'
 
-
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
@@ -49,4 +48,5 @@ class Sidebar extends React.Component {
         );
     }
 }
+
 export default Sidebar;

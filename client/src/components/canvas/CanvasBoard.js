@@ -3,6 +3,7 @@ import Cookies from 'universal-cookie';
 import  { Route, Redirect } from 'react-router-dom';
 import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar';
+import InfoCards from '../layout/InfoCards';
 
 const cookies = new Cookies();
 
@@ -68,7 +69,7 @@ class CanvasBoard extends Component {
             }} />
         }
         return(
-            <div style = {{height:'100%'}}>
+            <div>
                 <Canvas
                         onRef={ref => (this.canvas= ref)}
                         mode={this.state.mode}
@@ -79,6 +80,8 @@ class CanvasBoard extends Component {
                         lineWidth={this.state.lineWidth}
                         eraser={this.state.eraser} />
 
+                <InfoCards/>
+
                 <Sidebar style={styleSideBar}
                          mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                          onChangeColor={this.changeColor}
@@ -88,8 +91,6 @@ class CanvasBoard extends Component {
                          onZoom={this.onZoom}
                          showForm={this.showForm}
                          onEraser={this.onEraser}/>
-
-
             </div>
         );
     }
