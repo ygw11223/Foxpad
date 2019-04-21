@@ -25,22 +25,20 @@ class CanvasBoard extends Component {
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
+        this.id = cookies.get('cd_user_name');
     }
 
     session_update(data){
-        for (var key in data) {
-            console.log(key, data[key]);
-        }
+        this.cardDeck.state.totalIds = Object.keys(data).length;
+        this.cardDeck.state.color = data[this.id];
+        delete data[this.id];
+        this.cardDeck.state.members = data;
+        this.cardDeck.forceUpdate();
     }
 
     onInitCanvas(){
-        let id = cookies.get('cd_user_name');
-        if (id == undefined) {
-            id = "ID_NOT_FOUND";
-        }
-
         this.socket.emit('init', {
-            user_id: id,
+            user_id: this.id,
             canvas_id: this.props.match.params.id,
         });
         // Get image and strokes from server.
@@ -53,6 +51,7 @@ class CanvasBoard extends Component {
         if (id == undefined) {
             this.setState({toLogin: true});
         } else {
+            this.id = id;
             // On server, we save user and canvas id on the socket object, which
             // will disappear when connection is lost. So we need to init upon
             // each connection.
@@ -117,17 +116,19 @@ class CanvasBoard extends Component {
                         socket={this.socket}
                         uploader={this.uploader}/>
 
-                <InfoCards/>
+                <InfoCards
+                        onRef={ref => (this.cardDeck= ref)}
+                        name={this.id}/>
 
                 <Sidebar
-                         mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
-                         onChangeColor={this.changeColor}
-                         onChangeWidth={this.changeWidth}
-                         onUndo={this.onUndoEvent}
-                         onChangeMode={this.onChangeMode}
-                         onZoom={this.onZoom}
-                         showForm={this.showForm}
-                         onEraser={this.onEraser}/>
+                        mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
+                        onChangeColor={this.changeColor}
+                        onChangeWidth={this.changeWidth}
+                        onUndo={this.onUndoEvent}
+                        onChangeMode={this.onChangeMode}
+                        onZoom={this.onZoom}
+                        showForm={this.showForm}
+                        onEraser={this.onEraser}/>
             </div>
         );
     }

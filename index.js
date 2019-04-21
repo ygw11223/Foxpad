@@ -65,7 +65,7 @@ function onConnection(socket){
         if (!(socket.canvas_id in DATABASE)) {
             DATABASE[socket.canvas_id] = {};
             SESSION_INFO[socket.canvas_id] = {};
-            USER_INFO[socket.canvas_id] = {}
+            USER_INFO[socket.canvas_id] = {};
             console.log("New canvas_id encountered when init socket.");
         }
         socket.join(socket.canvas_id);
@@ -75,7 +75,7 @@ function onConnection(socket){
 
         // Initilize user information
         if (!(socket.user_id in USER_INFO[socket.canvas_id])) {
-            USER_INFO[socket.canvas_id][socket.user_id] = randomColor();
+            USER_INFO[socket.canvas_id][socket.user_id] = randomColor({luminosity: 'dark'});
         }
         SESSION_INFO[socket.canvas_id][socket.user_id] = USER_INFO[socket.canvas_id][socket.user_id];
         socket.broadcast.in(socket.canvas_id).emit('session_update', SESSION_INFO[socket.canvas_id]);
