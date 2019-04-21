@@ -74,7 +74,7 @@ function onConnection(socket){
 
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
-        console.log("One user joined", socket.canvas_id);
+        console.log(socket.user_id, "joined", socket.canvas_id);
     });
 
     // Save drawing data and broadcast to all of its peers
@@ -149,8 +149,10 @@ function onConnection(socket){
     });
 
     socket.on('disconnect', () => {
-        CANVAS_IDS[socket.canvas_id] -= 1;
-        console.log("One user left", socket.canvas_id);
+        if (socket.canvas_id) {
+            CANVAS_IDS[socket.canvas_id] -= 1;
+            console.log(socket.user_id, "left", socket.canvas_id);
+        }
     });
 
     var uploader = new SocketIOFile(socket, {

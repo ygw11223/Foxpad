@@ -1,12 +1,8 @@
 import React, {Component} from 'react';
-import openSocket from 'socket.io-client';
-import SocketIOFileClient from 'socket.io-file-client';
 import Cookies from 'universal-cookie';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
-var socket; // Not const because we want to open it in canvas constructor.
-var uploader;
 
 const styleCanvas = {
   zIndex: 'auto',
@@ -34,7 +30,6 @@ class Canvas extends Component {
         this.updateDimensions = this.updateDimensions.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
-        this.onInitCanvas = this.onInitCanvas.bind(this);
         this.onEmitImg = this.onEmitImg.bind(this);
         this.onDrawImage = this.onDrawImage.bind(this);
         //this.onScrollEvent = this.onScrollEvent.bind(this);
@@ -61,44 +56,10 @@ class Canvas extends Component {
         // zooming
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
-
-        // On server, we save user and canvas id on the socket object, which
-        // will disappear when connection is lost. So we need to init upon
-        // each connection.
-        socket = openSocket();
-        socket.on('connect', this.onInitCanvas);
-        uploader = new SocketIOFileClient(socket);
-    }
-
-    onInitCanvas(){
-        let id = cookies.get('cd_user_name');
-        if (id == undefined) {
-            // TODO : This is not guaranteed unique. Look for better id generator.
-            id = Math.random().toString(36).substr(2, 9);
-            cookies.set('cd_user_name', id);
-            console.log(id)
-        }
-
-        socket.emit('init', {
-            user_id: id,
-            canvas_id: this.props.room_id,
-        });
-        socket.on('drawing', this.onDrawingEvent);
-        socket.on('image', this.onImageEvent);
-        socket.on('redraw', this.onRedrawEvent);
-        socket.on('update', (cmd)=>{
-            if(cmd === "image_ready") {
-                this.onEmitImg();
-            }
-        });
-        // Get image and strokes from server.
-        this.onEmitImg();
-        socket.emit('command', 'update');
     }
 
     onEmitImg(){
-        console.log('emit image');
-        socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
 
     onRedrawEvent(data_array) {
@@ -131,7 +92,7 @@ class Canvas extends Component {
     updateDimensions() {
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.ctx.translate(-this.offsetX,-this.offsetY);
-        socket.emit('command', 'update');
+        this.props.socket.emit('command', 'update');
         this.onEmitImg();
     }
 
@@ -153,7 +114,7 @@ class Canvas extends Component {
         this.ctx.stroke();
 
         if(!emit){return;}
-        socket.emit('drawing', {
+        this.props.socket.emit('drawing', {
             x0: x0,
             y0: y0,
             x1: x1,
@@ -197,7 +158,7 @@ class Canvas extends Component {
 
     onUndoEvent(e) {
         console.log('undo');
-        socket.emit('command', 'undo');
+        this.props.socket.emit('command', 'undo');
     }
 
     showForm(e) {
@@ -210,7 +171,7 @@ class Canvas extends Component {
         e.preventDefault();
         console.log("upload");
         var file = document.getElementById("file");
-        var id = uploader.upload(file);
+        var id = this.props.uploader.upload(file);
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
@@ -237,7 +198,7 @@ class Canvas extends Component {
         this.preX = currentX;
         this.preY = currentY;
         if(!this.props.mode){
-            socket.emit('command', 'new_stroke');
+            this.props.socket.emit('command', 'new_stroke');
         }
     }
 
@@ -283,7 +244,7 @@ class Canvas extends Component {
                 this.offsetY -= dy;
             }
             this.ctx.translate(dx,dy);
-            socket.emit('command', 'update');
+            this.props.socket.emit('command', 'update');
         }
         else {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -320,7 +281,7 @@ class Canvas extends Component {
         // this.ctx.translate(dx, dy);
         // this.offsetX -= dx;
         // this.offsetY -= dy;
-        socket.emit('command', 'update');
+        this.props.socket.emit('command', 'update');
         this.onEmitImg();
     }
 
