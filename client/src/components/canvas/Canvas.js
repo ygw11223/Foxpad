@@ -157,9 +157,13 @@ class Canvas extends Component {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
+            //this.pictureOffsetX = this.imageHight/2;
+            //this.pictureOffsetY = -this.imageWidth/2;
+
         }
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
-        this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
+        console.log([-this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageWidth/2]);
+        this.pctx.drawImage(this.image, -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2  , this.imageWidth, this.imageHight);
     }
 
     onUndoEvent(e) {
@@ -237,8 +241,7 @@ class Canvas extends Component {
         if(this.props.mode){
             let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
             let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
-            this.pictureOffsetX -= currentX - this.preX;
-            this.pictureOffsetY -= currentY - this.preY;
+
             if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
                 dx = this.offsetX + this.solveOffSet(-this.canvas_width/2, 0);
             } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
@@ -251,7 +254,8 @@ class Canvas extends Component {
             }
             this.offsetX -= dx;
             this.offsetY -= dy;
-            console.log([dx, this.mapWindowToCanvas(0, this.offsetX), -this.canvas_width/2]);
+            this.pictureOffsetX += dx/this.scale;
+            this.pictureOffsetY += dy/this.scale;
             this.ctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
