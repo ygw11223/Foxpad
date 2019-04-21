@@ -62,7 +62,7 @@ class CardStack extends React.Component {
     }
 
     componentDidMount() {
-       this.props.onRef(this)''
+       this.props.onRef(this);
     }
 
     render () {
