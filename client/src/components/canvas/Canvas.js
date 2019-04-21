@@ -13,7 +13,6 @@ const styleCanvas = {
   position:'absolute',
   left:'0px',
   top:'0px',
-
 };
 
 const stylePicture = {
