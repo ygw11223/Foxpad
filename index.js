@@ -6,13 +6,15 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
+var randomColor = require('randomcolor');
 // Max level of multi-resolution image pyramid.
 const MaxImageLevel = 3;
 
-// Maintain infomation on active sessions. Currently only conatins number of
-// users per seesion.
-// TODO(Guowei) : Come up with a better format.
-CANVAS_IDS = {};
+// Maintain infomation on users.
+USER_INFO = {};
+
+// Maintain infomation on active session
+SESSION_INFO = {};
 
 // Maintain stroke info per session.
 // TODO(Guowei) : Update when connecting firebase to server.
@@ -30,21 +32,19 @@ app.use('/canvas/images', express.static(__dirname + '/images'));
 // Request for joining an canvas should be "/canvas/VALID_ID".
 app.get('/canvas/*', function (req, res) {
     // Get canvas id.
-    console.log(req.url);
     var canvas_id = req.originalUrl.substr(8);
     // Check if session id is valid.
-    if (!(canvas_id in CANVAS_IDS)) {
+    if (!(canvas_id in SESSION_INFO)) {
         res.status(400).send('Invalid Url!');
     } else {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
-
 app.get('/new_canvas', function (req, res) {
     // Create a new canvas id.
-    console.log(req.url);
     var id = hashes.generate();
-    CANVAS_IDS[id] = 0;
+    SESSION_INFO[id] = {};
+    USER_INFO[id] = {}
     DATABASE[id] = {};
 
     res.status(200);
@@ -52,7 +52,6 @@ app.get('/new_canvas', function (req, res) {
     res.send(id);
     console.log("New canvas created:", id);
 });
-
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 });
@@ -65,15 +64,22 @@ function onConnection(socket){
         // Check if canvas id is valid.
         if (!(socket.canvas_id in DATABASE)) {
             DATABASE[socket.canvas_id] = {};
+            SESSION_INFO[socket.canvas_id] = {};
+            USER_INFO[socket.canvas_id] = {}
             console.log("New canvas_id encountered when init socket.");
         }
         socket.join(socket.canvas_id);
-        // Number of client in this session incremented.
-        CANVAS_IDS[auth_info.canvas_id] += 1;
         if (!(socket.user_id in DATABASE[socket.canvas_id])) {
-
             DATABASE[socket.canvas_id][socket.user_id] = [];
         }
+
+        // Initilize user information
+        if (!(socket.user_id in USER_INFO[socket.canvas_id])) {
+            USER_INFO[socket.canvas_id][socket.user_id] = randomColor();
+        }
+        SESSION_INFO[socket.canvas_id][socket.user_id] = USER_INFO[socket.canvas_id][socket.user_id];
+        socket.broadcast.in(socket.canvas_id).emit('session_update', SESSION_INFO[socket.canvas_id]);
+        socket.emit('session_update', SESSION_INFO[socket.canvas_id]);
         console.log(socket.user_id, "joined", socket.canvas_id);
     });
 
@@ -150,7 +156,8 @@ function onConnection(socket){
 
     socket.on('disconnect', () => {
         if (socket.canvas_id) {
-            CANVAS_IDS[socket.canvas_id] -= 1;
+            delete SESSION_INFO[socket.canvas_id][socket.user_id];
+            socket.broadcast.in(socket.canvas_id).emit('session_update', SESSION_INFO[socket.canvas_id]);
             console.log(socket.user_id, "left", socket.canvas_id);
         }
     });

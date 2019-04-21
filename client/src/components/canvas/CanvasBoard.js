@@ -21,8 +21,16 @@ class CanvasBoard extends Component {
         this.onZoom = this.onZoom.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
+        this.session_update = this.session_update.bind(this);
+
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
+    }
+
+    session_update(data){
+        for (var key in data) {
+            console.log(key, data[key]);
+        }
     }
 
     onInitCanvas(){
@@ -52,6 +60,7 @@ class CanvasBoard extends Component {
             this.socket.on('drawing', this.canvas.onDrawingEvent);
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.canvas.onRedrawEvent);
+            this.socket.on('session_update', this.session_update);
             this.socket.on('update', (cmd)=>{
                 if(cmd === "image_ready") {
                     this.canvas.onEmitImg();

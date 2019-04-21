@@ -136,9 +136,7 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
-        console.log("image");
         this.nextImage.src = data;
-        console.log([this.image.width,this.image.height]);
     }
 
     onLoadNextImage() {
@@ -149,9 +147,7 @@ class Canvas extends Component {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
-        }
-        console.log("draw image");
-        console.log(this.image);
+        };
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
     }
