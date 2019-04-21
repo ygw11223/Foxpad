@@ -1,33 +1,7 @@
 import React from 'react';
 import {Card, CardText, CardBody, CardTitle} from 'reactstrap';
 import InfoCard from './InfoCard'
-
-// TODO : Refine styling according to design
-// TODO : change position method when adding multiple canvas
-const stackStyles = {
-    zIndex: '5',
-    position:'absolute',
-    left:'0px',
-    top:'0px',
-    display: 'flex',
-    flexDirection: 'row',
-    overflow: 'hidden',
-    padding: 0,
-    margin: 0,
-    background: '#f8f8f8',
-    height: 100,
-    color: 'white',
-};
-// TODO : Pass in background through props
-const card1Style = {
-    zIndex: '100',
-    height: 100,
-    width: 250,
-    padding: '0 0 0 20px',
-    margin: 0,
-    borderRadius: '0 0 25px 0',
-    flexShrink: 0,
-};
+import './style.css'
 
 // TODO : Programmatically add and remove cards
 class CardStack extends React.Component {
@@ -103,5 +77,32 @@ class CardStack extends React.Component {
     }
 
 }
+
+// TODO : Refine styling according to design
+// TODO : change position method when adding multiple canvas
+const stackStyles = {
+    zIndex: '5',
+    position:'absolute',
+    left:'0px',
+    top:'0px',
+    display: 'flex',
+    flexDirection: 'row',
+    overflow: 'hidden',
+    padding: 0,
+    margin: 0,
+    borderRadius: '0 0 25px 0',
+    height: 100,
+    color: 'white',
+};
+// TODO : Pass in background through props
+const card1Style = {
+    zIndex: '100',
+    height: 100,
+    width: 250,
+    padding: '0 0 0 20px',
+    margin: 0,
+    borderRadius: '0 0 25px 0',
+    flexShrink: 0,
+};
 
 export default CardStack;

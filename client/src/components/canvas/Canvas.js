@@ -5,10 +5,10 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 const cookies = new Cookies();
 
 const styleCanvas = {
-  zIndex: 'auto',
-  position:'absolute',
-  left:'0px',
-  top:'0px',
+    zIndex: 'auto',
+    position:'absolute',
+    left:'0px',
+    top:'0px',
 };
 
 const stylePicture = {
