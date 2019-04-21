@@ -7,13 +7,6 @@ import InfoCards from '../layout/InfoCards';
 
 const cookies = new Cookies();
 
-const styleSideBar = {
-  zIndex: '5',
-  position:'absolute',
-  left:'100px',
-  top:'100px',
-};
-
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
@@ -82,7 +75,7 @@ class CanvasBoard extends Component {
 
                 <InfoCards/>
 
-                <Sidebar style={styleSideBar}
+                <Sidebar
                          mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                          onChangeColor={this.changeColor}
                          onChangeWidth={this.changeWidth}

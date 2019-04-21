@@ -2,6 +2,14 @@ import React from 'react';
 import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu} from 'reactstrap';
 import './style.css'
 
+// TODO : change position method when adding multiple canvas
+const styleSideBar = {
+  zIndex: '5',
+  position:'absolute',
+  left:'0px',
+  top:'100px',
+};
+
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
@@ -12,7 +20,7 @@ class Sidebar extends React.Component {
     //
     render() {
         return (
-            <ButtonGroup   vertical id="buttonGroup" >
+            <ButtonGroup   vertical id="buttonGroup" style={styleSideBar}>
                 <Button eventKey="white" id="eraser" className='tool-button button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser fa-2x align-middle" style={{color: 'white'}}></i></Button>
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}

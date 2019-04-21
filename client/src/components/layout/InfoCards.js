@@ -2,6 +2,8 @@ import React from 'react';
 import {Card, CardText, CardBody, CardTitle} from 'reactstrap';
 import InfoCard from './InfoCard'
 
+// TODO : Refine styling according to design
+// TODO : change position method when adding multiple canvas
 const stackStyles = {
     zIndex: '5',
     position:'absolute',
@@ -10,29 +12,32 @@ const stackStyles = {
     display: 'flex',
     flexDirection: 'row',
     overflow: 'hidden',
-    whiteSpace: 'nowrap',
     padding: 0,
     margin: 0,
     background: '#f8f8f8',
     height: 100,
     color: 'white',
-    fontWeight: 'bold',
 };
+// TODO : Pass in background through props
 const card1Style = {
     zIndex: '100',
     height: 100,
-    width: 150,
-    padding: 0,
+    width: 250,
+    padding: '0 0 0 20px',
     margin: 0,
     background:'#42c8f4',
     borderRadius: '0 0 25px 0',
     flexShrink: 0,
 };
 
+// TODO : Programmatically add and remove cards
 class CardStack extends React.Component {
     constructor (props) {
         super(props);
-        this.state = {hoverId : 0, totalIds : 4}
+        this.state = {
+            hoverId : 0, // Card id which user hovers on
+            totalIds : 4, // Total number of cards
+        }
         this.updateHoverId = this.updateHoverId.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
     }
@@ -48,22 +53,32 @@ class CardStack extends React.Component {
     render () {
         const style = {
             ...stackStyles,
-            width: 125 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0),
+            // Update width of the card deck to prevent white space
+            width: 225 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0),
         }
+
         return (
             <ul style={style}
                 onMouseOut={this.onMouseOut}>
+
                 <Card style={card1Style}>
-                    <CardBody style={{padding: 10}}>
+                    <CardBody style={{padding: '0 0 0 0'}}>
                         <CardTitle style={{
                             margin: 0,
                             padding: 0,
+                            fontSize: '250%'
                         }}>
                             <b>Canvas 1</b>
                         </CardTitle>
-                        <CardText>————<br/>Anze</CardText>
+                        <p style={{
+                            padding: 0,
+                            margin: 0,
+                            fontSize: '10px',
+                        }}>———————</p>
+                        <CardText>Logined in as: <b>Anze</b></CardText>
                     </CardBody>
                 </Card>
+
                 <InfoCard
                     id={1}
                     name={'Guowei'}
