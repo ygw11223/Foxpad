@@ -43,8 +43,6 @@ class Canvas extends Component {
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
-        this.pictureOffsetX = 0;
-        this.pictureOffsetY = 0;
         this.scale = 1;
         this.preX = -1;
         this.preY = -1;
@@ -102,8 +100,19 @@ class Canvas extends Component {
     }
 
     updateDimensions() {
+        // let dx =  this.mapWindowToCanvas(window.innerWidth, this.offsetX) - this.mapWindowToCanvas(this.state.width, this.offsetX);
+        // let dy =  this.mapWindowToCanvas(window.innerHeight, this.offsetY) - this.mapWindowToCanvas(this.state.height, this.offsetY);
+        // this.offsetX += dx < 0 ? dx : -dx;
+        // this.offsetY += dy < 0 ? dy : -dy;
+
         this.setState({height: window.innerHeight, width: window.innerWidth});
-        this.ctx.translate(-this.offsetX,-this.offsetY);
+        this.imageHight *= this.scale;
+        this.imageWidth *= this.scale;
+        this.scale = 1;
+        this.offsetY = -this.state.height/2;
+        this.offsetX = -this.state.width/2;
+        this.ctx.translate(-this.offsetX, -this.offsetY);
+
         this.props.socket.emit('command', 'update');
         this.onEmitImg();
     }
@@ -157,12 +166,8 @@ class Canvas extends Component {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
-            //this.pictureOffsetX = this.imageHight/2;
-            //this.pictureOffsetY = -this.imageWidth/2;
-
         }
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
-        console.log([-this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageWidth/2]);
         this.pctx.drawImage(this.image, -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2  , this.imageWidth, this.imageHight);
     }
 
@@ -254,8 +259,6 @@ class Canvas extends Component {
             }
             this.offsetX -= dx;
             this.offsetY -= dy;
-            this.pictureOffsetX += dx/this.scale;
-            this.pictureOffsetY += dy/this.scale;
             this.ctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
