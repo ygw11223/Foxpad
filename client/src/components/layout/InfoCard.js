@@ -42,7 +42,7 @@ class InfoCard extends Component {
             <Card style={style}
                 onMouseOver={this.onMouseOver}>
 
-                <CardBody style={{padding: 0}}>
+                <CardBody style={{padding: 10}}>
                     <CardText> {this.props.name} </CardText>
                 </CardBody>
 

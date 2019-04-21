@@ -66,7 +66,7 @@ class CardStack extends React.Component {
                         <CardTitle style={{
                             margin: 0,
                             padding: 0,
-                            fontSize: '250%'
+                            fontSize: '200%'
                         }}>
                             <b>Canvas 1</b>
                         </CardTitle>
@@ -74,7 +74,7 @@ class CardStack extends React.Component {
                             padding: 0,
                             margin: 0,
                             fontSize: '10px',
-                        }}>———————</p>
+                        }}>————</p>
                         <CardText>Logined in as: <b>Anze</b></CardText>
                     </CardBody>
                 </Card>
