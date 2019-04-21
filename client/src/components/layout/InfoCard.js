@@ -6,7 +6,7 @@ const InfoCardStyle = {
     height: 100,
     width: 150,
     position:'relative',
-    padding: '25px 0 0 0',
+    padding: '25px 25px 0 25px',
     margin: 0,
     borderRadius: '0 0 25px 0',
     textAlign: 'center',
