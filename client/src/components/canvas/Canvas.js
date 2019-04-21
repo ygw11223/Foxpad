@@ -9,18 +9,19 @@ var socket; // Not const because we want to open it in canvas constructor.
 var uploader;
 
 const styleCanvas = {
-  zIndex: '2',
+  zIndex: 'auto',
   position:'absolute',
-  left:'54px',
-  top:'4px',
+  left:'0px',
+  top:'0px',
+
 };
 
 const stylePicture = {
     backgroundColor: 'white',
-    zIndex: '1',
+    zIndex: '-1',
     position:'absolute',
-    left:'54px',
-    top:'4px',
+    left:'0px',
+    top:'0px',
 };
 
 class Canvas extends Component {
@@ -125,11 +126,11 @@ class Canvas extends Component {
     }
 
     componentWillMount() {
-        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
+        this.setState({height: window.innerHeight, width: window.innerWidth-50});
     }
 
     updateDimensions() {
-        this.setState({height: window.innerHeight-8, width: window.innerWidth-8-50});
+        this.setState({height: window.innerHeight, width: window.innerWidth});
         this.ctx.translate(-this.offsetX,-this.offsetY);
         socket.emit('command', 'update');
         this.onEmitImg();

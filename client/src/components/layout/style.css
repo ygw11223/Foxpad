@@ -1,3 +1,210 @@
 .tool-button {
-    width: 50px
+    width: 50px;
+    cursor: pointer;
+    height: 80px;
+    background-color: #c5c5c5;
+    /* pointer-events: none; */
+}
+
+.tool-button:hover {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.tool-button:focus {
+    background-color: #4C94CE;
+    border: none;
+}
+
+/* #buttonGroup {
+    margin-left: 50px;
+    margin-top: 50px;
+} */
+
+
+#image {
+    border-radius: 0px 0px 25px 0px;
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#image:focus, #image:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+
+#eraser {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#eraser:focus, #eraser:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #eraser::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+
+
+#penWidth {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#penWidth:focus, #penWidth:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #penWidth::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+#palette {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#palette:focus, #palette:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #palette::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+#undo {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#undo:focus, #undo:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #undo::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+#changeMode {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#changeMode:focus, #changeMode:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #changeMode::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+#zoomIn {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#zoomIn:focus, #zoomIn:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #zoomIn::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+#zoomOut {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#zoomOut:focus, #zoomOut:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+/* #zoomOut::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 35px;
+    padding-top: 0px;
+    border-bottom: 1px solid white;
+} */
+
+.fa-2x {
+  font-size: 2em !important;}
+
+.fas {
+    margin-top: auto;
 }
