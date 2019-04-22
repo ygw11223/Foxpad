@@ -100,7 +100,7 @@ function onConnection(socket){
             var width = IMAGES[socket.canvas_id].w;
             var height = IMAGES[socket.canvas_id].h;
             while (level > 0) {
-                if (pos.w >= width && pos.h >= height) {
+                if (1280 >= width && 720 >= height) {
                     break;
                 }
                 level -= 1;

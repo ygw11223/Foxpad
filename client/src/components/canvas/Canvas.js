@@ -22,7 +22,7 @@ const stylePicture = {
 class Canvas extends Component {
     constructor(props) {
         super(props);
-        this.state = { drawing: false, height: 700, width: 1000, modal: false};
+        this.state = { drawing: false, height: 0, width: 0, modal: false};
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -39,17 +39,17 @@ class Canvas extends Component {
         this.onLoadNextImage = this.onLoadNextImage.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
-
+        this.solveOffSet = this.solveOffSet.bind(this);
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
-        this.pictureOffsetX = 0;
-        this.pictureOffsetY = 0;
         this.scale = 1;
         this.preX = -1;
         this.preY = -1;
         this.imageWidth = -1;
         this.imageHight = -1;
+        this.canvas_width = 1920;
+        this.canvas_hight = 1080;
         this.image = new Image();
         this.image.onload = this.onDrawImage;
         // Buffer for next level of resolution of image. Needed for smooth
@@ -72,6 +72,13 @@ class Canvas extends Component {
             this.onDrawingEvent(data_array[i]);
         }
         this.onDrawImage();
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 5, 0, 2 * Math.PI)
+        this.ctx.fillStyle = "blue";
+        this.ctx.fill();
+        this.ctx.rect(-960,-540,1920,1080);
+        this.ctx.stroke();
+        this.ctx.closePath();
     }
 
     componentWillUnmount() {
@@ -83,15 +90,24 @@ class Canvas extends Component {
        this.props.onRef(this);
        this.ctx = this.refs.canvas.getContext('2d');
        this.pctx = this.refs.picture.getContext('2d');
+       this.offsetY = -this.state.height/2;
+       this.offsetX = -this.state.width/2;
+       this.ctx.translate(-this.offsetX, -this.offsetY);
     }
 
     componentWillMount() {
-        this.setState({height: window.innerHeight, width: window.innerWidth-50});
+        this.setState({height: window.innerHeight, width: window.innerWidth});
     }
 
     updateDimensions() {
         this.setState({height: window.innerHeight, width: window.innerWidth});
-        this.ctx.translate(-this.offsetX,-this.offsetY);
+        this.imageHight *= this.scale;
+        this.imageWidth *= this.scale;
+        this.scale = 1;
+        this.offsetY = -this.state.height/2;
+        this.offsetX = -this.state.width/2;
+        this.ctx.translate(-this.offsetX, -this.offsetY);
+
         this.props.socket.emit('command', 'update');
         this.onEmitImg();
     }
@@ -100,8 +116,6 @@ class Canvas extends Component {
         this.ctx.beginPath();
         if (isEraser) {
             this.ctx.globalCompositeOperation="destination-out";
-            // this.ctx.arc(x0,y0,16,0,Math.PI*2,false);
-            // this.ctx.fill();
         }
         else {
             this.ctx.globalCompositeOperation="source-over";
@@ -147,9 +161,9 @@ class Canvas extends Component {
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
-        };
+        }
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
-        this.pctx.drawImage(this.image, -this.pictureOffsetX, -this.pictureOffsetY, this.imageWidth, this.imageHight);
+        this.pctx.drawImage(this.image, -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2  , this.imageWidth, this.imageHight);
     }
 
     onUndoEvent(e) {
@@ -202,6 +216,10 @@ class Canvas extends Component {
         return x*this.scale+offset;
     }
 
+    solveOffSet(x,y) {
+        return y - x*this.scale;
+    }
+
     onMouseMove(e) {
         if (!this.state.active) {
             return;
@@ -223,22 +241,19 @@ class Canvas extends Component {
         if(this.props.mode){
             let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
             let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
-            this.pictureOffsetX -= currentX - this.preX;
-            this.pictureOffsetY -= currentY - this.preY;
-            if(this.pictureOffsetX < 0) {
-                this.pictureOffsetX = 0;
-                dx = this.offsetX;
-                this.offsetX = 0;
-            } else {
-                this.offsetX -= dx;
+
+            if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+                dx = this.offsetX + this.solveOffSet(-this.canvas_width/2, 0);
+            } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+                dx = this.offsetX + this.solveOffSet(this.canvas_width/2, this.state.width);
             }
-            if(this.pictureOffsetY < 0) {
-                this.pictureOffsetY = 0;
-                dy = this.offsetY;
-                this.offsetY = 0;
-            } else {
-                this.offsetY -= dy;
+            if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY + this.solveOffSet(-this.canvas_hight/2, 0);
+            } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+                dy = this.offsetY + this.solveOffSet(this.canvas_hight/2, this.state.height);
             }
+            this.offsetX -= dx;
+            this.offsetY -= dy;
             this.ctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
