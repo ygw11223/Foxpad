@@ -100,11 +100,6 @@ class Canvas extends Component {
     }
 
     updateDimensions() {
-        // let dx =  this.mapWindowToCanvas(window.innerWidth, this.offsetX) - this.mapWindowToCanvas(this.state.width, this.offsetX);
-        // let dy =  this.mapWindowToCanvas(window.innerHeight, this.offsetY) - this.mapWindowToCanvas(this.state.height, this.offsetY);
-        // this.offsetX += dx < 0 ? dx : -dx;
-        // this.offsetY += dy < 0 ? dy : -dy;
-
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
