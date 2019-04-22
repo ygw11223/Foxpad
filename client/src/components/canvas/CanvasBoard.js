@@ -60,6 +60,9 @@ class CanvasBoard extends Component {
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.canvas.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
+            this.socket.on('mouse_position', (data)=>{
+                console.log(data);
+            });
             this.socket.on('update', (cmd)=>{
                 if(cmd === "image_ready") {
                     this.canvas.onEmitImg();
