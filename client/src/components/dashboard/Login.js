@@ -4,6 +4,7 @@ import  { Route, Redirect } from 'react-router-dom'
 import './login.css'
 
 const logo = require('./foxy2.png');
+const arrow = require('./right-arrow.png');
 const cookies = new Cookies();
 
 class Login extends React.Component {
@@ -49,9 +50,12 @@ class Login extends React.Component {
                     </div>
                     <div class="input-wrapper">
                         <row>
-                            <label for="userName" id="user_name">Collaborative Drawing</label>
-                            <input type="text" placeholder="What's your name?" s={3} label="userName" id="userName" onChange={this.handleChange}/>
-                            <button type="button" id="submitButton" onClick={this.onSubmit}>Start drawing!</button>
+                            <label for="userName" id="user_name">Hi there!</label>
+                            <p id="name_text">Welcome to Collaborative Drawing</p>
+                            <div id="wrappinginput">
+                                <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>
+                                <button type="button" id="submitButton" onClick={this.onSubmit}><img src={arrow} alt="arrow" id="arrow"/></button>
+                            </div>
                         </row>
                     </div>
                 </div>
