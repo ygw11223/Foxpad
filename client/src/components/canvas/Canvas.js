@@ -81,15 +81,6 @@ class Canvas extends Component {
             this.onDrawingEvent(data_array[i]);
         }
         this.onDrawImage();
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, 5, 0, 2 * Math.PI)
-        this.ctx.fillStyle = "blue";
-        this.ctx.fill();
-        this.ctx.rect(-960,-540,1920,1080);
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.beginPath();
-
     }
 
     componentWillUnmount() {
@@ -145,8 +136,6 @@ class Canvas extends Component {
             this.mctx.fill();
             this.mctx.closePath();
         }
-
-
     }
 
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {

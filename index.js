@@ -106,7 +106,6 @@ function onConnection(socket){
     });
 
     socket.on('mouse_position', (data) => {
-        console.log(data);
         const cid = socket.canvas_id;
         const uid = socket.user_id;
         SESSION_INFO[cid][uid]['pos_x_mouse'] = data.x;
