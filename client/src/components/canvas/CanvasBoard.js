@@ -17,11 +17,12 @@ class CanvasBoard extends Component {
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.showForm = this.showForm.bind(this);
-        this.onChangeMode = this.onChangeMode.bind(this);
         this.onZoom = this.onZoom.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.session_update = this.session_update.bind(this);
+        this.onDraw = this.onDraw.bind(this);
+        this.onDrag = this.onDrag.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -87,12 +88,16 @@ class CanvasBoard extends Component {
         this.canvas.zoom(direction);
     }
 
-    onChangeMode(){
-        this.setState({mode: !this.state.mode})
+    onDraw(){
+        this.setState({mode: false});
+    }
+
+    onDrag(){
+        this.setState({mode: true});
     }
 
     onEraser(e) {
-        this.setState({lineWidth: e, eraser: true})
+        this.setState({lineWidth: e, eraser: true});
     }
 
     render(){
@@ -121,11 +126,11 @@ class CanvasBoard extends Component {
                         name={this.id}/>
 
                 <Sidebar
-                        mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                         onChangeColor={this.changeColor}
                         onChangeWidth={this.changeWidth}
                         onUndo={this.onUndoEvent}
-                        onChangeMode={this.onChangeMode}
+                        onDraw={this.onDraw}
+                        onDrag={this.onDrag}
                         onZoom={this.onZoom}
                         showForm={this.showForm}
                         onEraser={this.onEraser}/>

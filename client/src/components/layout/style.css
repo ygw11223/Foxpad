@@ -193,6 +193,34 @@
     background-color: #4C94CE;
 }
 
+#draw {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#draw:focus, #draw:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
+#drag {
+    background-color: #c5c5c5;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#drag:focus, #drag:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE;
+}
+
 /* #zoomOut::after {
     content: "";
     display: block;

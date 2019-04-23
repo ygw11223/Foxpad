@@ -320,19 +320,20 @@ class Canvas extends Component {
                 height = {this.state.height }
                 width  = {this.state.width }
             />
-
-                <Modal isOpen={this.state.modal} toggle={this.showForm}>
-                    <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
-                    <ModalBody>
-                      <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                        <input type="file" id="file" multiple />
-                        <input type="submit" value="Upload" />
-                      </form>
-                     </ModalBody>
-                     <ModalFooter>
-                        <Button color="secondary" onClick={this.showForm}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
+                <div>
+                    <Modal isOpen={this.state.modal} toggle={this.showForm}>
+                        <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
+                        <ModalBody>
+                          <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
+                            <input type="file" id="file" multiple />
+                            <input type="submit" value="Upload" />
+                          </form>
+                         </ModalBody>
+                         <ModalFooter>
+                            <Button color="secondary" onClick={this.showForm}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+                </div>
             </div>
         );
     }
