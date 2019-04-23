@@ -126,15 +126,16 @@ class Canvas extends Component {
     }
 
     updateMouseLocation(mouseList) {
-        console.log(mouseList);
         this.mctx.save();    // save the current state of our canvas (translate offset)
         this.mctx.setTransform(1,0,0,1,0,0);
         this.mctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
         this.mctx.restore(); // restore the translate offset
+        let time = new Date().getTime();
 
         for(var i in mouseList) {
-            if(i == this.props.name /*|| mouseList[i]['timestamp'] > new Date().getTime() - 5000*/)
+            if(i == this.props.name || time - mouseList[i]['timestamp'] > 5000)
                 continue;
+
             this.mctx.beginPath();
             this.mctx.arc(mouseList[i]['pos_x_mouse'],
                           mouseList[i]['pos_y_mouse'],
