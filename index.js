@@ -58,29 +58,43 @@ app.get('*', function (req, res) {
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
+        const cid = auth_info.canvas_id;
+        const uid = auth_info.user_id;
         // Initialize socket.
-        socket.canvas_id = auth_info.canvas_id;
-        socket.user_id = auth_info.user_id
+        socket.canvas_id = cid;
+        socket.user_id = uid;
         // Check if canvas id is valid.
-        if (!(socket.canvas_id in DATABASE)) {
-            DATABASE[socket.canvas_id] = {};
-            SESSION_INFO[socket.canvas_id] = {};
-            USER_INFO[socket.canvas_id] = {};
+        if (!(cid in DATABASE)) {
+            DATABASE[cid] = {};
+            SESSION_INFO[cid] = {};
+            USER_INFO[cid] = {};
             console.log("New canvas_id encountered when init socket.");
         }
-        socket.join(socket.canvas_id);
-        if (!(socket.user_id in DATABASE[socket.canvas_id])) {
-            DATABASE[socket.canvas_id][socket.user_id] = [];
+        socket.join(cid);
+        if (!(uid in DATABASE[cid])) {
+            DATABASE[cid][uid] = [];
         }
 
         // Initilize user information
-        if (!(socket.user_id in USER_INFO[socket.canvas_id])) {
-            USER_INFO[socket.canvas_id][socket.user_id] = randomColor({luminosity: 'dark'});
+        if (!(uid in USER_INFO[cid])) {
+            USER_INFO[cid][uid] = randomColor({luminosity: 'dark'});
         }
-        SESSION_INFO[socket.canvas_id][socket.user_id] = USER_INFO[socket.canvas_id][socket.user_id];
-        socket.broadcast.in(socket.canvas_id).emit('session_update', SESSION_INFO[socket.canvas_id]);
-        socket.emit('session_update', SESSION_INFO[socket.canvas_id]);
-        console.log(socket.user_id, "joined", socket.canvas_id);
+        SESSION_INFO[cid][uid] = {
+            color: USER_INFO[cid][uid],
+            pos_x_mouse: 0,
+            pos_y_mouse: 0,
+            timestamp: 0,
+            pen_color: 0,
+            pen_width: 0,
+        }
+
+        var members = {};
+        for (var key in SESSION_INFO[cid]) {
+            members[key] = SESSION_INFO[cid][key]['color'];
+        }
+        socket.broadcast.in(cid).emit('session_update', members);
+        socket.emit('session_update', members);
+        console.log(uid, "joined", cid);
     });
 
     // Save drawing data and broadcast to all of its peers
@@ -89,6 +103,16 @@ function onConnection(socket){
         var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
         DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
+    });
+
+    socket.on('mouse_position', (data) => {
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
+        SESSION_INFO[cid][uid]['pos_x_mouse'] = data.x;
+        SESSION_INFO[cid][uid]['pos_y_mouse'] = data.y;
+        SESSION_INFO[cid][uid]['pen_width'] = data.w;
+        SESSION_INFO[cid][uid]['timestamp'] = new Date().getTime();
+        socket.broadcast.in(cid).emit('mouse_position', SESSION_INFO[cid]);
     });
 
     socket.on('image', (pos) => {
@@ -155,10 +179,17 @@ function onConnection(socket){
     });
 
     socket.on('disconnect', () => {
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
+
         if (socket.canvas_id) {
-            delete SESSION_INFO[socket.canvas_id][socket.user_id];
-            socket.broadcast.in(socket.canvas_id).emit('session_update', SESSION_INFO[socket.canvas_id]);
-            console.log(socket.user_id, "left", socket.canvas_id);
+            delete SESSION_INFO[cid][uid];
+            var members = {};
+            for (var key in SESSION_INFO[cid]) {
+                members[key] = SESSION_INFO[cid][key]['color'];
+            }
+            socket.broadcast.in(cid).emit('session_update', members);
+            console.log(uid, "left", socket.canvas_id);
         }
     });
 

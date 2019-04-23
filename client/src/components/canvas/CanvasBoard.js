@@ -60,6 +60,7 @@ class CanvasBoard extends Component {
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.canvas.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
+            this.socket.on('mouse_position', this.canvas.updateMouseLocation);
             this.socket.on('update', (cmd)=>{
                 if(cmd === "image_ready") {
                     this.canvas.onEmitImg();
@@ -104,7 +105,7 @@ class CanvasBoard extends Component {
         }
         return(
             <div>
-                <Canvas
+                <Canvas style={{cursor: 'none'}}
                         onRef={ref => (this.canvas= ref)}
                         mode={this.state.mode}
                         width={this.state.width}
@@ -114,7 +115,8 @@ class CanvasBoard extends Component {
                         lineWidth={this.state.lineWidth}
                         eraser={this.state.eraser}
                         socket={this.socket}
-                        uploader={this.uploader}/>
+                        uploader={this.uploader}
+                        name = {this.id}/>
 
                 <InfoCards
                         onRef={ref => (this.cardDeck= ref)}

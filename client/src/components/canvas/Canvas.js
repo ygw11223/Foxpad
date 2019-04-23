@@ -4,6 +4,13 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 const cookies = new Cookies();
 
+const styleMouse = {
+    zIndex: '3',
+    position:'absolute',
+    left:'0px',
+    top:'0px',
+};
+
 const styleCanvas = {
     zIndex: 'auto',
     position:'absolute',
@@ -40,6 +47,8 @@ class Canvas extends Component {
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
+        this.updateMouseLocation = this.updateMouseLocation.bind(this);
+
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -72,13 +81,6 @@ class Canvas extends Component {
             this.onDrawingEvent(data_array[i]);
         }
         this.onDrawImage();
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, 5, 0, 2 * Math.PI)
-        this.ctx.fillStyle = "blue";
-        this.ctx.fill();
-        this.ctx.rect(-960,-540,1920,1080);
-        this.ctx.stroke();
-        this.ctx.closePath();
     }
 
     componentWillUnmount() {
@@ -90,9 +92,11 @@ class Canvas extends Component {
        this.props.onRef(this);
        this.ctx = this.refs.canvas.getContext('2d');
        this.pctx = this.refs.picture.getContext('2d');
+       this.mctx = this.refs.mouse.getContext('2d');
        this.offsetY = -this.state.height/2;
        this.offsetX = -this.state.width/2;
        this.ctx.translate(-this.offsetX, -this.offsetY);
+       this.mctx.translate(-this.offsetX, -this.offsetY);
     }
 
     componentWillMount() {
@@ -107,9 +111,31 @@ class Canvas extends Component {
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
         this.ctx.translate(-this.offsetX, -this.offsetY);
-
+        this.mctx.translate(-this.offsetX, -this.offsetY);
         this.props.socket.emit('command', 'update');
         this.onEmitImg();
+    }
+
+    updateMouseLocation(mouseList) {
+        this.mctx.save();    // save the current state of our canvas (translate offset)
+        this.mctx.setTransform(1,0,0,1,0,0);
+        this.mctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
+        this.mctx.restore(); // restore the translate offset
+        let time = new Date().getTime();
+
+        for(var i in mouseList) {
+            if(i == this.props.name || time - mouseList[i]['timestamp'] > 5000)
+                continue;
+
+            this.mctx.beginPath();
+            this.mctx.arc(mouseList[i]['pos_x_mouse'],
+                          mouseList[i]['pos_y_mouse'],
+                           mouseList[i]['pen_width']/2,//mouseList[i]['pen_width'],
+                          0, 2 * Math.PI);
+            this.mctx.fillStyle = mouseList[i]['color'];
+            this.mctx.fill();
+            this.mctx.closePath();
+        }
     }
 
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
@@ -189,6 +215,7 @@ class Canvas extends Component {
     }
 
     onMouseDown(e) {
+
         this.setState({ active: true });
         let currentX = 0;
         let currentY = 0;
@@ -221,21 +248,25 @@ class Canvas extends Component {
     }
 
     onMouseMove(e) {
-        if (!this.state.active) {
-            return;
-        }
-
         let currentX = 0;
         let currentY = 0;
 
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;
+            this.props.socket.emit("mouse_position",
+                                   {x: this.mapWindowToCanvas(currentX, this.offsetX),
+                                    y: this.mapWindowToCanvas(currentY, this.offsetY),
+                                    w: this.props.lineWidth});
         }
         else if(e.type === "touchmove") {
             let rect = this.refs.canvas.getBoundingClientRect();
             currentX = e.touches[0].clientX - rect.left;
             currentY = e.touches[0].clientY - rect.top;
+        }
+
+        if (!this.state.active) {
+            return;
         }
 
         if(this.props.mode){
@@ -255,6 +286,7 @@ class Canvas extends Component {
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
+            this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
         else {
@@ -269,6 +301,7 @@ class Canvas extends Component {
         }
         this.preX = currentX;
         this.preY = currentY;
+
     }
 
     onMouseUp() {
@@ -283,6 +316,7 @@ class Canvas extends Component {
         // this.offsetX += dx;
         // this.offsetY += dy;
         this.ctx.scale(factor,factor);
+        this.mctx.scale(factor,factor);
         //linear algebra
         this.scale /= factor;
         this.offsetX /= factor;
@@ -300,10 +334,10 @@ class Canvas extends Component {
         return (
             <div>
             <canvas
-                ref="canvas"
-                style={styleCanvas}
+                ref="mouse"
+                style={styleMouse}
                 height = {this.state.height }
-                width  = {this.state.width }
+                width  = {this.state.width}
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
@@ -312,6 +346,12 @@ class Canvas extends Component {
                 onTouchMove={this.onMouseMove}
                 onTouchEnd={this.onMouseUp}
                 onTouchCancel={this.onMouseUp}
+            />
+            <canvas
+                ref="canvas"
+                style={styleCanvas}
+                height = {this.state.height }
+                width  = {this.state.width }
                 //onWheel={this.onScrollEvent}
             />
             <canvas
