@@ -5,7 +5,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 const cookies = new Cookies();
 
 const styleMouse = {
-    zIndex: '2',
+    zIndex: '3',
     position:'absolute',
     left:'0px',
     top:'0px',
@@ -47,7 +47,8 @@ class Canvas extends Component {
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
-        this.drawingMouses = this.drawingMouses.bind(this);
+        this.updateMouseLocation = this.updateMouseLocation.bind(this);
+
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -119,9 +120,32 @@ class Canvas extends Component {
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
         this.ctx.translate(-this.offsetX, -this.offsetY);
-
+        this.mctx.translate(-this.offsetX, -this.offsetY);
         this.props.socket.emit('command', 'update');
         this.onEmitImg();
+    }
+
+    updateMouseLocation(mouseList) {
+        console.log(mouseList);
+        this.mctx.save();    // save the current state of our canvas (translate offset)
+        this.mctx.setTransform(1,0,0,1,0,0);
+        this.mctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
+        this.mctx.restore(); // restore the translate offset
+
+        for(var i in mouseList) {
+            if(i == this.props.name /*|| mouseList[i]['timestamp'] > new Date().getTime() - 5000*/)
+                continue;
+            this.mctx.beginPath();
+            this.mctx.arc(mouseList[i]['pos_x_mouse'],
+                          mouseList[i]['pos_y_mouse'],
+                           mouseList[i]['pen_width']/2,//mouseList[i]['pen_width'],
+                          0, 2 * Math.PI);
+            this.mctx.fillStyle = mouseList[i]['color'];
+            this.mctx.fill();
+            this.mctx.closePath();
+        }
+
+
     }
 
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
@@ -149,18 +173,6 @@ class Canvas extends Component {
             lineWidth: lineWidth,
             isEraser: this.props.eraser,
         });
-    }
-
-    drawingMouses(x,y,r){
-        this.mctx.save();    // save the current state of our canvas (translate offset)
-        this.mctx.setTransform(1,0,0,1,0,0);
-        this.mctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
-        this.mctx.restore(); // restore the translate offset
-        this.mctx.beginPath();
-        this.mctx.arc(this.mapWindowToCanvas(x, this.offsetX), this.mapWindowToCanvas(y, this.offsetY), r, 0, 2 * Math.PI)
-        this.mctx.fillStyle = "blue";
-        this.mctx.fill();
-        this.ctx.closePath();
     }
 
     onDrawingEvent(data) {
@@ -246,23 +258,25 @@ class Canvas extends Component {
     }
 
     onMouseMove(e) {
-        console.log("move");
-        this.drawingMouses(e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.props.lineWidth)
-        if (!this.state.active) {
-            return;
-        }
-
         let currentX = 0;
         let currentY = 0;
 
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;
+            this.props.socket.emit("mouse_position",
+                                   {x: this.mapWindowToCanvas(currentX, this.offsetX),
+                                    y: this.mapWindowToCanvas(currentY, this.offsetY),
+                                    w: this.props.lineWidth});
         }
         else if(e.type === "touchmove") {
             let rect = this.refs.canvas.getBoundingClientRect();
             currentX = e.touches[0].clientX - rect.left;
             currentY = e.touches[0].clientY - rect.top;
+        }
+
+        if (!this.state.active) {
+            return;
         }
 
         if(this.props.mode){
@@ -282,6 +296,7 @@ class Canvas extends Component {
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
+            this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
         else {
@@ -311,6 +326,7 @@ class Canvas extends Component {
         // this.offsetX += dx;
         // this.offsetY += dy;
         this.ctx.scale(factor,factor);
+        this.mctx.scale(factor,factor);
         //linear algebra
         this.scale /= factor;
         this.offsetX /= factor;

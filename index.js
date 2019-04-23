@@ -106,13 +106,14 @@ function onConnection(socket){
     });
 
     socket.on('mouse_position', (data) => {
-        const cid = auth_info.canvas_id;
-        const uid = auth_info.user_id;
+        console.log(data);
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
         SESSION_INFO[cid][uid]['pos_x_mouse'] = data.x;
         SESSION_INFO[cid][uid]['pos_y_mouse'] = data.y;
         SESSION_INFO[cid][uid]['pen_width'] = data.w;
         SESSION_INFO[cid][uid]['timestamp'] = new Date().getTime();
-        socket.broadcast.in(uid).emit('mouse_position', SESSION_INFO[cid]);
+        socket.broadcast.in(cid).emit('mouse_position', SESSION_INFO[cid]);
     });
 
     socket.on('image', (pos) => {
