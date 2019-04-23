@@ -19,7 +19,6 @@ class CanvasBoard extends Component {
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.showForm = this.showForm.bind(this);
-        this.onChangeMode = this.onChangeMode.bind(this);
         this.onZoom = this.onZoom.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
@@ -28,7 +27,8 @@ class CanvasBoard extends Component {
         this.onHideNavbar = this.onHideNavbar.bind(this);
         this.newCanvas = this.newCanvas.bind(this);
         this.setCanvas = this.setCanvas.bind(this);
-
+        this.onDraw = this.onDraw.bind(this);
+        this.onDrag = this.onDrag.bind(this);
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
@@ -124,12 +124,16 @@ class CanvasBoard extends Component {
         this.canvas.zoom(direction);
     }
 
-    onChangeMode(){
-        this.setState({mode: !this.state.mode})
+    onDraw(){
+        this.setState({mode: false});
+    }
+
+    onDrag(){
+        this.setState({mode: true});
     }
 
     onEraser(e) {
-        this.setState({lineWidth: e, eraser: true})
+        this.setState({lineWidth: e, eraser: true});
     }
 
     onHideNavbar() {
@@ -174,11 +178,11 @@ class CanvasBoard extends Component {
                             hideNavbar={this.state.hideNavbar}/>
 
                     <Sidebar
-                            mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                             onChangeColor={this.changeColor}
                             onChangeWidth={this.changeWidth}
                             onUndo={this.onUndoEvent}
-                            onChangeMode={this.onChangeMode}
+                            onDraw={this.onDraw}
+                            onDrag={this.onDrag}
                             onZoom={this.onZoom}
                             showForm={this.showForm}
                             onEraser={this.onEraser}
