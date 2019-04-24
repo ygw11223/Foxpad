@@ -81,6 +81,10 @@ class Canvas extends Component {
             this.onDrawingEvent(data_array[i]);
         }
         this.onDrawImage();
+        this.ctx.beginPath();
+        this.ctx.rect(-960,-540,1920,1080);
+        this.ctx.stroke();
+        this.ctx.closePath();
     }
 
     componentWillUnmount() {
@@ -274,14 +278,14 @@ class Canvas extends Component {
             let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
 
             if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
-                dx = this.offsetX + this.solveOffSet(-this.canvas_width/2, 0);
+                dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
             } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
-                dx = this.offsetX + this.solveOffSet(this.canvas_width/2, this.state.width);
+                dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
             }
             if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
-                dy = this.offsetY + this.solveOffSet(-this.canvas_hight/2, 0);
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
-                dy = this.offsetY + this.solveOffSet(this.canvas_hight/2, this.state.height);
+                dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
             this.offsetX -= dx;
             this.offsetY -= dy;
