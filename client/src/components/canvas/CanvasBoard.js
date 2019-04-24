@@ -25,21 +25,23 @@ class CanvasBoard extends Component {
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
-        this.id = cookies.get('cd_user_name');
+        this.uid = cookies.get('cd_user_name');
+        this.cid = 1;
     }
 
     session_update(data){
         this.cardDeck.state.totalIds = Object.keys(data).length;
-        this.cardDeck.state.color = data[this.id];
-        delete data[this.id];
+        this.cardDeck.state.color = data[this.uid];
+        delete data[this.uid];
         this.cardDeck.state.members = data;
         this.cardDeck.forceUpdate();
     }
 
     onInitCanvas(){
         this.socket.emit('init', {
-            user_id: this.id,
-            canvas_id: this.props.match.params.id,
+            user_id: this.uid,
+            room_id: this.props.match.params.id,
+            canvas_id: this.props.match.params.id + this.cid,
         });
         // Get image and strokes from server.
         this.canvas.onEmitImg();
@@ -51,7 +53,7 @@ class CanvasBoard extends Component {
         if (id == undefined) {
             this.setState({toLogin: true});
         } else {
-            this.id = id;
+            this.uid = id;
             // On server, we save user and canvas id on the socket object, which
             // will disappear when connection is lost. So we need to init upon
             // each connection.
@@ -116,11 +118,11 @@ class CanvasBoard extends Component {
                         eraser={this.state.eraser}
                         socket={this.socket}
                         uploader={this.uploader}
-                        name = {this.id}/>
+                        name = {this.uid}/>
 
                 <InfoCards
                         onRef={ref => (this.cardDeck= ref)}
-                        name={this.id}/>
+                        name={this.uid}/>
 
                 <Sidebar
                         mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
