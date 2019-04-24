@@ -1,5 +1,6 @@
 import React from 'react';
-import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu} from 'reactstrap';
+import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, DropdownMenu, Popover, PopoverBody, PopoverHeader} from 'reactstrap';
+import Slider from './Slider.js'
 import './style.css'
 
 // TODO : change position method when adding multiple canvas
@@ -13,8 +14,14 @@ const styleSideBar = {
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {btnDroprightColor:false, btnDroprightWidth:false, btnDroprightEraser: false};
+        this.togglePopover = this.togglePopover.bind(this);
+        this.state = {btnDroprightColor:false, btnDroprightWidth:false, btnDroprightEraser: false, popoverPenOpen: false, popoverEraserOpen: false, sliderValue: 10};
     }
+
+    togglePopover() {
+        this.setState({popoverOpen: !this.state.popoverOpen});
+    }
+
     // Todo: Anze
     //          rewrite DropdownItem into list
     //
@@ -22,29 +29,19 @@ class Sidebar extends React.Component {
         return (
             <ButtonGroup   vertical id="buttonGroup" style={styleSideBar}>
 
-                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightEraser}
-                                    toggle={()=>{this.setState({btnDroprightEraser: !this.state.btnDroprightEraser})}}>
-                    <DropdownToggle   si id="eraser" className='tool-button' >
-                        <i className="fas fa-eraser fa-2x" style={{color: 'white'}}></i>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        <DropdownItem eventKey="2" onClick={() => this.props.onEraser("2")} >2</DropdownItem>
-                        <DropdownItem eventKey="10" onClick={() => this.props.onEraser("10")}>10</DropdownItem>
-                        <DropdownItem eventKey="15" onClick={() => this.props.onEraser("15")}>15</DropdownItem>
-                    </DropdownMenu>
-                </ButtonDropdown>
+                <Button eventKey="draw" id="eraser" className='tool-button button'> <i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i></Button>
+                <Popover placement="right" hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={()=>{this.setState({popoverEraserOpen: !this.state.popoverEraserOpen})}}>
 
-                <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
-                                    toggle={()=>{this.setState({btnDroprightWidth: !this.state.btnDroprightWidth})}}>
-                    <DropdownToggle   si id="penWidth" className='tool-button' >
-                        <i className="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                        <DropdownItem eventKey="2" onClick={() => this.props.onChangeWidth("2")} >2</DropdownItem>
-                        <DropdownItem eventKey="10" onClick={() => this.props.onChangeWidth("10")}>10</DropdownItem>
-                        <DropdownItem eventKey="15" onClick={() => this.props.onChangeWidth("15")}>15</DropdownItem>
-                    </DropdownMenu>
-                </ButtonDropdown>
+                  <PopoverBody className="popover"><Slider onChangeWidth={this.props.onEraser}/></PopoverBody>
+                </Popover>
+
+
+                <Button eventKey="draw" id="draw" className='tool-button button'> <i class={"fas fa-pencil-alt fa-2x"} style={{color: 'white'}}></i></Button>
+                <Popover placement="right" hideArrow="true" isOpen={this.state.popoverPenOpen} target="draw" trigger="legacy" className="popover" toggle={()=>{this.setState({popoverPenOpen: !this.state.popoverPenOpen})}}>
+
+                  <PopoverBody className="popover"><Slider onChangeWidth={this.props.onChangeWidth}/></PopoverBody>
+                </Popover>
+
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightColor}
                                     toggle={()=>{this.setState({btnDroprightColor: !this.state.btnDroprightColor})}}>
