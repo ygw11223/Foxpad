@@ -246,10 +246,15 @@
     -ms-user-select: none;
 }
 
+
 .canvasList {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 .canvasList::-webkit-scrollbar {
     display: none;
+
+.popover {
+    width: 200px;
+    height: 80px;
 }
