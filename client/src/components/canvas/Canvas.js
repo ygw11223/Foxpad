@@ -51,7 +51,7 @@ class Canvas extends Component {
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
         this.initCanvas = this.initCanvas.bind(this);
-        
+
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -78,6 +78,8 @@ class Canvas extends Component {
         this.offsetX = -this.state.width/2;
         this.preX = -1;
         this.preY = -1;
+        this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
     }
 
     onEmitImg() {
