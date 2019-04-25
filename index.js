@@ -58,6 +58,11 @@ app.get('*', function (req, res) {
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
+        // Leave previous canvas
+        if (socket.canvas_id) {
+            socket.leave(socket.canvas_id);
+        }
+
         var new_canvas = false;
         const rid = auth_info.room_id;
         const cid = auth_info.canvas_id;
@@ -70,6 +75,7 @@ function onConnection(socket){
         // Check if room id is valid.
         if (!(rid in USER_INFO)) {
             SESSION_INFO[rid] = {};
+            SESSION_INFO[rid]['.num_canvas'] = 0;
             USER_INFO[rid] = {};
             console.log("New room id encountered when init socket.");
         }
@@ -89,6 +95,7 @@ function onConnection(socket){
         if (!(cid in DATABASE)) {
             DATABASE[cid] = {};
             SESSION_INFO[rid]['.num_canvas'] += 1;
+            console.log('new canvas');
             new_canvas = true;
         }
         // Initilize user information
@@ -106,6 +113,7 @@ function onConnection(socket){
         }
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
+        socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
         console.log(uid, "joined", cid);
     });
 
@@ -115,7 +123,6 @@ function onConnection(socket){
         var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
         DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
         socket.broadcast.in(socket.canvas_id).emit('drawing', data);
-        console.log(socket.canvas_id);
     });
 
     socket.on('mouse_position', (data) => {
@@ -161,6 +168,8 @@ function onConnection(socket){
                 socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
                 console.log('Image sent.');
             }
+        } else {
+            socket.emit('image', 'NONE');
         }
     });
 

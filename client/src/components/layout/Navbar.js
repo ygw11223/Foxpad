@@ -9,14 +9,25 @@ const styleNavbar = {
   height: '50px',
   borderRadius: '0 25px 25px 0',
   width: '50px',
-  fontSize: '100%',
-  transition: '0.5s'
+  fontSize: '150%',
+  transition: '0.5s',
+  border: 0,
+  outline: 0,
+  boxShadow: 'none',
 };
 
 class Navbar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {color: 'blue'};
+    }
+
+    componentDidMount() {
+       this.props.onRef(this);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(null)
     }
 
     render() {

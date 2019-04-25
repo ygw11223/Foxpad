@@ -24,7 +24,10 @@ class CanvasBoard extends Component {
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.session_update = this.session_update.bind(this);
+        this.canvas_update = this.canvas_update.bind(this);
         this.onHideNavbar = this.onHideNavbar.bind(this);
+        this.newCanvas = this.newCanvas.bind(this);
+        this.setCanvas = this.setCanvas.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -32,22 +35,43 @@ class CanvasBoard extends Component {
         this.cid = 1;
     }
 
+    setCanvas(id) {
+        console.log('set', id);
+        if (this.cid !== id) {
+            this.cid = id;
+            this.canvasList.setState({current_canvas: this.cid});
+            this.cardDeck.setState({current_canvas: this.cid})
+            this.onInitCanvas();
+        }
+    }
+
+    newCanvas() {
+        if (this.canvasList.state.num_canvas < 10) {
+            this.cid = this.canvasList.state.num_canvas += 1;
+            this.canvasList.setState({num_canvas: this.cid, current_canvas: this.cid});
+            this.cardDeck.setState({current_canvas: this.cid})
+            this.onInitCanvas();
+        }
+    }
+
+    canvas_update(num) {
+        this.canvasList.setState({num_canvas: num});
+    }
+
     session_update(data){
-        console.log(this.cardDeck);
-        console.log(this.canvasList);
-        console.log(this.navbar);
-        console.log(data);
+        this.cardDeck.state.totalIds = Object.keys(data).length;
+
         var color = data[this.uid];
         delete data[this.uid];
-        this.cardDeck.state.totalIds = Object.keys(data).length;
         this.cardDeck.state.color = color;
         this.cardDeck.state.members = data;
         this.cardDeck.forceUpdate();
-        //this.canvasList.setState({'color': color});
-        //this.navbar.setState({'color': color});
+        this.canvasList.setState({'color': color});
+        this.navbar.setState({'color': color});
     }
 
     onInitCanvas(){
+        this.canvas.initCanvas();
         this.socket.emit('init', {
             user_id: this.uid,
             room_id: this.props.match.params.id,
@@ -72,6 +96,7 @@ class CanvasBoard extends Component {
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.canvas.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
+            this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
             this.socket.on('update', (cmd)=>{
                 if(cmd === "image_ready") {
@@ -129,8 +154,9 @@ class CanvasBoard extends Component {
             <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
                 <CanvasList
                         onRef={ref => (this.canvasList= ref)}
-                        num_canvas = {5}
-                        hideNavbar={this.state.hideNavbar}/>
+                        hideNavbar={this.state.hideNavbar}
+                        newCanvas={this.newCanvas}
+                        setCanvas={this.setCanvas}/>
 
                 <div>
                     <Canvas style={{cursor: 'none'}}

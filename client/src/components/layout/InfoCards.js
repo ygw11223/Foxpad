@@ -13,6 +13,7 @@ class CardStack extends React.Component {
             name: this.props.name,
             color: '#42c8f4',
             members: {},
+            current_canvas: 1,
         }
         this.updateHoverId = this.updateHoverId.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
@@ -39,6 +40,10 @@ class CardStack extends React.Component {
        this.props.onRef(this);
     }
 
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
     render () {
         var left = this.props.hideNavbar ? '0' : '212px';
         const style = {
@@ -62,7 +67,7 @@ class CardStack extends React.Component {
                             padding: 0,
                             fontSize: '200%'
                         }}>
-                            <b>Canvas 1</b>
+                            <b>Canvas {this.state.current_canvas}</b>
                         </CardTitle>
                         <p style={{
                             padding: 0,
@@ -94,17 +99,19 @@ const stackStyles = {
     borderRadius: '0 0 25px 0',
     height: 100,
     color: 'white',
-    transition: '0.5s'
+    transition: '0.5s',
+    border: 0,
 };
 // TODO : Pass in background through props
 const card1Style = {
     zIndex: '100',
-    height: 100,
-    width: 250,
+    height: '100px',
+    width: '250px',
     padding: '0 0 0 20px',
     margin: 0,
     borderRadius: '0 0 25px 0',
     flexShrink: 0,
+    border: 0,
 };
 
 export default CardStack;
