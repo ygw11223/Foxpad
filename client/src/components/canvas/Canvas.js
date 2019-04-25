@@ -39,7 +39,7 @@ class Canvas extends Component {
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onEmitImg = this.onEmitImg.bind(this);
         this.onDrawImage = this.onDrawImage.bind(this);
-        //this.onScrollEvent = this.onScrollEvent.bind(this);
+        this.onScrollEvent = this.onScrollEvent.bind(this);
         this.mapWindowToCanvas = this.mapWindowToCanvas.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
@@ -82,6 +82,9 @@ class Canvas extends Component {
         }
         this.onDrawImage();
         this.ctx.beginPath();
+        this.ctx.arc(0, 0, 5, 0, 2 * Math.PI)
+        this.ctx.fillStyle = "blue";
+        this.ctx.fill();
         this.ctx.rect(-960,-540,1920,1080);
         this.ctx.stroke();
         this.ctx.closePath();
@@ -219,7 +222,6 @@ class Canvas extends Component {
     }
 
     onMouseDown(e) {
-
         this.setState({ active: true });
         let currentX = 0;
         let currentY = 0;
@@ -270,6 +272,8 @@ class Canvas extends Component {
         }
 
         if (!this.state.active) {
+            this.preX = currentX;
+            this.preY = currentY;
             return;
         }
 
@@ -312,26 +316,63 @@ class Canvas extends Component {
         this.setState({ active: false });
     }
 
-    zoom(direction) {
-        let dx =  this.scale*this.preX;
-        let dy =  this.scale*this.preY;
+    // zoom(direction) {
+    //    let dx =  this.scale*this.preX;
+    //    let dy =  this.scale*this.preY;
+    //    let factor = Math.pow(2, direction);//set scale factor to 2
+    //    // this.ctx.translate(-dx, -dy);
+    //    // this.offsetX += dx;
+    //    // this.offsetY += dy;
+    //    this.ctx.scale(factor,factor);
+    //    this.mctx.scale(factor,factor);
+    //    //linear algebra
+    //    this.scale /= factor;
+    //    this.offsetX /= factor;
+    //    this.offsetY/= factor;
+    //    this.imageHight *= factor;
+    //    this.imageWidth *= factor;
+    //    // this.ctx.translate(dx, dy);
+    //    // this.offsetX -= dx;
+    //    // this.offsetY -= dy;
+    //    console.log([-this.offsetX, -this.offsetY]);
+    //    this.props.socket.emit('command', 'update');
+    //    this.onEmitImg();
+    // }
+    zoom(direction, x, y) {
+        let preX = (x === null ? this.state.width/2 : x);
+        let preY = (y === null ? this.state.height/2: y);
+        console.log([preX, preY]);
+        let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
+        let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
         let factor = Math.pow(2, direction);//set scale factor to 2
-        // this.ctx.translate(-dx, -dy);
-        // this.offsetX += dx;
-        // this.offsetY += dy;
-        this.ctx.scale(factor,factor);
-        this.mctx.scale(factor,factor);
+
+
+        this.ctx.translate(preX_T, preY_T);
+        this.mctx.translate(preX_T, preY_T);
+        this.offsetX -= preX_T;
+        this.offsetY -= preY_T;
+
         //linear algebra
         this.scale /= factor;
-        this.offsetX /= factor;
-        this.offsetY/= factor;
+        this.offsetX = this.offsetX/factor;
+        this.offsetY = this.offsetY/factor;
         this.imageHight *= factor;
         this.imageWidth *= factor;
-        // this.ctx.translate(dx, dy);
-        // this.offsetX -= dx;
-        // this.offsetY -= dy;
+        this.ctx.scale(factor,factor);
+        this.mctx.scale(factor,factor);
+
+        this.ctx.translate(-preX_T, -preY_T);
+        this.mctx.translate(-preX_T, -preY_T);
+        this.offsetX += preX_T;
+        this.offsetY += preY_T;
         this.props.socket.emit('command', 'update');
+
         this.onEmitImg();
+    }
+
+    onScrollEvent(event) {
+        let wheel = event.deltaY < 0 ? 1 : -1;
+        this.zoom(wheel, this.preX, this.preY);
     }
 
     render() {
@@ -350,13 +391,14 @@ class Canvas extends Component {
                 onTouchMove={this.onMouseMove}
                 onTouchEnd={this.onMouseUp}
                 onTouchCancel={this.onMouseUp}
+                onWheel={this.onScrollEvent}
             />
             <canvas
                 ref="canvas"
                 style={styleCanvas}
                 height = {this.state.height }
                 width  = {this.state.width }
-                //onWheel={this.onScrollEvent}
+
             />
             <canvas
                 ref="picture"
