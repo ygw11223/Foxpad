@@ -40,10 +40,12 @@ class CardStack extends React.Component {
     }
 
     render () {
+        var left = this.props.hideNavbar ? '0' : '212px';
         const style = {
             ...stackStyles,
             // Update width of the card deck to prevent white space
             width: 225 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0),
+            left: left
         };
         const mainCardStyle = {
             ...card1Style,
@@ -83,7 +85,6 @@ class CardStack extends React.Component {
 const stackStyles = {
     zIndex: '5',
     position:'absolute',
-    left:'0px',
     top:'0px',
     display: 'flex',
     flexDirection: 'row',
@@ -93,6 +94,7 @@ const stackStyles = {
     borderRadius: '0 0 25px 0',
     height: 100,
     color: 'white',
+    transition: '0.5s'
 };
 // TODO : Pass in background through props
 const card1Style = {

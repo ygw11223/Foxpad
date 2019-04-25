@@ -3,7 +3,9 @@ import Cookies from 'universal-cookie';
 import  { Route, Redirect } from 'react-router-dom';
 import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar';
+import Navbar from '../layout/Navbar';
 import InfoCards from '../layout/InfoCards';
+import CanvasList from './CanvasList';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
 
@@ -12,7 +14,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'red', lineWidth: 5, mode: false, eraser: false, toLogin: false};
+        this.state = {color: 'red', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -22,6 +24,7 @@ class CanvasBoard extends Component {
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.session_update = this.session_update.bind(this);
+        this.onHideNavbar = this.onHideNavbar.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -30,11 +33,18 @@ class CanvasBoard extends Component {
     }
 
     session_update(data){
-        this.cardDeck.state.totalIds = Object.keys(data).length;
-        this.cardDeck.state.color = data[this.uid];
+        console.log(this.cardDeck);
+        console.log(this.canvasList);
+        console.log(this.navbar);
+        console.log(data);
+        var color = data[this.uid];
         delete data[this.uid];
+        this.cardDeck.state.totalIds = Object.keys(data).length;
+        this.cardDeck.state.color = color;
         this.cardDeck.state.members = data;
         this.cardDeck.forceUpdate();
+        //this.canvasList.setState({'color': color});
+        //this.navbar.setState({'color': color});
     }
 
     onInitCanvas(){
@@ -98,6 +108,10 @@ class CanvasBoard extends Component {
         this.setState({lineWidth: e, eraser: true})
     }
 
+    onHideNavbar() {
+        this.setState({hideNavbar: !this.state.hideNavbar})
+    }
+
     render(){
         if (this.state.toLogin === true) {
             return <Redirect to={{
@@ -105,34 +119,55 @@ class CanvasBoard extends Component {
                 state: { fromCanvas: true, room_id: this.props.match.params.id }
             }} />
         }
+
+        var icon = '<';
+        if (this.state.hideNavbar === true) {
+            icon = '>';
+        }
+
         return(
-            <div>
-                <Canvas style={{cursor: 'none'}}
-                        onRef={ref => (this.canvas= ref)}
-                        mode={this.state.mode}
-                        width={this.state.width}
-                        height={this.state.height}
-                        color={this.state.color}
-                        room_id={this.props.match.params.id}
-                        lineWidth={this.state.lineWidth}
-                        eraser={this.state.eraser}
-                        socket={this.socket}
-                        uploader={this.uploader}
-                        name = {this.uid}/>
+            <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+                <CanvasList
+                        onRef={ref => (this.canvasList= ref)}
+                        num_canvas = {5}
+                        hideNavbar={this.state.hideNavbar}/>
 
-                <InfoCards
-                        onRef={ref => (this.cardDeck= ref)}
-                        name={this.uid}/>
+                <div>
+                    <Canvas style={{cursor: 'none'}}
+                            onRef={ref => (this.canvas= ref)}
+                            mode={this.state.mode}
+                            width={this.state.width}
+                            height={this.state.height}
+                            color={this.state.color}
+                            room_id={this.props.match.params.id}
+                            lineWidth={this.state.lineWidth}
+                            eraser={this.state.eraser}
+                            socket={this.socket}
+                            uploader={this.uploader}
+                            name = {this.uid}/>
 
-                <Sidebar
-                        mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
-                        onChangeColor={this.changeColor}
-                        onChangeWidth={this.changeWidth}
-                        onUndo={this.onUndoEvent}
-                        onChangeMode={this.onChangeMode}
-                        onZoom={this.onZoom}
-                        showForm={this.showForm}
-                        onEraser={this.onEraser}/>
+                    <InfoCards
+                            onRef={ref => (this.cardDeck= ref)}
+                            name={this.uid}
+                            hideNavbar={this.state.hideNavbar}/>
+
+                    <Sidebar
+                            mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
+                            onChangeColor={this.changeColor}
+                            onChangeWidth={this.changeWidth}
+                            onUndo={this.onUndoEvent}
+                            onChangeMode={this.onChangeMode}
+                            onZoom={this.onZoom}
+                            showForm={this.showForm}
+                            onEraser={this.onEraser}
+                            hideNavbar={this.state.hideNavbar}/>
+
+                    <Navbar
+                            onRef={ref => (this.navbar= ref)}
+                            onHideNavbar={this.onHideNavbar}
+                            icon={icon}
+                            hideNavbar={this.state.hideNavbar}/>
+                </div>
             </div>
         );
     }

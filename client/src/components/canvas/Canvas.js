@@ -5,25 +5,28 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 const cookies = new Cookies();
 
 const styleMouse = {
+    zIndex: '4',
+    position:'absolute',
+    left:'0px',
+    top:'0px',
+    width: '100%'
+};
+
+const styleCanvas = {
     zIndex: '3',
     position:'absolute',
     left:'0px',
     top:'0px',
-};
-
-const styleCanvas = {
-    zIndex: 'auto',
-    position:'absolute',
-    left:'0px',
-    top:'0px',
+    width: '100%'
 };
 
 const stylePicture = {
     backgroundColor: 'white',
-    zIndex: '-1',
+    zIndex: '2',
     position:'absolute',
     left:'0px',
     top:'0px',
+    width: '100%'
 };
 
 class Canvas extends Component {
