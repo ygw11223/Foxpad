@@ -4,8 +4,10 @@ import  { Route, Redirect } from 'react-router-dom';
 import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar';
 import InfoCards from '../layout/InfoCards';
+import Minimap from './minimap/Minimap';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
+
 
 const cookies = new Cookies();
 
@@ -57,6 +59,8 @@ class CanvasBoard extends Component {
             // each connection.
             this.socket.on('connect', this.onInitCanvas);
             this.socket.on('drawing', this.canvas.onDrawingEvent);
+            this.socket.on('drawing', this.minimap.onDrawingEvent);
+
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.canvas.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
@@ -117,11 +121,9 @@ class CanvasBoard extends Component {
                         socket={this.socket}
                         uploader={this.uploader}
                         name = {this.id}/>
-
                 <InfoCards
                         onRef={ref => (this.cardDeck= ref)}
                         name={this.id}/>
-
                 <Sidebar
                         mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                         onChangeColor={this.changeColor}
@@ -131,6 +133,11 @@ class CanvasBoard extends Component {
                         onZoom={this.onZoom}
                         showForm={this.showForm}
                         onEraser={this.onEraser}/>
+                <Minimap
+                            onRef={ref => (this.minimap= ref)}
+                            height = {this.state.height/10}
+                            width  = {this.state.width/10}
+                            />
             </div>
         );
     }

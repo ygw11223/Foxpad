@@ -163,6 +163,8 @@ class Canvas extends Component {
             lineWidth: lineWidth,
             isEraser: this.props.eraser,
         });
+
+
     }
 
     onDrawingEvent(data) {
@@ -360,7 +362,6 @@ class Canvas extends Component {
                 height = {this.state.height }
                 width  = {this.state.width }
             />
-
                 <Modal isOpen={this.state.modal} toggle={this.showForm}>
                     <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
                     <ModalBody>
