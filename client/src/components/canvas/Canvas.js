@@ -9,7 +9,6 @@ const styleMouse = {
     position:'absolute',
     left:'0px',
     top:'0px',
-    width: '100%'
 };
 
 const styleCanvas = {
@@ -17,7 +16,6 @@ const styleCanvas = {
     position:'absolute',
     left:'0px',
     top:'0px',
-    width: '100%'
 };
 
 const stylePicture = {

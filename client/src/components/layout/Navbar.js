@@ -5,7 +5,7 @@ import {Button, ButtonGroup,ButtonDropdown, DropdownToggle, DropdownItem, Dropdo
 const styleNavbar = {
   zIndex: '5',
   position: 'absolute',
-  top: '800px',
+  top: '600px',
   height: '50px',
   borderRadius: '0 25px 25px 0',
   width: '50px',

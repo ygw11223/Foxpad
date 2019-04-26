@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button} from 'reactstrap';
+import '../layout/style.css'
 
 const CanvasListStyle = {
     height: '100%',
@@ -11,7 +12,7 @@ const CanvasListStyle = {
     transition: '0.5s',
     position: 'absolute',
     zIndex: '5',
-    overflow: 'hidden',
+    overflow: 'scroll',
     border: 0,
 };
 
@@ -20,6 +21,7 @@ class CanvasList extends Component {
         super(props);
         this.state = {color: 'blue', num_canvas: 1, current_canvas: 1};
         this.renderCanvas = this.renderCanvas.bind(this);
+        this.renderButton = this.renderButton.bind(this);
     }
 
     componentDidMount() {
@@ -44,6 +46,7 @@ class CanvasList extends Component {
                         border: border,
                         borderColor: 'black',
                         margin: '10px 0 10px 0',
+                        flexShrink: 0,
                     }}
                     onClick={this.props.setCanvas.bind(this, i)}>
                 </Button>
@@ -52,19 +55,9 @@ class CanvasList extends Component {
         return children;
     }
 
-    render() {
-        var width = this.props.hideNavbar ? '0' : '212px';
-        const style = {
-            ...CanvasListStyle,
-            width: width,
-            backgroundColor: this.state.color,
-        }
-        return (
-            <div style={style}>
-                <p style={{width: '150px'}}> Canvas List </p>
-
-                {this.renderCanvas()}
-
+    renderButton() {
+        if (this.state.num_canvas < 10) {
+            return(
                 <Button style={{
                         height: '108px',
                         width: '192px',
@@ -77,7 +70,24 @@ class CanvasList extends Component {
                     onClick={() => this.props.newCanvas()}
                     backgroundColor='blue'>
                     <b>+</b>
-                </Button>
+                </Button>);
+        }
+    }
+
+    render() {
+        var width = this.props.hideNavbar ? '0' : '212px';
+        const style = {
+            ...CanvasListStyle,
+            width: width,
+            backgroundColor: this.state.color,
+        }
+        return (
+            <div style={style} class='canvasList'>
+                <p style={{width: '150px'}}> Canvas List </p>
+
+                {this.renderCanvas()}
+
+                {this.renderButton()}
             </div>
         );
     }

@@ -60,7 +60,6 @@ class CanvasBoard extends Component {
 
     session_update(data){
         this.cardDeck.state.totalIds = Object.keys(data).length;
-
         var color = data[this.uid];
         delete data[this.uid];
         this.cardDeck.state.color = color;

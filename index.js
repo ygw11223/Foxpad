@@ -82,6 +82,9 @@ function onConnection(socket){
         if (!(uid in USER_INFO[rid])) {
             USER_INFO[rid][uid] = randomColor({luminosity: 'dark'});
         }
+        if (!(uid in SESSION_INFO[rid])) {
+            console.log(uid, "joined", cid);
+        }
         SESSION_INFO[rid][uid] = {
             color: USER_INFO[rid][uid],
             pos_x_mouse: 0,
@@ -114,7 +117,6 @@ function onConnection(socket){
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
         socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
-        console.log(uid, "joined", cid);
     });
 
     // Save drawing data and broadcast to all of its peers
