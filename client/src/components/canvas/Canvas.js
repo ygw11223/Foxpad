@@ -339,13 +339,16 @@ class Canvas extends Component {
     //    this.onEmitImg();
     // }
     zoom(direction, x, y) {
-        let preX = (x === null ? this.state.width/2 : x);
-        let preY = (y === null ? this.state.height/2: y);
-        console.log([preX, preY]);
+        let preX = (x === undefined ? this.state.width/2 : x);
+        let preY = (y === undefined ? this.state.height/2: y);
+
         let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
         let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
         let factor = Math.pow(2, direction);//set scale factor to 2
 
+        if(this.scale/factor > 1) {
+            return;
+        }
 
         this.ctx.translate(preX_T, preY_T);
         this.mctx.translate(preX_T, preY_T);
@@ -365,9 +368,38 @@ class Canvas extends Component {
         this.mctx.translate(-preX_T, -preY_T);
         this.offsetX += preX_T;
         this.offsetY += preY_T;
+
+        let x1 = this.mapWindowToCanvas(0, this.offsetX);
+        let y1 = this.mapWindowToCanvas(0, this.offsetY);
+        let x2 = this.mapWindowToCanvas(this.state.width, this.offsetX);
+        let y2 = this.mapWindowToCanvas(this.state.height, this.offsetY);
+        console.log([x1,y1,x2,y2,this.canvas_width/2,this.canvas_hight/2]);
+        let dx = 0;
+        let dy = 0;
+
+        if(x1 < -this.canvas_width/2) {
+            dx = -this.canvas_width/2 - x1;
+        } else if(x2 > this.canvas_width/2) {
+            dx = this.canvas_width/2 - x2;
+        }
+
+        if (y1 < -this.canvas_hight/2) {
+            dy = -this.canvas_hight/2 - y1;
+        } else if(y2 > this.canvas_hight/2) {
+            dy = this.canvas_hight/2 - y2;
+        }
+
+        if(!(dx === 0 && dy === 0)) {
+            this.offsetX += dx;
+            this.offsetY += dy;
+            this.ctx.translate(-dx,-dy);
+            this.mctx.translate(-dx,-dy);
+        }
+        console.log([dx,dy]);
         this.props.socket.emit('command', 'update');
 
         this.onEmitImg();
+
     }
 
     onScrollEvent(event) {
