@@ -5,7 +5,7 @@ class MySlider extends Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      value: 10
+      value: this.props.value
     }
   }
 
@@ -13,11 +13,10 @@ class MySlider extends Component {
     this.setState({
       value: value
     })
-    //this.props.handleChangeValue(value);
+    this.props.getValue(value);
   }
 
   handleChangeComplete = () => {
-    console.log('Change event completed');
     this.props.onChangeWidth(this.state.value);
   };
 

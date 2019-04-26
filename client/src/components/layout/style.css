@@ -1,7 +1,7 @@
 .tool-button {
     width: 50px;
     cursor: pointer;
-    height: 80px;
+    height: 50px;
     background-color: #c5c5c5;
     /* pointer-events: none; */
 }
@@ -24,8 +24,7 @@
 
 
 #image {
-    border-radius: 0px 0px 25px 0px;
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -40,7 +39,7 @@
 
 
 #eraser {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -65,7 +64,7 @@
 
 
 #penWidth {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -88,10 +87,11 @@
 } */
 
 #palette {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
+    border-radius: 0px 0px 25px 0px;
 }
 
 #palette:focus, #palette:hover {
@@ -111,10 +111,11 @@
 } */
 
 #undo {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
+    box-sizing: none;
 }
 
 #undo:focus, #undo:hover {
@@ -134,7 +135,7 @@
 } */
 
 #changeMode {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -157,7 +158,7 @@
 } */
 
 #zoomIn {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -180,7 +181,7 @@
 } */
 
 #zoomOut {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -194,7 +195,7 @@
 }
 
 #draw {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -208,7 +209,7 @@
 }
 
 #drag {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -246,7 +247,35 @@
     -ms-user-select: none;
 }
 
-.popover {
+.popover:not(.colorPopover) {
+    left: -11px !important;
     width: 200px;
-    height: 80px;
+    height: 50px;
+    border-radius: 0px 15px 15px 0px !important;
+    background-color: rgba(186, 184, 185, 0.8) !important;
+    padding: 0px 10px;
+}
+
+.colorPopover {
+    left: -10px !important;
+    top: 42px !important;
+    background-color: rgba(186, 184, 185, 0.8) !important;
+    padding: 10px;
+    border-radius: 0px 15px 15px 15px !important;
+}
+
+
+.rangeslider__fill { background-color: #639BD4 !important; }
+
+.rangeslider__handle:after {
+    content: initial !important;
+}
+
+.rangeslider {
+    height: 5px;
+    margin-bottom: auto;
+    position: relative;
+    background: #8B898A;
+    -ms-touch-action: none;
+    touch-action: none;
 }
