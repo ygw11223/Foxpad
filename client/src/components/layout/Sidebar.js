@@ -57,19 +57,16 @@ class Sidebar extends React.Component {
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
 
-
                 <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class={"fas fa-pencil-alt fa-2x"} style={{color: 'white'}}></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={()=>{this.setState({popoverPenOpen: !this.state.popoverPenOpen})}}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
-
-
-
                 <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.state.color}}></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen})}}>
                   <ColorPicker updateColor={this.updateColor} onChangeColor={this.props.onChangeColor}/>
                 </Popover>
+                
             </ButtonGroup>
         );
     }
