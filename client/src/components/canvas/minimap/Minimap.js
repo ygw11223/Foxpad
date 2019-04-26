@@ -5,8 +5,6 @@ const minimap = require('./boop.jpg');
 class Minimap extends Component {
     constructor(props) {
         super(props);
-        this.state = {height: 300, width: 300};
-
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
     }
 
@@ -27,12 +25,10 @@ class Minimap extends Component {
         else {
             this.ctx.globalCompositeOperation="source-over";
         }
-        // this.ctx.moveTo(x0, y0);
-        // this.ctx.lineTo(x1, y1);
-        this.ctx.moveTo(30, 50);    // testing purposes
-        this.ctx.lineTo(150, 100);
+        this.ctx.moveTo(x0/4, y0/4);
+        this.ctx.lineTo(x1/4, y1/4);
         this.ctx.lineCap = "round";
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = lineWidth/4;
         this.ctx.strokeStyle = color;
         this.ctx.stroke();
     }
@@ -53,10 +49,10 @@ class Minimap extends Component {
               <canvas
                   ref="minimap"
                   id = "mini"
-                  // height = {this.state.height}
-                  // width  = {this.state.width}
+                  height = {270}
+                  width  = {480}
                   />
-              <img src={minimap} id="test" alt="minimap" />
+              // <img src={minimap} id="test" alt="minimap" />
             </div>
         );
     }

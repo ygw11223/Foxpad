@@ -135,8 +135,8 @@ class CanvasBoard extends Component {
                         onEraser={this.onEraser}/>
                 <Minimap
                             onRef={ref => (this.minimap= ref)}
-                            height = {this.state.height/10}
-                            width  = {this.state.width/10}
+                            // height = {this.state.height/8}
+                            // width  = {this.state.width/8}
                             />
             </div>
         );
