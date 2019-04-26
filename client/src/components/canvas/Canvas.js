@@ -111,6 +111,7 @@ class Canvas extends Component {
     }
 
     updateDimensions() {
+        // when change canvas size, reset scale and offsets
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
@@ -191,7 +192,6 @@ class Canvas extends Component {
     }
 
     onDrawImage() {
-        console.log("draw",[this.imageWidth, this.imageHight]);
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
             this.imageHight = this.image.height;
             this.imageWidth = this.image.width;
@@ -204,7 +204,6 @@ class Canvas extends Component {
     }
 
     onUndoEvent(e) {
-        console.log('undo');
         this.props.socket.emit('command', 'undo');
     }
 
@@ -321,23 +320,25 @@ class Canvas extends Component {
     }
 
     zoom(direction, x, y) {
+        // cursor positon; if using button, set center of view port as cursor positon.
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
-
+        // apply operator on cursor positon
         let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
         let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
+        // factor is 1.1
         let factor = Math.pow(1.1, direction);//set scale factor to 2
-
+        // set base scale, cannot zoom out further
         if(this.scale/factor > 1) {
             return;
         }
-
+        // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
         this.mctx.translate(preX_T, preY_T);
         this.offsetX -= preX_T;
         this.offsetY -= preY_T;
 
-        //linear algebra
+        // zoom in
         this.scale /= factor;
         this.offsetX = this.offsetX/factor;
         this.offsetY = this.offsetY/factor;
@@ -346,16 +347,18 @@ class Canvas extends Component {
         this.ctx.scale(factor,factor);
         this.mctx.scale(factor,factor);
 
+        // translate back(fix mouse positon)
         this.ctx.translate(-preX_T, -preY_T);
         this.mctx.translate(-preX_T, -preY_T);
         this.offsetX += preX_T;
         this.offsetY += preY_T;
 
+        // fix boundary
         let x1 = this.mapWindowToCanvas(0, this.offsetX);
         let y1 = this.mapWindowToCanvas(0, this.offsetY);
         let x2 = this.mapWindowToCanvas(this.state.width, this.offsetX);
         let y2 = this.mapWindowToCanvas(this.state.height, this.offsetY);
-        console.log([x1,y1,x2,y2,this.canvas_width/2,this.canvas_hight/2]);
+
         let dx = 0;
         let dy = 0;
 
@@ -370,18 +373,15 @@ class Canvas extends Component {
         } else if(y2 > this.canvas_hight/2) {
             dy = this.canvas_hight/2 - y2;
         }
-
+        // if both dx and dy are 0, don't transform
         if(!(dx === 0 && dy === 0)) {
             this.offsetX += dx;
             this.offsetY += dy;
             this.ctx.translate(-dx,-dy);
             this.mctx.translate(-dx,-dy);
         }
-        console.log([dx,dy]);
         this.props.socket.emit('command', 'update');
-
         this.onEmitImg();
-
     }
 
     onScrollEvent(event) {
