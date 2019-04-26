@@ -144,7 +144,7 @@ class CanvasBoard extends Component {
             }} />
         }
 
-        var icon = this.hideNavbar === true ? '>' : '<';
+        var icon = (this.state.hideNavbar === true ? '>' : '<');
 
         return(
             <div style={{display: 'flex', flexDirection: 'row', height: '100%'}}>

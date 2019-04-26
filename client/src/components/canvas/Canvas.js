@@ -141,7 +141,7 @@ class Canvas extends Component {
         let time = new Date().getTime();
 
         for(var i in mouseList) {
-            if(i == this.props.name || time - mouseList[i]['timestamp'] > 5000)
+            if(i == this.props.name || time - mouseList[i]['timestamp'] > 3000)
                 continue;
 
             this.mctx.beginPath();
@@ -237,7 +237,6 @@ class Canvas extends Component {
     }
 
     onMouseDown(e) {
-
         this.setState({ active: true });
         let currentX = 0;
         let currentY = 0;

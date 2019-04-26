@@ -35,7 +35,7 @@ class CanvasList extends Component {
     renderCanvas() {
         var children = [];
         for (var i = 1; i <= this.state.num_canvas; i++) {
-            var border = (i === this.state.current_canvas ? '5px' : '0');
+            var boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
             children.push(
                 <Button
                     style={{
@@ -43,10 +43,11 @@ class CanvasList extends Component {
                         width: '192px',
                         backgroundColor: 'white',
                         padding: 0,
-                        border: border,
+                        border: 0,
                         borderColor: 'black',
                         margin: '10px 0 10px 0',
                         flexShrink: 0,
+                        boxShadow: boxShadow
                     }}
                     onClick={this.props.setCanvas.bind(this, i)}>
                 </Button>
@@ -83,7 +84,7 @@ class CanvasList extends Component {
         }
         return (
             <div style={style} class='canvasList'>
-                <p style={{width: '150px'}}> Canvas List </p>
+                <p style={{width: '150px', textAlign: 'center'}}> Canvases </p>
 
                 {this.renderCanvas()}
 
