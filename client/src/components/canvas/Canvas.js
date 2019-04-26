@@ -48,6 +48,7 @@ class Canvas extends Component {
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
+        this.initCanvas = this.initCanvas.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -67,7 +68,19 @@ class Canvas extends Component {
         this.nextImage.onload = this.onLoadNextImage;
     }
 
-    onEmitImg(){
+    initCanvas() {
+        this.scale = 1;
+        this.imageHight = -1;
+        this.imageWidth = -1;
+        this.offsetY = -this.state.height/2;
+        this.offsetX = -this.state.width/2;
+        this.preX = -1;
+        this.preY = -1;
+        this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+    }
+
+    onEmitImg() {
         this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
     }
 
@@ -134,7 +147,7 @@ class Canvas extends Component {
             this.mctx.beginPath();
             this.mctx.arc(mouseList[i]['pos_x_mouse'],
                           mouseList[i]['pos_y_mouse'],
-                           mouseList[i]['pen_width']/2,//mouseList[i]['pen_width'],
+                           mouseList[i]['pen_width'],
                           0, 2 * Math.PI);
             this.mctx.fillStyle = mouseList[i]['color'];
             this.mctx.fill();
@@ -180,19 +193,24 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
-        this.nextImage.src = data;
+        if (data === 'NONE') {
+            this.image.src = null;
+        } else {
+            this.nextImage.src = data;
+        }
     }
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
+        if (this.imageHight <= 0 || this.imageWidth <= 0) {
+            this.imageHight = this.nextImage.height;
+            this.imageWidth = this.nextImage.width;
+        }
     }
 
     onDrawImage() {
-        if (this.imageHight <= 0 || this.imageWidth <= 0) {
-            this.imageHight = this.image.height;
-            this.imageWidth = this.image.width;
-        }
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
+        if (this.image.src === null || this.imageHight <= 0 || this.imageWidth <= 0) return;
         this.pctx.drawImage(this.image, -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2  , this.imageWidth, this.imageHight);
     }
 

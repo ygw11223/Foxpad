@@ -1,7 +1,7 @@
 .tool-button {
-    width: 50px;
+    width: 40px;
     cursor: pointer;
-    height: 80px;
+    height: 60px;
     background-color: #c5c5c5;
     /* pointer-events: none; */
 }
@@ -216,4 +216,12 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+.canvasList {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.canvasList::-webkit-scrollbar {
+    display: none;
 }

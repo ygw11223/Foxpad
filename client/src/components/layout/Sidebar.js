@@ -6,8 +6,8 @@ import './style.css'
 const styleSideBar = {
   zIndex: '5',
   position:'absolute',
-  left:'0px',
   top:'100px',
+  transition: '0.5s'
 };
 
 class Sidebar extends React.Component {
@@ -19,8 +19,13 @@ class Sidebar extends React.Component {
     //          rewrite DropdownItem into list
     //
     render() {
+        var left = this.props.hideNavbar ? '0' : '212px';
+        const style = {
+            ...styleSideBar,
+            left: left,
+        }
         return (
-            <ButtonGroup   vertical id="buttonGroup" style={styleSideBar}>
+            <ButtonGroup   vertical id="buttonGroup" style={style}>
                 <Button eventKey="white" id="eraser" className='tool-button button'  onClick={() => this.props.onChangeColor("white")}> <i class="fas fa-eraser fa-2x align-middle" style={{color: 'white'}}></i></Button>
 
                 <ButtonDropdown   direction="right" isOpen={this.state.btnDroprightWidth}
