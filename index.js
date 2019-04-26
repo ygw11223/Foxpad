@@ -144,6 +144,9 @@ function onConnection(socket){
             }
         }
         socket.broadcast.in(cid).emit('mouse_position', mouse_data);
+        if (Math.random() < 0.05) {
+            socket.emit('mouse_position', mouse_data);
+        }
     });
 
     socket.on('image', (pos) => {
