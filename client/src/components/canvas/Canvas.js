@@ -81,7 +81,7 @@ class Canvas extends Component {
     }
 
     onEmitImg() {
-        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.log2(this.scale)});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.round(Math.log2(this.scale))});
     }
 
     onRedrawEvent(data_array) {
@@ -334,35 +334,13 @@ class Canvas extends Component {
         this.setState({ active: false });
     }
 
-    // zoom(direction) {
-    //    let dx =  this.scale*this.preX;
-    //    let dy =  this.scale*this.preY;
-    //    let factor = Math.pow(2, direction);//set scale factor to 2
-    //    // this.ctx.translate(-dx, -dy);
-    //    // this.offsetX += dx;
-    //    // this.offsetY += dy;
-    //    this.ctx.scale(factor,factor);
-    //    this.mctx.scale(factor,factor);
-    //    //linear algebra
-    //    this.scale /= factor;
-    //    this.offsetX /= factor;
-    //    this.offsetY/= factor;
-    //    this.imageHight *= factor;
-    //    this.imageWidth *= factor;
-    //    // this.ctx.translate(dx, dy);
-    //    // this.offsetX -= dx;
-    //    // this.offsetY -= dy;
-    //    console.log([-this.offsetX, -this.offsetY]);
-    //    this.props.socket.emit('command', 'update');
-    //    this.onEmitImg();
-    // }
     zoom(direction, x, y) {
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
 
         let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
         let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
-        let factor = Math.pow(2, direction);//set scale factor to 2
+        let factor = Math.pow(1.1, direction);//set scale factor to 2
 
         if(this.scale/factor > 1) {
             return;
