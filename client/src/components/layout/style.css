@@ -28,6 +28,7 @@
     border: none;
     outline: none;
     box-shadow: none;
+    border-radius: 0px 0px 25px 0px;
 }
 
 #image:focus, #image:hover {
@@ -91,7 +92,6 @@
     border: none;
     outline: none;
     box-shadow: none;
-    border-radius: 0px 0px 25px 0px;
 }
 
 #palette:focus, #palette:hover {
@@ -265,8 +265,8 @@
 }
 
 .colorPopover {
-    left: -10px !important;
-    top: 42px !important;
+    left: -8px !important;
+    top: 20px !important;
     background-color: rgba(186, 184, 185, 0.8) !important;
     padding: 10px;
     border-radius: 0px 15px 15px 15px !important;
