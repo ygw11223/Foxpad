@@ -49,6 +49,7 @@ class Canvas extends Component {
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
         this.initCanvas = this.initCanvas.bind(this);
+        this.onMouseSideMove = this.onMouseSideMove.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -114,6 +115,7 @@ class Canvas extends Component {
        this.offsetX = -this.state.width/2;
        this.ctx.translate(-this.offsetX, -this.offsetY);
        this.mctx.translate(-this.offsetX, -this.offsetY);
+       setInterval(this.onMouseSideMove, 50);
     }
 
     componentWillMount() {
@@ -268,6 +270,41 @@ class Canvas extends Component {
         return y - x*this.scale;
     }
 
+    onMouseSideMove() {
+        if(!this.state.active && this.props.mode) {
+            var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
+                    - this.mapWindowToCanvas(0, this.offsetX);
+            var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
+                    - this.mapWindowToCanvas(0, this.offsetY);
+            //hardcode the boundary, 40px
+            if (this.preX > 40 && this.preX < this.state.width - 40)
+                dx = 0;
+            else if(this.preX > this.state.width - 40) {
+                dx = -dx;
+            }
+            if (this.preY > 40 && this.preY < this.state.height - 40)
+                dy = 0;
+            else if(this.preY > this.state.height - 40) {
+                dy = -dy;
+            }
+            if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+                dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+            } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+                dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+            }
+            if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+            } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+            }
+            this.offsetX -= dx;
+            this.offsetY -= dy;
+            this.ctx.translate(dx,dy);
+            this.mctx.translate(dx,dy);
+            this.props.socket.emit('command', 'update');
+        }
+    }
+
     onMouseMove(e) {
         let currentX = 0;
         let currentY = 0;
@@ -286,15 +323,11 @@ class Canvas extends Component {
             currentY = e.touches[0].clientY - rect.top;
         }
 
-        if (!this.state.active) {
-            this.preX = currentX;
-            this.preY = currentY;
-            return;
-        }
-
-        if(this.props.mode){
-            let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
-            let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
+        if(this.props.mode && this.state.active){
+            let dx =  this.mapWindowToCanvas(currentX , this.offsetX)
+                    - this.mapWindowToCanvas(this.preX, this.offsetX);
+            let dy =  this.mapWindowToCanvas(currentY , this.offsetY)
+                    - this.mapWindowToCanvas(this.preY, this.offsetY);
 
             if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
                 dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
@@ -312,7 +345,7 @@ class Canvas extends Component {
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
-        else {
+        else if (this.state.active) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
