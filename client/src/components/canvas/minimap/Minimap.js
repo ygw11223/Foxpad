@@ -6,6 +6,8 @@ class Minimap extends Component {
     constructor(props) {
         super(props);
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
+        this.drawLine = this.drawLine.bind(this);
+        this.onRedrawEvent = this.onRedrawEvent.bind(this);
     }
 
     componentWillUnmount() {
@@ -18,6 +20,17 @@ class Minimap extends Component {
        this.offsetY = -135/2;
        this.offsetX = -120;
        this.ctx.translate(-this.offsetX, -this.offsetY);
+    }
+
+    onRedrawEvent(data_array) {
+        this.ctx.save();    // save the current state of our canvas (translate offset)
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, 240, 135); // clear the whole canvas
+        this.ctx.restore(); // restore the translate offset
+        var i = 0;
+        for (i = 0; i < data_array.length; i++) {
+            this.onDrawingEvent(data_array[i]);
+        }
     }
 
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {

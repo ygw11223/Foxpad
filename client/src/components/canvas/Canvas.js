@@ -181,8 +181,6 @@ class Canvas extends Component {
             lineWidth: lineWidth,
             isEraser: this.props.eraser,
         });
-
-
     }
 
     onDrawingEvent(data) {
@@ -330,11 +328,10 @@ class Canvas extends Component {
                           this.props.color,
                           this.props.lineWidth,
                           this.props.eraser);
-
         }
         this.preX = currentX;
         this.preY = currentY;
-        console.log(this.preX, this.preY);
+        // console.log(this.preX, this.preY);
     }
 
     onMouseUp() {
