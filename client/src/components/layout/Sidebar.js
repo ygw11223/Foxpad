@@ -97,7 +97,7 @@ class Sidebar extends React.Component {
             left: left,
         }
         return (
-            <ButtonGroup   vertical id="buttonGroup" style={styleSideBar}>
+            <ButtonGroup   vertical id="buttonGroup" style={style}>
 
                 <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
                 <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
