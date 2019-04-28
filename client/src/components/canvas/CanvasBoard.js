@@ -5,6 +5,7 @@ import Canvas from './Canvas';
 import Sidebar from '../layout/Sidebar';
 import Navbar from '../layout/Navbar';
 import InfoCards from '../layout/InfoCards';
+import Minimap from './minimap/Minimap';
 import CanvasList from './CanvasList';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
@@ -28,6 +29,10 @@ class CanvasBoard extends Component {
         this.newCanvas = this.newCanvas.bind(this);
         this.setCanvas = this.setCanvas.bind(this);
         this.onDrag = this.onDrag.bind(this);
+        this.onDrawingEvent = this.onDrawingEvent.bind(this);
+        this.minimapDraw = this.minimapDraw.bind(this);
+        this.onRedrawEvent = this.onRedrawEvent.bind(this);
+
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
@@ -80,6 +85,20 @@ class CanvasBoard extends Component {
         this.socket.emit('command', 'update');
     }
 
+    onDrawingEvent(data) {
+        this.canvas.onDrawingEvent(data);
+        this.minimap.onDrawingEvent(data);
+    }
+
+    onRedrawEvent(data_array) {
+        this.canvas.onRedrawEvent(data_array);
+        this.minimap.onRedrawEvent(data_array);
+    }
+
+    minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
+        this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
+    }
+
     componentDidMount() {
         let id = cookies.get('cd_user_name');
         if (id == undefined) {
@@ -90,9 +109,9 @@ class CanvasBoard extends Component {
             // will disappear when connection is lost. So we need to init upon
             // each connection.
             this.socket.on('connect', this.onInitCanvas);
-            this.socket.on('drawing', this.canvas.onDrawingEvent);
+            this.socket.on('drawing', this.onDrawingEvent);
             this.socket.on('image', this.canvas.onImageEvent);
-            this.socket.on('redraw', this.canvas.onRedrawEvent);
+            this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
@@ -155,6 +174,9 @@ class CanvasBoard extends Component {
                         setCanvas={this.setCanvas}/>
 
                 <div>
+                    <Minimap
+                            onRef={ref => (this.minimap= ref)}/>
+
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
                             mode={this.state.mode}
@@ -166,7 +188,8 @@ class CanvasBoard extends Component {
                             eraser={this.state.eraser}
                             socket={this.socket}
                             uploader={this.uploader}
-                            name = {this.uid}/>
+                            name = {this.uid}
+                            minimapDraw={this.minimapDraw}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck= ref)}

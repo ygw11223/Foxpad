@@ -321,10 +321,17 @@ class Canvas extends Component {
                           this.props.lineWidth,
                           this.props.eraser,
                           1)
+            this.props.minimapDraw(this.mapWindowToCanvas(this.preX, this.offsetX),
+                          this.mapWindowToCanvas(this.preY, this.offsetY),
+                          this.mapWindowToCanvas(currentX, this.offsetX),
+                          this.mapWindowToCanvas(currentY, this.offsetY),
+                          this.props.color,
+                          this.props.lineWidth,
+                          this.props.eraser);
         }
         this.preX = currentX;
         this.preY = currentY;
-
+        // console.log(this.preX, this.preY);
     }
 
     onMouseUp() {
@@ -404,34 +411,33 @@ class Canvas extends Component {
     render() {
         return (
             <div>
-            <canvas
-                ref="mouse"
-                style={styleMouse}
-                height = {this.state.height }
-                width  = {this.state.width}
-                onMouseDown={this.onMouseDown}
-                onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}
-                onMouseOut={this.onMouseUp}
-                onTouchStart={this.onMouseDown}
-                onTouchMove={this.onMouseMove}
-                onTouchEnd={this.onMouseUp}
-                onTouchCancel={this.onMouseUp}
-                onWheel={this.onScrollEvent}
-            />
-            <canvas
-                ref="canvas"
-                style={styleCanvas}
-                height = {this.state.height }
-                width  = {this.state.width }
+                <canvas
+                    ref="mouse"
+                    style={styleMouse}
+                    height = {this.state.height }
+                    width  = {this.state.width}
+                    onMouseDown={this.onMouseDown}
+                    onMouseMove={this.onMouseMove}
+                    onMouseUp={this.onMouseUp}
+                    onMouseOut={this.onMouseUp}
+                    onTouchStart={this.onMouseDown}
+                    onTouchMove={this.onMouseMove}
+                    onTouchEnd={this.onMouseUp}
+                    onTouchCancel={this.onMouseUp}
+                    onWheel={this.onScrollEvent}/>
 
-            />
-            <canvas
-                ref="picture"
-                style={stylePicture}
-                height = {this.state.height }
-                width  = {this.state.width }
-            />
+                <canvas
+                    ref="canvas"
+                    style={styleCanvas}
+                    height = {this.state.height }
+                    width  = {this.state.width }/>
+
+                <canvas
+                    ref="picture"
+                    style={stylePicture}
+                    height = {this.state.height }
+                    width  = {this.state.width }/>
+
                 <div>
                     <Modal isOpen={this.state.modal} toggle={this.showForm}>
                         <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
