@@ -14,12 +14,11 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'red', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
         this.showForm = this.showForm.bind(this);
-        this.onChangeMode = this.onChangeMode.bind(this);
         this.onZoom = this.onZoom.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
@@ -28,7 +27,7 @@ class CanvasBoard extends Component {
         this.onHideNavbar = this.onHideNavbar.bind(this);
         this.newCanvas = this.newCanvas.bind(this);
         this.setCanvas = this.setCanvas.bind(this);
-
+        this.onDrag = this.onDrag.bind(this);
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
@@ -110,6 +109,7 @@ class CanvasBoard extends Component {
     }
 
     changeWidth(e) {
+        console.log(e);
         this.setState({lineWidth: e, eraser: false})
     }
 
@@ -124,12 +124,12 @@ class CanvasBoard extends Component {
         this.canvas.zoom(direction);
     }
 
-    onChangeMode(){
-        this.setState({mode: !this.state.mode})
+    onDrag(mode){
+        this.setState({mode: mode});
     }
 
     onEraser(e) {
-        this.setState({lineWidth: e, eraser: true})
+        this.setState({lineWidth: e, eraser: true});
     }
 
     onHideNavbar() {
@@ -174,11 +174,10 @@ class CanvasBoard extends Component {
                             hideNavbar={this.state.hideNavbar}/>
 
                     <Sidebar
-                            mode={this.state.mode ? "fa-hand-paper": "fa-edit"}
                             onChangeColor={this.changeColor}
                             onChangeWidth={this.changeWidth}
                             onUndo={this.onUndoEvent}
-                            onChangeMode={this.onChangeMode}
+                            onDrag={this.onDrag}
                             onZoom={this.onZoom}
                             showForm={this.showForm}
                             onEraser={this.onEraser}

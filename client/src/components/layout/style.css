@@ -1,7 +1,7 @@
 .tool-button {
     width: 40px;
     cursor: pointer;
-    height: 60px;
+    height: 50px;
     background-color: #c5c5c5;
     /* pointer-events: none; */
 }
@@ -24,23 +24,23 @@
 
 
 #image {
-    border-radius: 0px 0px 25px 0px;
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
+    border-radius: 0px 0px 25px 0px;
 }
 
 #image:focus, #image:hover {
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 
 #eraser {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -50,7 +50,7 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #eraser::after {
@@ -65,7 +65,7 @@
 
 
 #penWidth {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -75,7 +75,7 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #penWidth::after {
@@ -88,7 +88,7 @@
 } */
 
 #palette {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -98,7 +98,7 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #palette::after {
@@ -111,17 +111,18 @@
 } */
 
 #undo {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
+    box-sizing: none;
 }
 
 #undo:focus, #undo:hover {
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #undo::after {
@@ -134,7 +135,7 @@
 } */
 
 #changeMode {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -144,7 +145,7 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #changeMode::after {
@@ -157,7 +158,7 @@
 } */
 
 #zoomIn {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -167,7 +168,7 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
 }
 
 /* #zoomIn::after {
@@ -180,7 +181,7 @@
 } */
 
 #zoomOut {
-    background-color: #c5c5c5;
+    background-color: #A0A0A0;
     border: none;
     outline: none;
     box-shadow: none;
@@ -190,7 +191,35 @@
     border:none;
     outline:none;
     box-shadow: none;
-    background-color: #4C94CE;
+    background-color: #4C94CE !important;
+}
+
+#draw {
+    background-color: #A0A0A0;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#draw:focus, #draw:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE !important;
+}
+
+#drag {
+    background-color: #A0A0A0;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#drag:focus, #drag:hover {
+    border:none;
+    outline:none;
+    box-shadow: none;
+    background-color: #4C94CE !important;
 }
 
 /* #zoomOut::after {
@@ -224,4 +253,37 @@
 }
 .canvasList::-webkit-scrollbar {
     display: none;
+}
+
+.popover:not(.colorPopover) {
+    left: -11px !important;
+    width: 200px;
+    height: 50px;
+    border-radius: 0px 15px 15px 0px !important;
+    background-color: rgba(186, 184, 185, 0.8) !important;
+    padding: 0px 10px;
+}
+
+.colorPopover {
+    left: -8px !important;
+    top: 20px !important;
+    background-color: rgba(186, 184, 185, 0.8) !important;
+    padding: 10px;
+    border-radius: 0px 15px 15px 15px !important;
+}
+
+
+.rangeslider__fill { background-color: #639BD4 !important; }
+
+.rangeslider__handle:after {
+    content: initial !important;
+}
+
+.rangeslider {
+    height: 5px;
+    margin-bottom: auto;
+    position: relative;
+    background: #8B898A;
+    -ms-touch-action: none;
+    touch-action: none;
 }
