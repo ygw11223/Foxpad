@@ -302,7 +302,11 @@ function onConnection(socket){
 
         if (fileInfo.uploadDir.substr(-3) === 'pdf') {
             var pdfImage = new PDFImage(fileInfo.uploadDir, {
-                combinedImage: true
+                combinedImage: true,
+                convertOptions: {
+                    "-density": "150",
+                    "-quality": "100"
+                }
             });
 
             pdfImage.convertFile().then(function (imagePaths) {
