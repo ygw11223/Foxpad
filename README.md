@@ -3,6 +3,9 @@
 ## Requirements
 
 - cmake
+- imagemagick
+- ghostscript
+- poppler-utils
 
 ## Start server
 
