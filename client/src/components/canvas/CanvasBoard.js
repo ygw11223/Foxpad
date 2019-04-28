@@ -21,7 +21,6 @@ class CanvasBoard extends Component {
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.session_update = this.session_update.bind(this);
-        this.onDraw = this.onDraw.bind(this);
         this.onDrag = this.onDrag.bind(this);
 
         this.socket = openSocket();
@@ -89,12 +88,8 @@ class CanvasBoard extends Component {
         this.canvas.zoom(direction);
     }
 
-    onDraw(){
-        this.setState({mode: false});
-    }
-
-    onDrag(){
-        this.setState({mode: true});
+    onDrag(mode){
+        this.setState({mode: mode});
     }
 
     onEraser(e) {
@@ -130,7 +125,6 @@ class CanvasBoard extends Component {
                         onChangeColor={this.changeColor}
                         onChangeWidth={this.changeWidth}
                         onUndo={this.onUndoEvent}
-                        onDraw={this.onDraw}
                         onDrag={this.onDrag}
                         onZoom={this.onZoom}
                         showForm={this.showForm}
