@@ -300,10 +300,18 @@ class Canvas extends Component {
                           this.props.lineWidth,
                           this.props.eraser,
                           1)
+            this.props.minimapDraw(this.mapWindowToCanvas(this.preX, this.offsetX),
+                          this.mapWindowToCanvas(this.preY, this.offsetY),
+                          this.mapWindowToCanvas(currentX, this.offsetX),
+                          this.mapWindowToCanvas(currentY, this.offsetY),
+                          this.props.color,
+                          this.props.lineWidth,
+                          this.props.eraser);
+
         }
         this.preX = currentX;
         this.preY = currentY;
-
+        console.log(this.preX, this.preY);
     }
 
     onMouseUp() {

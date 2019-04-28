@@ -24,6 +24,7 @@ class CanvasBoard extends Component {
         this.onEraser = this.onEraser.bind(this);
         this.onInitCanvas = this.onInitCanvas.bind(this);
         this.session_update = this.session_update.bind(this);
+        this.minimapDraw = this.minimapDraw.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -100,6 +101,9 @@ class CanvasBoard extends Component {
         this.setState({lineWidth: e, eraser: true})
     }
 
+    minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit){
+      this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
+    }
     render(){
         if (this.state.toLogin === true) {
             return <Redirect to={{
@@ -109,6 +113,11 @@ class CanvasBoard extends Component {
         }
         return(
             <div>
+                <Minimap
+                        onRef={ref => (this.minimap= ref)}
+                        // height = {this.state.height/8}
+                        // width  = {this.state.width/8}
+                        />
                 <Canvas style={{cursor: 'none'}}
                         onRef={ref => (this.canvas= ref)}
                         mode={this.state.mode}
@@ -120,7 +129,8 @@ class CanvasBoard extends Component {
                         eraser={this.state.eraser}
                         socket={this.socket}
                         uploader={this.uploader}
-                        name = {this.id}/>
+                        name = {this.id}
+                        minimapDraw = {this.minimapDraw}/>
                 <InfoCards
                         onRef={ref => (this.cardDeck= ref)}
                         name={this.id}/>
@@ -133,11 +143,7 @@ class CanvasBoard extends Component {
                         onZoom={this.onZoom}
                         showForm={this.showForm}
                         onEraser={this.onEraser}/>
-                <Minimap
-                            onRef={ref => (this.minimap= ref)}
-                            // height = {this.state.height/8}
-                            // width  = {this.state.width/8}
-                            />
+
             </div>
         );
     }

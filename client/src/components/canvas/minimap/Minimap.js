@@ -15,6 +15,9 @@ class Minimap extends Component {
     componentDidMount() {
        this.props.onRef(this);
        this.ctx = this.refs.minimap.getContext('2d');
+       this.offsetY = -135/2;
+       this.offsetX = -120;
+       this.ctx.translate(-this.offsetX, -this.offsetY);
     }
 
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
@@ -25,10 +28,10 @@ class Minimap extends Component {
         else {
             this.ctx.globalCompositeOperation="source-over";
         }
-        this.ctx.moveTo(x0/4, y0/4);
-        this.ctx.lineTo(x1/4, y1/4);
+        this.ctx.moveTo(x0/8, y0/8);
+        this.ctx.lineTo(x1/8, y1/8);
         this.ctx.lineCap = "round";
-        this.ctx.lineWidth = lineWidth/4;
+        this.ctx.lineWidth = lineWidth/8;
         this.ctx.strokeStyle = color;
         this.ctx.stroke();
     }
@@ -49,10 +52,9 @@ class Minimap extends Component {
               <canvas
                   ref="minimap"
                   id = "mini"
-                  height = {270}
-                  width  = {480}
+                  height = {135}
+                  width  = {240}
                   />
-              // <img src={minimap} id="test" alt="minimap" />
             </div>
         );
     }
