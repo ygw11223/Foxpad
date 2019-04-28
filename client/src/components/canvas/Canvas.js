@@ -81,7 +81,7 @@ class Canvas extends Component {
     }
 
     onEmitImg() {
-        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.round(Math.log2(this.scale))});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.floor(Math.log2(this.scale))});
     }
 
     onRedrawEvent(data_array) {
@@ -331,7 +331,7 @@ class Canvas extends Component {
         this.setState({ active: false });
     }
 
-    zoom(direction, x, y) {
+    zoom(direction, zoom_factor, x, y) {
         // cursor positon; if using button, set center of view port as cursor positon.
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
@@ -339,10 +339,10 @@ class Canvas extends Component {
         let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
         let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
         // factor is 1.1
-        let factor = Math.pow(1.1, direction);//set scale factor to 2
+        let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
         if(this.scale/factor > 1) {
-            return;
+            factor = 1/this.scale;
         }
         // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
@@ -397,8 +397,14 @@ class Canvas extends Component {
     }
 
     onScrollEvent(event) {
+        event.preventDefault();
         let wheel = event.deltaY < 0 ? 1 : -1;
-        this.zoom(wheel, this.preX, this.preY);
+        console.log(event.ctrlKey);
+        if(event.ctrlKey)
+            this.zoom(wheel, 1.1, this.preX, this.preY);
+        else {
+            this.zoom(wheel, 1.1)
+        }
     }
 
     render() {
