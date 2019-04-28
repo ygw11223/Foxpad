@@ -109,7 +109,6 @@ class CanvasBoard extends Component {
     }
 
     changeWidth(e) {
-        console.log(e);
         this.setState({lineWidth: e, eraser: false})
     }
 

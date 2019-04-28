@@ -39,6 +39,10 @@ class Sidebar extends React.Component {
     onPen() {
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("penWidth");
+        let penArrow = document.getElementById("penRight");
+        let eraserArrow = document.getElementById("eraserRight");
+        penArrow.style.display = "block";
+        eraserArrow.style.display = "none";
 
         for(var i = 0; i < buttons.length; i++) {
              buttons[i].style.backgroundColor = "#A0A0A0";
@@ -49,7 +53,7 @@ class Sidebar extends React.Component {
             this.setState({popoverPenOpen: !this.state.popoverPenOpen});
         }
         else {
-            this.setState({onPen: true, onEraser: false});
+            this.setState({onPen: true, onEraser: false, popoverEraserOpen: false, popoverColorOpen: false});
             this.props.onDrag(false);
             this.props.onChangeWidth(this.state.penWidth);
         }
@@ -58,6 +62,10 @@ class Sidebar extends React.Component {
     onEraser() {
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("eraser");
+        let penArrow = document.getElementById("penRight");
+        let eraserArrow = document.getElementById("eraserRight");
+        penArrow.style.display = "none";
+        eraserArrow.style.display = "block";
 
         for(var i = 0; i < buttons.length; i++) {
              buttons[i].style.backgroundColor = "#A0A0A0";
@@ -68,7 +76,7 @@ class Sidebar extends React.Component {
             this.setState({popoverEraserOpen: !this.state.popoverEraserOpen});
         }
         else {
-            this.setState({onEraser: true, onPen: false});
+            this.setState({onEraser: true, onPen: false, popoverPenOpen: false, popoverColorOpen: false});
             this.props.onDrag(false);
             this.props.onEraser(this.state.eraserWidth);
         }
@@ -77,13 +85,17 @@ class Sidebar extends React.Component {
     onDrag() {
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("drag");
+        let penArrow = document.getElementById("penRight");
+        let eraserArrow = document.getElementById("eraserRight");
+        penArrow.style.display = "none";
+        eraserArrow.style.display = "none";
 
         for(var i = 0; i < buttons.length; i++) {
              buttons[i].style.backgroundColor = "#A0A0A0";
         }
         target.style.backgroundColor = "#4C94CE";
 
-        this.setState({onDrag: true, onEraser: false, onPen: false});
+        this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false});
         this.props.onDrag(true);
     }
 
@@ -96,6 +108,7 @@ class Sidebar extends React.Component {
             ...styleSideBar,
             left: left,
         }
+
         return (
             <ButtonGroup   vertical id="buttonGroup" style={style}>
 
@@ -109,12 +122,12 @@ class Sidebar extends React.Component {
                   <ColorPicker updateColor={this.updateColor} onChangeColor={this.props.onChangeColor}/>
                 </Popover>
 
-                <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class={"fas fa-pencil-alt fa-2x"} style={{color: 'white'}}></i></Button>
+                <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="penRight"></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={this.onPen}>
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
-                <Button eventKey="eraser" id="eraser" className='tool-button button'> <i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i></Button>
+                <Button eventKey="eraser" id="eraser" className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
