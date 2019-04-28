@@ -29,28 +29,28 @@ IMAGES = {};
 app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
 
-// Request for joining an canvas should be "/canvas/VALID_ID".
-app.get('/canvas/*', function (req, res) {
-    // Get canvas id.
-    var canvas_id = req.originalUrl.substr(8);
-    // Check if session id is valid.
-    if (!(canvas_id in SESSION_INFO)) {
+// Request for joining an canvas room should be "/room/VALID_ID".
+app.get('/room/*', function (req, res) {
+    // Get room id.
+    var room_id = req.originalUrl.substr(8);
+    // Check if room id is valid.
+    if (!(room_id in USER_INFO)) {
         res.status(400).send('Invalid Url!');
     } else {
         res.sendFile(__dirname + '/client/build/index.html');
     }
 });
-app.get('/new_canvas', function (req, res) {
+app.get('/new_room', function (req, res) {
     // Create a new canvas id.
     var id = hashes.generate();
     SESSION_INFO[id] = {};
-    USER_INFO[id] = {}
-    DATABASE[id] = {};
+    SESSION_INFO[id]['.num_canvas'] = 0;
+    USER_INFO[id] = {};
 
     res.status(200);
     res.type("text/json");
     res.send(id);
-    console.log("New canvas created:", id);
+    console.log("New room created:", id);
 });
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
@@ -58,43 +58,65 @@ app.get('*', function (req, res) {
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
+        // Leave previous canvas
+        if (socket.canvas_id) {
+            socket.leave(socket.canvas_id);
+        }
+
+        var new_canvas = false;
+        const rid = auth_info.room_id;
         const cid = auth_info.canvas_id;
         const uid = auth_info.user_id;
         // Initialize socket.
+        socket.room_id = rid;
         socket.canvas_id = cid;
         socket.user_id = uid;
-        // Check if canvas id is valid.
-        if (!(cid in DATABASE)) {
-            DATABASE[cid] = {};
-            SESSION_INFO[cid] = {};
-            USER_INFO[cid] = {};
-            console.log("New canvas_id encountered when init socket.");
-        }
-        socket.join(cid);
-        if (!(uid in DATABASE[cid])) {
-            DATABASE[cid][uid] = [];
-        }
 
-        // Initilize user information
-        if (!(uid in USER_INFO[cid])) {
-            USER_INFO[cid][uid] = randomColor({luminosity: 'dark'});
+        // Check if room id is valid.
+        if (!(rid in USER_INFO)) {
+            SESSION_INFO[rid] = {};
+            SESSION_INFO[rid]['.num_canvas'] = 0;
+            USER_INFO[rid] = {};
+            console.log("New room id encountered when init socket.");
         }
-        SESSION_INFO[cid][uid] = {
-            color: USER_INFO[cid][uid],
+        if (!(uid in USER_INFO[rid])) {
+            USER_INFO[rid][uid] = randomColor({luminosity: 'dark'});
+        }
+        if (!(uid in SESSION_INFO[rid])) {
+            console.log(uid, "joined", cid);
+        }
+        SESSION_INFO[rid][uid] = {
+            color: USER_INFO[rid][uid],
             pos_x_mouse: 0,
             pos_y_mouse: 0,
             timestamp: 0,
             pen_color: 0,
             pen_width: 0,
+            canvas_id: cid,
+        }
+        // Create canvas in database
+        if (!(cid in DATABASE)) {
+            DATABASE[cid] = {};
+            SESSION_INFO[rid]['.num_canvas'] += 1;
+            console.log('new canvas');
+            new_canvas = true;
+        }
+        // Initilize user information
+        if (!(uid in DATABASE[cid])) {
+            DATABASE[cid][uid] = [];
+        }
+        socket.join([cid, rid]);
+        if (new_canvas) {
+            socket.broadcast.in(rid).emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
         }
 
         var members = {};
-        for (var key in SESSION_INFO[cid]) {
-            members[key] = SESSION_INFO[cid][key]['color'];
+        for (var key in SESSION_INFO[rid]) {
+            members[key] = SESSION_INFO[rid][key]['color'];
         }
-        socket.broadcast.in(cid).emit('session_update', members);
+        socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
-        console.log(uid, "joined", cid);
+        socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
     });
 
     // Save drawing data and broadcast to all of its peers
@@ -108,11 +130,23 @@ function onConnection(socket){
     socket.on('mouse_position', (data) => {
         const cid = socket.canvas_id;
         const uid = socket.user_id;
-        SESSION_INFO[cid][uid]['pos_x_mouse'] = data.x;
-        SESSION_INFO[cid][uid]['pos_y_mouse'] = data.y;
-        SESSION_INFO[cid][uid]['pen_width'] = data.w;
-        SESSION_INFO[cid][uid]['timestamp'] = new Date().getTime();
-        socket.broadcast.in(cid).emit('mouse_position', SESSION_INFO[cid]);
+        const rid = socket.room_id;
+
+        SESSION_INFO[rid][uid]['pos_x_mouse'] = data.x;
+        SESSION_INFO[rid][uid]['pos_y_mouse'] = data.y;
+        SESSION_INFO[rid][uid]['pen_width'] = data.w;
+        SESSION_INFO[rid][uid]['timestamp'] = new Date().getTime();
+
+        var mouse_data = {};
+        for (var key in SESSION_INFO[rid]) {
+            if (cid == SESSION_INFO[rid][key]['canvas_id']) {
+                mouse_data[key] = SESSION_INFO[rid][key];
+            }
+        }
+        socket.broadcast.in(cid).emit('mouse_position', mouse_data);
+        if (Math.random() < 0.05) {
+            socket.emit('mouse_position', mouse_data);
+        }
     });
 
     socket.on('image', (pos) => {
@@ -139,6 +173,8 @@ function onConnection(socket){
                 socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
                 console.log('Image sent.');
             }
+        } else {
+            socket.emit('image', 'NONE');
         }
     });
 
@@ -179,17 +215,18 @@ function onConnection(socket){
     });
 
     socket.on('disconnect', () => {
+        const rid = socket.room_id;
         const cid = socket.canvas_id;
         const uid = socket.user_id;
 
-        if (socket.canvas_id) {
-            delete SESSION_INFO[cid][uid];
+        if (socket.room_id) {
+            delete SESSION_INFO[rid][uid];
             var members = {};
-            for (var key in SESSION_INFO[cid]) {
-                members[key] = SESSION_INFO[cid][key]['color'];
+            for (var key in SESSION_INFO[rid]) {
+                members[key] = SESSION_INFO[rid][key]['color'];
             }
-            socket.broadcast.in(cid).emit('session_update', members);
-            console.log(uid, "left", socket.canvas_id);
+            socket.broadcast.in(rid).emit('session_update', members);
+            console.log(uid, "left", rid);
         }
     });
 

@@ -29,7 +29,7 @@ class Dashboard extends Component {
     }
 
     newCanvas() {
-        this.xmlHttp.open("GET", '/new_canvas', true);
+        this.xmlHttp.open("GET", '/new_room', true);
         this.xmlHttp.send(null);
     }
 
