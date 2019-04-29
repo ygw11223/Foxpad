@@ -272,6 +272,7 @@ class Canvas extends Component {
 
     onMouseSideMove() {
         if(!this.state.active && this.props.mode) {
+            console.log('move');
             var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
             var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)

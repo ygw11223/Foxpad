@@ -6,6 +6,7 @@
 - imagemagick
 
 ## Start server
+
 First build front end.
 ```
 cd client

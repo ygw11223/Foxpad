@@ -32,11 +32,23 @@ class CanvasBoard extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.minimapDraw = this.minimapDraw.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
+        this.broadcastPreview = this.broadcastPreview.bind(this);
+        this.onPreviewEvent = this.onPreviewEvent.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
+    }
+
+    onPreviewEvent(data) {
+        this.canvasList.updatePreview(data.id, data.url);
+    }
+
+    broadcastPreview() {
+        let url = this.minimap.generateUrl();
+        this.socket.emit('preivew', {id: this.cid, url: url});
+        this.canvasList.updatePreview(this.cid, url);
     }
 
     setCanvas(id) {
@@ -110,14 +122,17 @@ class CanvasBoard extends Component {
             // each connection.
             this.socket.on('connect', this.onInitCanvas);
             this.socket.on('drawing', this.onDrawingEvent);
+            this.socket.on('preview', this.onPreviewEvent);
             this.socket.on('image', this.canvas.onImageEvent);
             this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
             this.socket.on('update', (cmd)=>{
-                if(cmd === "image_ready") {
+                if(cmd === 'image_ready') {
                     this.canvas.onEmitImg();
+                } else if (cmd === 'canvas_preview') {
+                    this.broadcastPreview();
                 }
             });
         }
@@ -170,7 +185,8 @@ class CanvasBoard extends Component {
                         onRef={ref => (this.canvasList= ref)}
                         hideNavbar={this.state.hideNavbar}
                         newCanvas={this.newCanvas}
-                        setCanvas={this.setCanvas}/>
+                        setCanvas={this.setCanvas}
+                        rid={this.props.match.params.id}/>
 
                 <div>
                     <Minimap

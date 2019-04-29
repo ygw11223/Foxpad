@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom'
 import {Button} from 'reactstrap';
 import '../layout/style.css'
 
@@ -19,9 +20,17 @@ const CanvasListStyle = {
 class CanvasList extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'blue', num_canvas: 1, current_canvas: 1};
+        this.state = {color: 'blue', num_canvas: 1, current_canvas: 1, canvas1: ''};
         this.renderCanvas = this.renderCanvas.bind(this);
         this.renderButton = this.renderButton.bind(this);
+        this.updatePreview = this.updatePreview.bind(this);
+        this.buttonList = [];
+    }
+
+    updatePreview(id, url) {
+        console.log('update preivew canvas:', id);
+        document.getElementsByClassName('canvasPreview' + id)[0].style.backgroundImage 
+            = 'url(' + url + ')';
     }
 
     componentDidMount() {
@@ -35,13 +44,15 @@ class CanvasList extends Component {
     renderCanvas() {
         var children = [];
         for (var i = 1; i <= this.state.num_canvas; i++) {
-            var boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
+            let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)'
+            let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
             children.push(
                 <Button
                     style={{
                         height: '108px',
                         width: '192px',
                         backgroundColor: 'white',
+                        backgroundImage: url,
                         padding: 0,
                         border: 0,
                         borderColor: 'black',
@@ -49,6 +60,7 @@ class CanvasList extends Component {
                         flexShrink: 0,
                         boxShadow: boxShadow
                     }}
+                    className={'canvasPreview' + i}
                     onClick={this.props.setCanvas.bind(this, i)}>
                 </Button>
             );
