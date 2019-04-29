@@ -7,7 +7,9 @@ const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 let randomColor = require('randomcolor');
-let PDF2Pic = require('pdf2pic');
+const { exec } = require('child_process');
+
+// let PDF2Pic = require('pdf2pic');
 
 // Max level of multi-resolution image pyramid.
 const MaxImageLevel = 3;
@@ -300,19 +302,18 @@ function onConnection(socket){
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
 
+        console.log(fileInfo.uploadDir);
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
-            let converter = new PDF2Pic({
-                density: 100,           // output pixels per inch
-                savename: socket.canvas_id,   // output file name
-                savedir: "./images",    // output file location
-                format: "png",          // output file format
-            })
-
-            converter.convertBulk(fileInfo.uploadDir, -1).then(resolve => {
-                console.log("image converted successfully")
-                buildImages('./images/'+socket.canvas_id+'.png', socket)
-            })
-
+            let file_Exe = 'montage -mode Concatenate -tile 1x -density 144 ' + fileInfo.uploadDir + ' ./images/'+socket.canvas_id+'.png'
+            console.log(file_Exe);
+            exec(file_Exe, function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+                buildImages('./images/'+socket.canvas_id+'.png', socket);
+            });
         } else {
             buildImages(fileInfo.uploadDir, socket)
         }
