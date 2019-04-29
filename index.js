@@ -6,8 +6,8 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
-var randomColor = require('randomcolor');
-var PDFImage = require("pdf-image").PDFImage;
+let randomColor = require('randomcolor');
+let PDF2Pic = require('pdf2pic');
 
 // Max level of multi-resolution image pyramid.
 const MaxImageLevel = 3;
@@ -300,19 +300,19 @@ function onConnection(socket){
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
 
-        if (fileInfo.uploadDir.substr(-3) === 'pdf') {
-            var pdfImage = new PDFImage(fileInfo.uploadDir, {
-                combinedImage: true,
-                convertOptions: {
-                    "-density": "150",
-                    "-quality": "100"
-                }
-            });
+        if (fileInfo.uploadDir.substr(-4) === '.pdf') {
+            let converter = new PDF2Pic({
+                density: 100,           // output pixels per inch
+                savename: socket.canvas_id,   // output file name
+                savedir: "./images",    // output file location
+                format: "png",          // output file format
+            })
 
-            pdfImage.convertFile().then(function (imagePaths) {
-                console.log("converted", imagePaths);
-                buildImages(imagePaths, socket)
-            });
+            converter.convertBulk(fileInfo.uploadDir, -1).then(resolve => {
+                console.log("image converted successfully")
+                buildImages('./images/'+socket.canvas_id+'.png', socket)
+            })
+
         } else {
             buildImages(fileInfo.uploadDir, socket)
         }

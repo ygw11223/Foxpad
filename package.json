@@ -14,7 +14,7 @@
     "socket.io-file": "latest",
     "opencv4nodejs": "latest",
     "randomcolor": "latest",
-    "pdf-image": "latest"
+    "pdf2pic": "latest"
   },
   "scripts": {
     "start": "node index"
