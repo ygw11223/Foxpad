@@ -1,6 +1,5 @@
 import React, {Component}  from 'react';
 import './minimap.css'
-const minimap = require('./boop.jpg');
 
 class Minimap extends Component {
     constructor(props) {
