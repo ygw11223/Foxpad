@@ -6,9 +6,11 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
-var randomColor = require('randomcolor');
+const randomColor = require('randomcolor');
+const { exec } = require('child_process');
+
 // Max level of multi-resolution image pyramid.
-const MaxImageLevel = 3;
+const MaxImageLevel = 5;
 
 // Maintain infomation on users.
 USER_INFO = {};
@@ -121,16 +123,27 @@ function onConnection(socket){
 
     // Save drawing data and broadcast to all of its peers
     socket.on('drawing', (data) => {
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
+
+        if (cid === undefined || uid === undefined) {
+            return;
+        }
+
         // TODO(Guowei) : Update when connecting firebase to server.
-        var idx_last = DATABASE[socket.canvas_id][socket.user_id].length - 1;
-        DATABASE[socket.canvas_id][socket.user_id][idx_last].push(data);
-        socket.broadcast.in(socket.canvas_id).emit('drawing', data);
+        var idx_last = DATABASE[cid][uid].length - 1;
+        DATABASE[cid][uid][idx_last].push(data);
+        socket.broadcast.in(cid).emit('drawing', data);
     });
 
     socket.on('mouse_position', (data) => {
         const cid = socket.canvas_id;
         const uid = socket.user_id;
         const rid = socket.room_id;
+
+        if (cid === undefined || uid === undefined || rid === undefined) {
+            return;
+        }
 
         SESSION_INFO[rid][uid]['pos_x_mouse'] = data.x;
         SESSION_INFO[rid][uid]['pos_y_mouse'] = data.y;
@@ -150,13 +163,19 @@ function onConnection(socket){
     });
 
     socket.on('image', (pos) => {
+        const cid = socket.canvas_id;
+
+        if (cid === undefined) {
+            return;
+        }
+
         // We assume each canvas only have one background image.
-        if (socket.canvas_id in IMAGES) {
+        if (cid in IMAGES) {
             // Find the proper default resolution level of the image,
             // which is the image of biggest size that can fit into the canvas.
             var level = MaxImageLevel;
-            var width = IMAGES[socket.canvas_id].w;
-            var height = IMAGES[socket.canvas_id].h;
+            var width = IMAGES[cid].w;
+            var height = IMAGES[cid].h;
             while (level > 0) {
                 if (1280 >= width && 720 >= height) {
                     break;
@@ -170,7 +189,7 @@ function onConnection(socket){
 
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
-                socket.emit('image', IMAGES[socket.canvas_id].name + level + '.png');
+                socket.emit('image', IMAGES[cid].name + level + '.png');
                 console.log('Image sent.');
             }
         } else {
@@ -179,35 +198,42 @@ function onConnection(socket){
     });
 
     socket.on('command', (cmd) => {
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
+
+        if (cid === undefined || uid === undefined) {
+            return;
+        }
+
         switch (cmd) {
             // Draw all previous strokes to the client
             case 'update':
                 // TODO : Currently not considering order of strokes. Same for undo.
                 data_array = [];
-                for (var user in DATABASE[socket.canvas_id]) {
-                    for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
-                            data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
+                for (var user in DATABASE[cid]) {
+                    for (var stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
+                        for (var seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
+                            data_array.push(DATABASE[cid][user][stroke][seg]);
                         }
                     }
                 }
                 socket.emit('redraw', data_array);
                 break;
             case 'undo':
-                DATABASE[socket.canvas_id][socket.user_id].pop();
+                DATABASE[cid][uid].pop();
                 data_array = [];
-                for (var user in DATABASE[socket.canvas_id]) {
-                    for (var stroke = 0; stroke < DATABASE[socket.canvas_id][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[socket.canvas_id][user][stroke].length; seg++) {
-                            data_array.push(DATABASE[socket.canvas_id][user][stroke][seg]);
+                for (var user in DATABASE[cid]) {
+                    for (var stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
+                        for (var seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
+                            data_array.push(DATABASE[cid][user][stroke][seg]);
                         }
                     }
                 }
                 socket.emit('redraw', data_array);
-                socket.broadcast.in(socket.canvas_id).emit('redraw', data_array);
+                socket.broadcast.in(cid).emit('redraw', data_array);
                 break;
             case 'new_stroke':
-                DATABASE[socket.canvas_id][socket.user_id].push([]);
+                DATABASE[cid][uid].push([]);
                 break;
             default:
                 console.log("Invalid command received.")
@@ -249,27 +275,47 @@ function onConnection(socket){
         console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
     });
 
-    uploader.on('complete', (fileInfo) => {
-        console.log('Upload Complete.');
+    function buildImages(filePath, socket) {
         // Build image pyramid for multiple resolutions
-        cv.imreadAsync(fileInfo.uploadDir, (err, mat) => {
+        cv.imreadAsync(filePath, (err, mat) => {
             IMAGES[socket.canvas_id] = {
                 'w': mat.cols,
                 'h': mat.rows,
-                'name': fileInfo.uploadDir
+                'name': filePath,
             };
             console.log(IMAGES[socket.canvas_id]);
-            // Hardcoded building up 4 levels from lowest to highest resolution.
+            // Hardcoded building up 6 levels from lowest to highest resolution.
             // TODO : Decide levels based on image size.
-            cv.imwrite(fileInfo.uploadDir + '0.png', mat.pyrDown().pyrDown().pyrDown());
-            cv.imwrite(fileInfo.uploadDir + '1.png', mat.pyrDown().pyrDown());
-            cv.imwrite(fileInfo.uploadDir + '2.png', mat.pyrDown());
-            cv.imwrite(fileInfo.uploadDir + '3.png', mat);
+            cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
+            cv.imwrite(filePath + '4.png', mat.pyrDown());
+            cv.imwrite(filePath + '5.png', mat);
 
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
             console.log('Image uploaded.');
-        })
+        });
+    }
+
+    uploader.on('complete', (fileInfo) => {
+        console.log('Upload Complete.');
+
+        if (fileInfo.uploadDir.substr(-4) === '.pdf') {
+            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 '
+                + fileInfo.uploadDir + ' ./images/' + socket.canvas_id + '.png';
+            exec(file_Exe, function (error, stdout, stderr) {
+                if (error !== null) {
+                    console.log('Error when converting pdf: ' + error);
+                } else {
+                    console.log('Pdf converted: ' + stdout);
+                    buildImages('./images/'+socket.canvas_id+'.png', socket);
+                }
+            });
+        } else {
+            buildImages(fileInfo.uploadDir, socket)
+        }
     });
 
     uploader.on('error', (err) => {
