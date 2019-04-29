@@ -6,13 +6,11 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
-let randomColor = require('randomcolor');
+const randomColor = require('randomcolor');
 const { exec } = require('child_process');
 
-// let PDF2Pic = require('pdf2pic');
-
 // Max level of multi-resolution image pyramid.
-const MaxImageLevel = 3;
+const MaxImageLevel = 5;
 
 // Maintain infomation on users.
 USER_INFO = {};
@@ -286,12 +284,14 @@ function onConnection(socket){
                 'name': filePath,
             };
             console.log(IMAGES[socket.canvas_id]);
-            // Hardcoded building up 4 levels from lowest to highest resolution.
+            // Hardcoded building up 6 levels from lowest to highest resolution.
             // TODO : Decide levels based on image size.
-            cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown());
-            cv.imwrite(filePath + '2.png', mat.pyrDown());
-            cv.imwrite(filePath + '3.png', mat);
+            cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
+            cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
+            cv.imwrite(filePath + '4.png', mat.pyrDown());
+            cv.imwrite(filePath + '5.png', mat);
 
             socket.emit('update', 'image_ready');
             socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
@@ -302,17 +302,16 @@ function onConnection(socket){
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
 
-        console.log(fileInfo.uploadDir);
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
-            let file_Exe = 'montage -mode Concatenate -tile 1x -density 144 ' + fileInfo.uploadDir + ' ./images/'+socket.canvas_id+'.png'
-            console.log(file_Exe);
+            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 '
+                + fileInfo.uploadDir + ' ./images/' + socket.canvas_id + '.png';
             exec(file_Exe, function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
                 if (error !== null) {
-                    console.log('exec error: ' + error);
+                    console.log('Error when converting pdf: ' + error);
+                } else {
+                    console.log('Pdf converted: ' + stdout);
+                    buildImages('./images/'+socket.canvas_id+'.png', socket);
                 }
-                buildImages('./images/'+socket.canvas_id+'.png', socket);
             });
         } else {
             buildImages(fileInfo.uploadDir, socket)
