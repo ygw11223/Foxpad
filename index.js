@@ -6,8 +6,10 @@ const SocketIOFile = require('socket.io-file');
 const port =  3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
-const randomColor = require('randomcolor');
 const { exec } = require('child_process');
+const fs = require('fs');
+const Set = require("collections/set");
+const randomColor = require('randomcolor');
 
 // Max level of multi-resolution image pyramid.
 const MaxImageLevel = 5;
@@ -24,6 +26,8 @@ SESSION_INFO = {};
 DATABASE = {};
 
 IMAGES = {};
+
+STALE_CANVAS = {};
 
 // Routing. TODO(Guowei) : Refine Routing logic.
 // Request for static file should start with "/static". Ex. "/static/main.css"
@@ -57,6 +61,22 @@ app.get('/new_room', function (req, res) {
 app.get('*', function (req, res) {
     res.sendFile(__dirname + '/client/build/index.html');
 });
+
+setInterval(() => {
+    let sockets = io.sockets.clients()['connected'];
+
+    for (let id in sockets) {
+        let cid = sockets[id].canvas_id;
+        if (cid === undefined) continue;
+        if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = true;
+
+        if (STALE_CANVAS[cid]) {
+            STALE_CANVAS[cid] = false;
+            console.log(cid);
+            sockets[id].emit('update', 'canvas_preview');
+        }
+  }
+}, 5000);
 
 function onConnection(socket){
     socket.on('init', (auth_info) => {
@@ -102,6 +122,7 @@ function onConnection(socket){
             SESSION_INFO[rid]['.num_canvas'] += 1;
             console.log('new canvas');
             new_canvas = true;
+            STALE_CANVAS[cid] = true;
         }
         // Initilize user information
         if (!(uid in DATABASE[cid])) {
@@ -134,6 +155,21 @@ function onConnection(socket){
         var idx_last = DATABASE[cid][uid].length - 1;
         DATABASE[cid][uid][idx_last].push(data);
         socket.broadcast.in(cid).emit('drawing', data);
+        // Mark canvas as stale
+        if (!STALE_CANVAS[cid]) {
+            STALE_CANVAS[cid] = true;
+        }
+    });
+
+    socket.on('preivew', (data) => {
+        const cid = socket.canvas_id;
+        const rid = socket.room_id;
+
+        socket.broadcast.in(rid).emit('preview', data);
+        let base64Data = data.url.replace(/^data:image\/png;base64,/, "");
+        fs.writeFile('images/preview' + cid + '.png', base64Data, 'base64', function(err) {
+            if (err) console.log(err);
+        });
     });
 
     socket.on('mouse_position', (data) => {
@@ -141,7 +177,8 @@ function onConnection(socket){
         const uid = socket.user_id;
         const rid = socket.room_id;
 
-        if (cid === undefined || uid === undefined || rid === undefined) {
+        if (cid === undefined || uid === undefined || rid === undefined ||
+            SESSION_INFO[rid][uid] === undefined) {
             return;
         }
 
@@ -184,8 +221,8 @@ function onConnection(socket){
                 width /= 2;
                 height /= 2;
             }
-            // Substract the relative zooming level of the canvas.
-            level -= pos.l;
+            // Add the relative zooming level of the canvas.
+            level += pos.l;
 
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
@@ -231,6 +268,10 @@ function onConnection(socket){
                 }
                 socket.emit('redraw', data_array);
                 socket.broadcast.in(cid).emit('redraw', data_array);
+                // Mark canvas as stale
+                if (!STALE_CANVAS[cid]) {
+                    STALE_CANVAS[cid] = true;
+                }
                 break;
             case 'new_stroke':
                 DATABASE[cid][uid].push([]);
