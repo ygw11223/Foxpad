@@ -56,7 +56,8 @@ class CanvasBoard extends Component {
         if (this.cid !== id) {
             this.cid = id;
             this.canvasList.setState({current_canvas: this.cid});
-            this.cardDeck.setState({current_canvas: this.cid})
+            this.cardDeck.setState({current_canvas: this.cid});
+            this.canvas.reconnect = false;
             this.onInitCanvas();
         }
     }
@@ -66,6 +67,7 @@ class CanvasBoard extends Component {
             this.cid = this.canvasList.state.num_canvas += 1;
             this.canvasList.setState({num_canvas: this.cid, current_canvas: this.cid});
             this.cardDeck.setState({current_canvas: this.cid})
+            this.canvas.reconnect = false;
             this.onInitCanvas();
         }
     }

@@ -62,6 +62,7 @@ class Canvas extends Component {
         this.canvas_width = 1920;
         this.canvas_hight = 1080;
         this.imageScale = 0;
+        this.reconnect = false;
         this.image = new Image();
         this.image.onload = this.onDrawImage;
         // Buffer for next level of resolution of image. Needed for smooth
@@ -71,6 +72,8 @@ class Canvas extends Component {
     }
 
     initCanvas() {
+        if (this.reconnect) return;
+        else this.reconnect = true;
         this.scale = 1;
         this.imageScale = 0;
         this.imageHight = -1;
@@ -441,7 +444,7 @@ class Canvas extends Component {
     onScrollEvent(event) {
         event.preventDefault();
         let wheel = event.deltaY < 0 ? 1 : -1;
-        console.log(event.ctrlKey);
+
         if(event.ctrlKey)
             this.zoom(wheel, 1.1, this.preX, this.preY);
         else {

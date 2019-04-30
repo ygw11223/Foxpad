@@ -177,7 +177,8 @@ function onConnection(socket){
         const uid = socket.user_id;
         const rid = socket.room_id;
 
-        if (cid === undefined || uid === undefined || rid === undefined) {
+        if (cid === undefined || uid === undefined || rid === undefined ||
+            SESSION_INFO[rid][uid] === undefined) {
             return;
         }
 
