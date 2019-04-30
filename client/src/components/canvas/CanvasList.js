@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom'
 import {Button} from 'reactstrap';
 import '../layout/style.css'
 
@@ -20,15 +19,14 @@ const CanvasListStyle = {
 class CanvasList extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'blue', num_canvas: 1, current_canvas: 1, canvas1: ''};
+        this.state = {color: 'blue', num_canvas: 1, current_canvas: 1};
         this.renderCanvas = this.renderCanvas.bind(this);
         this.renderButton = this.renderButton.bind(this);
         this.updatePreview = this.updatePreview.bind(this);
-        this.buttonList = [];
     }
 
     updatePreview(id, url) {
-        console.log('update preivew canvas:', id);
+        // console.log('update preivew canvas:', id);
         document.getElementsByClassName('canvasPreview' + id)[0].style.backgroundImage 
             = 'url(' + url + ')';
     }

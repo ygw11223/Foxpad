@@ -25,8 +25,6 @@ SESSION_INFO = {};
 // TODO(Guowei) : Maybe need a r/w lock.
 DATABASE = {};
 
-TIMERS = {};
-
 IMAGES = {};
 
 STALE_CANVAS = {};
@@ -65,7 +63,6 @@ app.get('*', function (req, res) {
 });
 
 setInterval(() => {
-    console.log('update preview')
     let sockets = io.sockets.clients()['connected'];
 
     for (let id in sockets) {
