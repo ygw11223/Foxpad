@@ -61,6 +61,7 @@ class Canvas extends Component {
         this.imageHight = -1;
         this.canvas_width = 1920;
         this.canvas_hight = 1080;
+        this.imageScale = 0;
         this.image = new Image();
         this.image.onload = this.onDrawImage;
         // Buffer for next level of resolution of image. Needed for smooth
@@ -71,6 +72,7 @@ class Canvas extends Component {
 
     initCanvas() {
         this.scale = 1;
+        this.imageScale = 0;
         this.imageHight = -1;
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
@@ -82,7 +84,7 @@ class Canvas extends Component {
     }
 
     onEmitImg() {
-        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.floor(Math.log2(this.scale))});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:this.imageScale});
     }
 
     onRedrawEvent(data_array) {
@@ -133,7 +135,6 @@ class Canvas extends Component {
         this.ctx.translate(-this.offsetX, -this.offsetY);
         this.mctx.translate(-this.offsetX, -this.offsetY);
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
     }
 
     updateMouseLocation(mouseList) {
@@ -209,6 +210,8 @@ class Canvas extends Component {
             this.imageHight = this.nextImage.height;
             this.imageWidth = this.nextImage.width;
         }
+        this.imageScale += 1;
+        this.onEmitImg();
     }
 
     onDrawImage() {
@@ -433,7 +436,6 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
     }
 
     onScrollEvent(event) {

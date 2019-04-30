@@ -220,8 +220,8 @@ function onConnection(socket){
                 width /= 2;
                 height /= 2;
             }
-            // Substract the relative zooming level of the canvas.
-            level -= pos.l;
+            // Add the relative zooming level of the canvas.
+            level += pos.l;
 
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
