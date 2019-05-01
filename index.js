@@ -111,6 +111,10 @@ function onConnection(socket){
             color: USER_INFO[rid][uid],
             pos_x_mouse: 0,
             pos_y_mouse: 0,
+            pos_x_viewport: 0,
+            pos_y_viewport: 0,
+            width_viewport: 0,
+            height_viewport: 0,
             timestamp: 0,
             pen_color: 0,
             pen_width: 0,
@@ -161,6 +165,23 @@ function onConnection(socket){
         }
     });
 
+    socket.on('position', (uid) => {
+        const rid = socket.room_id;
+
+        if (rid === undefined || SESSION_INFO[rid][uid] === undefined) {
+            return;
+        }
+
+        let pos = {
+            x: SESSION_INFO[rid][uid]['pos_x_viewport'],
+            y: SESSION_INFO[rid][uid]['pos_y_viewport'],
+            w: SESSION_INFO[rid][uid]['width_viewport'],
+            h: SESSION_INFO[rid][uid]['height_viewport'],
+            cid: SESSION_INFO[rid][uid]['canvas_id'].substr(-1),
+        }
+        socket.emit('position', pos);
+    });
+
     socket.on('preivew', (data) => {
         const cid = socket.canvas_id;
         const rid = socket.room_id;
@@ -197,6 +218,24 @@ function onConnection(socket){
         if (Math.random() < 0.05) {
             socket.emit('mouse_position', mouse_data);
         }
+    });
+
+    socket.on('viewport_position', (data) => {
+        const cid = socket.canvas_id;
+        const uid = socket.user_id;
+        const rid = socket.room_id;
+
+        if (cid === undefined || uid === undefined || rid === undefined ||
+            SESSION_INFO[rid][uid] === undefined) {
+            return;
+        }
+
+        SESSION_INFO[rid][uid]['pos_x_viewport'] = data.x;
+        SESSION_INFO[rid][uid]['pos_y_viewport'] = data.y;
+        SESSION_INFO[rid][uid]['width_viewport'] = data.w;
+        SESSION_INFO[rid][uid]['height_viewport'] = data.h;
+
+        console.log('position updated', rid);
     });
 
     socket.on('image', (pos) => {

@@ -25,7 +25,8 @@ class CardStack extends React.Component {
                     name={key}
                     color={this.state.members[key]}
                     updateHoverId={this.updateHoverId}
-                    hoverId={this.state.hoverId}/>
+                    hoverId={this.state.hoverId}
+                    socket={this.props.socket}/>
     }
 
     updateHoverId(id) {
