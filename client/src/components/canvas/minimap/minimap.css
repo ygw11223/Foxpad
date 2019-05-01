@@ -7,7 +7,6 @@
 
 #mini {
   z-index: 3;
-<<<<<<< HEAD
   position: absolute;
   right: 16px;
   bottom: 16px;
@@ -15,8 +14,6 @@
 
 #minipicture {
   z-index: 2;
-=======
->>>>>>> parent of 4357674... image in minimap behind strokes
   background-color: PaleTurquoise;
   position: absolute;
   right: 16px;

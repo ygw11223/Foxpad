@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 package-lock.json
+ImageMagick-7.0.8-42
+ImageMagick.tar.gz
 
 # testing
 /coverage

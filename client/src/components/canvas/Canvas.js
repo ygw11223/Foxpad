@@ -213,6 +213,7 @@ class Canvas extends Component {
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         if (this.image.src === null || this.imageHight <= 0 || this.imageWidth <= 0) return;
         this.pctx.drawImage(this.image, -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2  , this.imageWidth, this.imageHight);
+        this.props.minimapImage(this.image,this.imageWidth, this.imageHight);
     }
 
     onUndoEvent(e) {

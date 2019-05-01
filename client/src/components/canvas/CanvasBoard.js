@@ -31,6 +31,7 @@ class CanvasBoard extends Component {
         this.onDrag = this.onDrag.bind(this);
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.minimapDraw = this.minimapDraw.bind(this);
+        this.minimapImage = this.minimapImage.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
 
         this.socket = openSocket();
@@ -99,13 +100,10 @@ class CanvasBoard extends Component {
         this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
     }
 
-<<<<<<< HEAD
     minimapImage(datadata, imgWidth, imgHeight) {
         this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
     }
 
-=======
->>>>>>> parent of 4357674... image in minimap behind strokes
     componentDidMount() {
         let id = cookies.get('cd_user_name');
         if (id == undefined) {
@@ -196,7 +194,8 @@ class CanvasBoard extends Component {
                             socket={this.socket}
                             uploader={this.uploader}
                             name = {this.uid}
-                            minimapDraw={this.minimapDraw}/>
+                            minimapDraw={this.minimapDraw}
+                            minimapImage={this.minimapImage}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck= ref)}
