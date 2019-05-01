@@ -49,6 +49,7 @@ class Canvas extends Component {
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
         this.initCanvas = this.initCanvas.bind(this);
+        this.onMouseSideMove = this.onMouseSideMove.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -60,6 +61,8 @@ class Canvas extends Component {
         this.imageHight = -1;
         this.canvas_width = 1920;
         this.canvas_hight = 1080;
+        this.imageScale = 0;
+        this.reconnect = false;
         this.image = new Image();
         this.image.onload = this.onDrawImage;
         // Buffer for next level of resolution of image. Needed for smooth
@@ -69,7 +72,10 @@ class Canvas extends Component {
     }
 
     initCanvas() {
+        if (this.reconnect) return;
+        else this.reconnect = true;
         this.scale = 1;
+        this.imageScale = 0;
         this.imageHight = -1;
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
@@ -81,7 +87,7 @@ class Canvas extends Component {
     }
 
     onEmitImg() {
-        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.round(Math.log2(this.scale))});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:this.imageScale});
     }
 
     onRedrawEvent(data_array) {
@@ -114,6 +120,7 @@ class Canvas extends Component {
        this.offsetX = -this.state.width/2;
        this.ctx.translate(-this.offsetX, -this.offsetY);
        this.mctx.translate(-this.offsetX, -this.offsetY);
+       setInterval(this.onMouseSideMove, 50);
     }
 
     componentWillMount() {
@@ -131,7 +138,6 @@ class Canvas extends Component {
         this.ctx.translate(-this.offsetX, -this.offsetY);
         this.mctx.translate(-this.offsetX, -this.offsetY);
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
     }
 
     updateMouseLocation(mouseList) {
@@ -207,6 +213,8 @@ class Canvas extends Component {
             this.imageHight = this.nextImage.height;
             this.imageWidth = this.nextImage.width;
         }
+        this.imageScale += 1;
+        this.onEmitImg();
     }
 
     onDrawImage() {
@@ -269,6 +277,41 @@ class Canvas extends Component {
         return y - x*this.scale;
     }
 
+    onMouseSideMove() {
+        if(!this.state.active && this.props.mode) {
+            var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
+                    - this.mapWindowToCanvas(0, this.offsetX);
+            var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
+                    - this.mapWindowToCanvas(0, this.offsetY);
+            //hardcode the boundary, 40px
+            if (this.preX > 40 && this.preX < this.state.width - 40)
+                dx = 0;
+            else if(this.preX > this.state.width - 40) {
+                dx = -dx;
+            }
+            if (this.preY > 40 && this.preY < this.state.height - 40)
+                dy = 0;
+            else if(this.preY > this.state.height - 40) {
+                dy = -dy;
+            }
+            if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+                dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+            } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+                dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+            }
+            if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+            } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+            }
+            this.offsetX -= dx;
+            this.offsetY -= dy;
+            this.ctx.translate(dx,dy);
+            this.mctx.translate(dx,dy);
+            this.props.socket.emit('command', 'update');
+        }
+    }
+
     onMouseMove(e) {
         let currentX = 0;
         let currentY = 0;
@@ -287,15 +330,11 @@ class Canvas extends Component {
             currentY = e.touches[0].clientY - rect.top;
         }
 
-        if (!this.state.active) {
-            this.preX = currentX;
-            this.preY = currentY;
-            return;
-        }
-
-        if(this.props.mode){
-            let dx =  this.mapWindowToCanvas(currentX, this.offsetX) - this.mapWindowToCanvas(this.preX, this.offsetX);
-            let dy =  this.mapWindowToCanvas(currentY, this.offsetY) - this.mapWindowToCanvas(this.preY, this.offsetY);
+        if(this.props.mode && this.state.active){
+            let dx =  this.mapWindowToCanvas(currentX , this.offsetX)
+                    - this.mapWindowToCanvas(this.preX, this.offsetX);
+            let dy =  this.mapWindowToCanvas(currentY , this.offsetY)
+                    - this.mapWindowToCanvas(this.preY, this.offsetY);
 
             if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
                 dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
@@ -313,7 +352,7 @@ class Canvas extends Component {
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
         }
-        else {
+        else if (this.state.active) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
@@ -339,7 +378,7 @@ class Canvas extends Component {
         this.setState({ active: false });
     }
 
-    zoom(direction, x, y) {
+    zoom(direction, zoom_factor, x, y) {
         // cursor positon; if using button, set center of view port as cursor positon.
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
@@ -347,10 +386,10 @@ class Canvas extends Component {
         let preX_T = this.mapWindowToCanvas(preX, this.offsetX);
         let preY_T = this.mapWindowToCanvas(preY, this.offsetY);
         // factor is 1.1
-        let factor = Math.pow(1.1, direction);//set scale factor to 2
+        let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
         if(this.scale/factor > 1) {
-            return;
+            factor = 1/this.scale;
         }
         // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
@@ -401,12 +440,17 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
     }
 
     onScrollEvent(event) {
+        event.preventDefault();
         let wheel = event.deltaY < 0 ? 1 : -1;
-        this.zoom(wheel, this.preX, this.preY);
+
+        if(event.ctrlKey)
+            this.zoom(wheel, 1.1, this.preX, this.preY);
+        else {
+            this.zoom(wheel, 1.1)
+        }
     }
 
     render() {

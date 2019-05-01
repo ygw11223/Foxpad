@@ -3,6 +3,7 @@
 ## Requirements
 
 - cmake
+- [imagemagick](https://imagemagick.org/script/install-source.php)
 
 ## Start server
 

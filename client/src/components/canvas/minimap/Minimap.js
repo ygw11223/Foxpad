@@ -18,6 +18,15 @@ class Minimap extends Component {
         // zooming
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
+        this.generateUrl = this.generateUrl.bind(this);
+    }
+
+    generateUrl() {
+        let previewCanvas = document.createElement("canvas");
+        let previewContext = previewCanvas.getContext("2d");
+
+        previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
+        return previewCanvas.toDataURL('image/png');
     }
 
     componentWillUnmount() {

@@ -8,12 +8,13 @@
     "drawing"
   ],
   "dependencies": {
-    "express": "^4.16.4",
+    "collections": "latest",
+    "express": "latest",
+    "randomcolor": "latest",
     "short-id": "latest",
     "socket.io": "latest",
     "socket.io-file": "latest",
-    "opencv4nodejs": "latest",
-    "randomcolor": "latest"
+    "opencv4nodejs": "latest"
   },
   "scripts": {
     "start": "node index"
