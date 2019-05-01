@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Modal from '../layout/ImageForm.js'
+
 
 const cookies = new Cookies();
 
@@ -516,19 +517,11 @@ class Canvas extends Component {
                     width  = {this.state.width }/>
 
                 <div>
-                    <Modal isOpen={this.state.modal} toggle={this.showForm}>
-                        <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
-                        <ModalBody>
-                          <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                            <input type="file" id="file" multiple />
-                            <input type="submit" value="Upload" />
-                          </form>
-                         </ModalBody>
-                         <ModalFooter>
-                            <Button color="secondary" onClick={this.showForm}>Cancel</Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
+                <Modal
+                    showForm={this.showForm}
+                    onUploadEvent={this.onUploadEvent}
+                    modal={this.state.modal}/>
+                    </div>
             </div>
         );
     }
