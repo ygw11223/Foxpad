@@ -337,6 +337,13 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
+            // TODO : add position info
+            this.props.socket.emit('viewport_position', {
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0,
+            })
         }
     }
 
@@ -379,6 +386,13 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
+            // TODO : add position info
+            this.props.socket.emit('viewport_position', {
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0,
+            })
         }
         else if (this.state.active) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -472,6 +486,13 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.props.socket.emit('command', 'update');
+        // TODO : add position info
+        this.props.socket.emit('viewport_position', {
+            x: 0,
+            y: 0,
+            w: 0,
+            h: 0,
+        })
     }
 
     onScrollEvent(event) {
