@@ -42,7 +42,7 @@ class CanvasList extends Component {
     renderCanvas() {
         var children = [];
         for (var i = 1; i <= this.state.num_canvas; i++) {
-            let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)'
+            let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)';
             let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
             children.push(
                 <Button

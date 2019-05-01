@@ -3,16 +3,24 @@ import {Card, CardText, CardBody, CardTitle} from 'reactstrap';
 
 // Set flexShrink to fix card size
 const InfoCardStyle = {
+    height: '100%',
+    width: '100%',
+    padding: '25px 25px 0 25px',
+    margin: 0,
+    borderRadius: '0 0 25px 0',
+};
+
+const cardDivStyle = {
     height: 100,
     width: 150,
-    position:'relative',
-    padding: '25px 25px 0 25px',
+    position: 'relative',
+    padding: 0,
     margin: 0,
     borderRadius: '0 0 25px 0',
     textAlign: 'center',
     flexShrink: 0,
     fontWeight: 'bold',
-};
+}
 
 class InfoCard extends Component {
     constructor (props) {
@@ -31,22 +39,26 @@ class InfoCard extends Component {
             offset += 100;
         }
 
-        const style = {
+        const styleC = {
             ...InfoCardStyle,
-            left: offset,
             background: this.props.color,
+        }
+        const styleD = {
+            ...cardDivStyle,
+            left: offset,
             zIndex: 100 - this.props.id, // Allow left card cover right card.
         }
 
         return (
-            <Card style={style}
-                onMouseOver={this.onMouseOver}>
-
-                <CardBody style={{padding: 10}}>
-                    <CardText> {this.props.name} </CardText>
-                </CardBody>
-
-            </Card>
+            <div style={styleD} onClick={() => {
+                this.props.socket.emit('position', this.props.name);}}>
+                <Card style={styleC}
+                    onMouseOver={this.onMouseOver}>
+                    <CardBody style={{padding: 10}}>
+                        <CardText> {this.props.name} </CardText>
+                    </CardBody>
+                </Card>
+            </div>
         );
     }
 }
