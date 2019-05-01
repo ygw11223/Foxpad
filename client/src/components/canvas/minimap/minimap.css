@@ -6,15 +6,15 @@
 }
 
 #mini {
-  z-index: 3;
+  z-index: 4;
   position: absolute;
   right: 16px;
   bottom: 16px;
+  box-shadow: 5px 10px 18px #888888;
 }
 
 #minipicture {
   z-index: 2;
-  background-color: PaleTurquoise;
   position: absolute;
   right: 16px;
   bottom: 16px;
