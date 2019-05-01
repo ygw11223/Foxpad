@@ -10,8 +10,6 @@ class Minimap extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
-        // this.onImageEvent = this.onImageEvent.bind(this);
-        // this.onLoadNextImage = this.onLoadNextImage.bind(this);
         this.onDrawImage = this.onDrawImage.bind(this);
 
         this.image = new Image();
@@ -72,30 +70,10 @@ class Minimap extends Component {
                       data.isEraser)
     }
 
-    // onImageEvent(data) {
-    //     if (data === 'NONE') {
-    //         this.image.src = null;
-    //     } else {
-    //         this.nextImage.src = data;
-    //     }
-    // }
-    //
-    // onLoadNextImage() {
-    //     this.image.src = this.nextImage.src;
-    //     if (this.imageHight <= 0 || this.imageWidth <= 0) {
-    //         this.imageHight = this.nextImage.height;
-    //         this.imageWidth = this.nextImage.width;
-    //     }
-    // }
-
     onDrawImage(data, imgWidth, imgHeight) {
         this.pctx.clearRect(0, 0, width, height);
         console.log("x", -this.offsetX - imgWidth/2, "y", -this.offsetY - imgHeight/2);
         this.pctx.drawImage(data, -this.offsetX - imgWidth/16, -this.offsetY - imgHeight/16, imgWidth/8, imgHeight/8);
-        // this.pctx.rect(20, 20, 150, 100);
-        // this.pctx.stroke();
-        // -this.offsetX/this.scale - this.imageWidth/2, -this.offsetY/this.scale - this.imageHight/2
-        // this.imageWidth/8, this.imageHight/8
         console.log("printed minimap img");
     }
 

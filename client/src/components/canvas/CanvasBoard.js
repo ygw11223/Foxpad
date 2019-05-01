@@ -104,16 +104,6 @@ class CanvasBoard extends Component {
         this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
     }
 
-    // onImageEvent(data) {
-    //     this.canvas.onImageEvent(data);
-    //     this.minimap.onImageEvent(data);
-    // }
-
-    // onLoadNextImage(data) {
-    //     this.canvas.onLoadNextImage(data);
-    //     this.minimap.onLoadNextImage(data);
-    // }
-
     componentDidMount() {
         let id = cookies.get('cd_user_name');
         if (id == undefined) {

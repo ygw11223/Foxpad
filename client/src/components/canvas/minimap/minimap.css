@@ -7,11 +7,9 @@
 
 #mini {
   z-index: 3;
-  /* background-color: PaleTurquoise; */
   position: absolute;
   right: 16px;
   bottom: 16px;
-  /* bottom:300px; */
 }
 
 #minipicture {
@@ -20,5 +18,4 @@
   position: absolute;
   right: 16px;
   bottom: 16px;
-  /* bottom:300px; */
 }
