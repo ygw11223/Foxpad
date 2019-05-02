@@ -34,6 +34,7 @@ class CanvasBoard extends Component {
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
+        this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -87,7 +88,7 @@ class CanvasBoard extends Component {
         this.navbar.setState({'color': color});
     }
 
-    onInitCanvas(){
+    onInitCanvas() {
         this.canvas.initCanvas();
         this.socket.emit('init', {
             user_id: this.uid,
@@ -97,6 +98,16 @@ class CanvasBoard extends Component {
         // Get image and strokes from server.
         this.canvas.onEmitImg();
         this.socket.emit('command', 'update');
+    }
+
+    updateCanvasHistory() {
+        let canvases = cookies.get('cd_test_canvases');
+        if (canvases == undefined) {
+            canvases = {}
+        }
+
+        canvases[this.props.match.params.id] = new Date().getTime();
+        cookies.set('cd_test_canvases', canvases);
     }
 
     onDrawingEvent(data) {
@@ -118,6 +129,7 @@ class CanvasBoard extends Component {
         if (id == undefined) {
             this.setState({toLogin: true});
         } else {
+            this.updateCanvasHistory();
             this.uid = id;
             // On server, we save user and canvas id on the socket object, which
             // will disappear when connection is lost. So we need to init upon
