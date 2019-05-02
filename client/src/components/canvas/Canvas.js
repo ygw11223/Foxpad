@@ -67,6 +67,7 @@ class Canvas extends Component {
         // zooming
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
+        this.move_active = true;
     }
 
     initCanvas() {
@@ -271,7 +272,7 @@ class Canvas extends Component {
     }
 
     onMouseSideMove() {
-        if(!this.state.active && this.props.mode) {
+        if(!this.state.active && this.move_active) {
             var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
             var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
@@ -308,7 +309,7 @@ class Canvas extends Component {
     onMouseMove(e) {
         let currentX = 0;
         let currentY = 0;
-
+        this.move_active = true;
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;
@@ -458,7 +459,7 @@ class Canvas extends Component {
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={this.onMouseUp}
+                    onMouseOut={()=>{this.move_active = false}}
                     onTouchStart={this.onMouseDown}
                     onTouchMove={this.onMouseMove}
                     onTouchEnd={this.onMouseUp}
