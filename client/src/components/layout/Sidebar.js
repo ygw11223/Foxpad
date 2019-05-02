@@ -34,7 +34,6 @@ class Sidebar extends React.Component {
     }
 
     showImageButton() {
-
         let imageButton = document.getElementById("image");
         let eraserButton = document.getElementById("eraser");
         imageButton.style.visibility = "visible";
@@ -115,6 +114,14 @@ class Sidebar extends React.Component {
 
         this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false, showImageButton: false});
         this.props.onDrag(true);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
+    componentDidMount() {
+       this.props.onRef(this);
     }
 
     // Todo: Anze
