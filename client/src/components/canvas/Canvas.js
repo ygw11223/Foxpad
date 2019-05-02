@@ -333,10 +333,10 @@ class Canvas extends Component {
             this.props.socket.emit('command', 'update');
             // TODO : add position info
             this.props.socket.emit('viewport_position', {
-                x: 0,
-                y: 0,
-                w: 0,
-                h: 0,
+                x: this.mapWindowToCanvas(0, this.offsetX),
+                y: this.mapWindowToCanvas(0, this.offsetY),
+                w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+                h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
             })
         }
     }
@@ -382,10 +382,10 @@ class Canvas extends Component {
             this.props.socket.emit('command', 'update');
             // TODO : add position info
             this.props.socket.emit('viewport_position', {
-                x: 0,
-                y: 0,
-                w: 0,
-                h: 0,
+                x: this.mapWindowToCanvas(0, this.offsetX),
+                y: this.mapWindowToCanvas(0, this.offsetY),
+                w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+                h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
             })
         }
         else if (this.state.active) {
@@ -482,10 +482,10 @@ class Canvas extends Component {
         this.props.socket.emit('command', 'update');
         // TODO : add position info
         this.props.socket.emit('viewport_position', {
-            x: 0,
-            y: 0,
-            w: 0,
-            h: 0,
+            x: this.mapWindowToCanvas(0, this.offsetX),
+            y: this.mapWindowToCanvas(0, this.offsetY),
+            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         })
     }
 
