@@ -35,11 +35,21 @@ class CanvasBoard extends Component {
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
+        this.onImageEvent = this.onImageEvent.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
+    }
+
+    onImageEvent(data) {
+        if (data === 'NONE') {
+            this.sidebar.showImageButton();
+        } else {
+            this.sidebar.hideImageButton();
+        }
+        this.canvas.onImageEvent(data);
     }
 
     onPreviewEvent(data) {
@@ -137,7 +147,7 @@ class CanvasBoard extends Component {
             this.socket.on('connect', this.onInitCanvas);
             this.socket.on('drawing', this.onDrawingEvent);
             this.socket.on('preview', this.onPreviewEvent);
-            this.socket.on('image', this.canvas.onImageEvent);
+            this.socket.on('image', this.onImageEvent);
             this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
@@ -226,6 +236,7 @@ class CanvasBoard extends Component {
                             hideNavbar={this.state.hideNavbar}/>
 
                     <Sidebar
+                            onRef={ref => (this.sidebar= ref)}
                             onChangeColor={this.changeColor}
                             onChangeWidth={this.changeWidth}
                             onUndo={this.onUndoEvent}
