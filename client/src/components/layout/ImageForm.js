@@ -35,6 +35,7 @@ class ImageForm extends Component {
 
     handleFile(files) {
         var preview = document.getElementById("dropZone");
+        //currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
@@ -43,7 +44,7 @@ class ImageForm extends Component {
             const img = document.createElement("img");
             img.classList.add("obj");
             img.file = file;
-            preview.appendChild(img); // Assuming that "preview" is the div output where the content will be displayed.
+            preview.appendChild(img);
 
             const reader = new FileReader();
             reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
@@ -57,14 +58,14 @@ class ImageForm extends Component {
                 <ModalBody>
                   <h3> Image Upload </h3>
                   <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
-                  <form id="myform" name="myform" onSubmit={this.props.onUploadEvent}>
-
-                  </form>
                   </div>
                  </ModalBody>
                  <ModalFooter>
+                 <form id="myform" name="myform" onSubmit={this.props.onUploadEvent}>
                      <input type="file" id="file"/>
                      <input type="submit" value="Upload" />
+                 </form>
+
                     <Button color="secondary" onClick={this.props.showForm}>Cancel</Button>
                 </ModalFooter>
             </Modal>

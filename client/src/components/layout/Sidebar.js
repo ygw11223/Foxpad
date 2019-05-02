@@ -21,7 +21,24 @@ class Sidebar extends React.Component {
         this.onPen = this.onPen.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onDrag = this.onDrag.bind(this);
+        this.hideImageButton = this.hideImageButton.bind(this);
+        this.showImageButton = this.showImageButton.bind(this);
         this.state = {popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, color: '#EC1D63', onPen: true, onEraser: false};
+    }
+
+    hideImageButton() {
+        let imageButton = document.getElementById("image");
+        let eraserButton = document.getElementById("eraser");
+        imageButton.style.visibility = "hidden";
+        eraserButton.style.borderRadius = "0px 0px 25px 0px";
+    }
+
+    showImageButton() {
+
+        let imageButton = document.getElementById("image");
+        let eraserButton = document.getElementById("eraser");
+        imageButton.style.visibility = "visible";
+        eraserButton.style.borderRadius = "0px";
     }
 
     updatePenWidth(value) {
@@ -55,6 +72,7 @@ class Sidebar extends React.Component {
         else {
             this.setState({onPen: true, onEraser: false, popoverEraserOpen: false, popoverColorOpen: false});
             this.props.onDrag(false);
+            console.log(this.state.penWidth);
             this.props.onChangeWidth(this.state.penWidth);
         }
     }
@@ -76,7 +94,7 @@ class Sidebar extends React.Component {
             this.setState({popoverEraserOpen: !this.state.popoverEraserOpen});
         }
         else {
-            this.setState({onEraser: true, onPen: false, popoverPenOpen: false, popoverColorOpen: false});
+            this.setState({onEraser: true, onPen: false, popoverPenOpen: false, popoverColorOpen: false, showImageButton: true});
             this.props.onDrag(false);
             this.props.onEraser(this.state.eraserWidth);
         }
@@ -95,7 +113,7 @@ class Sidebar extends React.Component {
         }
         target.style.backgroundColor = "#4C94CE";
 
-        this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false});
+        this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false, showImageButton: false});
         this.props.onDrag(true);
     }
 
