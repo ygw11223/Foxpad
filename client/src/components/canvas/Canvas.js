@@ -263,10 +263,7 @@ class Canvas extends Component {
         console.log("upload");
         var file = document.getElementById("file");
         var id = this.props.uploader.upload(file);
-        this.setState(prevState => ({
-            modal: !prevState.modal
-        }));
-        console.log(id);
+        this.showForm();
     }
 
     onMouseDown(e) {
@@ -516,12 +513,10 @@ class Canvas extends Component {
                     height = {this.state.height }
                     width  = {this.state.width }/>
 
-                <div>
                 <Modal
                     showForm={this.showForm}
                     onUploadEvent={this.onUploadEvent}
                     modal={this.state.modal}/>
-                    </div>
             </div>
         );
     }

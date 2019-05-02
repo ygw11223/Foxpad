@@ -15,7 +15,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar:true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
