@@ -273,9 +273,9 @@ class Canvas extends Component {
 
     onMouseSideMove() {
         if(!this.state.active && this.move_active) {
-            var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
+            var dx =  this.mapWindowToCanvas(this.state.width*0.02, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
-            var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
+            var dy =  this.mapWindowToCanvas(this.state.height*0.02, this.offsetY)
                     - this.mapWindowToCanvas(0, this.offsetY);
             //hardcode the boundary, 40px
             if (this.preX > 40 && this.preX < this.state.width - 40)
@@ -459,7 +459,7 @@ class Canvas extends Component {
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={()=>{this.move_active = false}}
+                    onMouseOut={()=>{this.move_active = false;this.setState({ active: false });}}
                     onTouchStart={this.onMouseDown}
                     onTouchMove={this.onMouseMove}
                     onTouchEnd={this.onMouseUp}
