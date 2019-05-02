@@ -76,10 +76,7 @@ class Canvas extends Component {
         let widthScale = Math.ceil( Math.log(this.state.width / this.canvas_width)/Math.log(1.1));
         let hightScale = Math.ceil( Math.log(this.state.height / this.canvas_hight)/Math.log(1.1));
         this.initialScale = widthScale > hightScale ? widthScale : hightScale;
-        console.log("check", [widthScale, hightScale]);
         if(this.initialScale > 0) {
-            console.log(this.initialScale);
-            console.log("update size", [widthScale, hightScale]);
             this.initialScale = Math.pow(1.1, this.initialScale);
             this.scale = 1/this.initialScale;
             this.offsetX = this.offsetX/this.initialScale;
