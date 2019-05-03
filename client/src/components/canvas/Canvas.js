@@ -50,7 +50,7 @@ class Canvas extends Component {
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
         this.initCanvas = this.initCanvas.bind(this);
         this.onMouseSideMove = this.onMouseSideMove.bind(this);
-
+        this.initializeScale = this.initializeScale.bind(this);
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -61,6 +61,8 @@ class Canvas extends Component {
         this.imageHight = -1;
         this.canvas_width = 1920;
         this.canvas_hight = 1080;
+        this.imageScale = 0;
+        this.reconnect = false;
         this.image = new Image();
         this.image.onload = this.onDrawImage;
         // Buffer for next level of resolution of image. Needed for smooth
@@ -68,10 +70,34 @@ class Canvas extends Component {
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
         this.move_active = true;
+        this.initialScale = 1;
+    }
+
+    initializeScale() {
+        let widthScale = Math.ceil( Math.log(this.state.width / this.canvas_width)/Math.log(1.1));
+        let hightScale = Math.ceil( Math.log(this.state.height / this.canvas_hight)/Math.log(1.1));
+        this.initialScale = widthScale > hightScale ? widthScale : hightScale;
+        if(this.initialScale > 0) {
+            this.initialScale = Math.pow(1.1, this.initialScale);
+            this.scale = 1/this.initialScale;
+            this.offsetX = this.offsetX/this.initialScale;
+            this.offsetY = this.offsetY/this.initialScale;
+            this.imageHight *= this.initialScale;
+            this.imageWidth *= this.initialScale;
+            this.ctx.scale(this.initialScale,this.initialScale);
+            this.mctx.scale(this.initialScale,this.initialScale);
+            this.initialScale = this.scale;
+        } else {
+            this.initialScale = 1;
+        }
     }
 
     initCanvas() {
+        if (this.reconnect) return;
+        else this.reconnect = true;
         this.scale = 1;
+        this.initialScale = 1;
+        this.imageScale = 0;
         this.imageHight = -1;
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
@@ -80,10 +106,11 @@ class Canvas extends Component {
         this.preY = -1;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.initializeScale();
     }
 
     onEmitImg() {
-        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:Math.floor(Math.log2(this.scale))});
+        this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:this.imageScale});
     }
 
     onRedrawEvent(data_array) {
@@ -134,7 +161,7 @@ class Canvas extends Component {
         this.ctx.translate(-this.offsetX, -this.offsetY);
         this.mctx.translate(-this.offsetX, -this.offsetY);
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
+        this.initializeScale();
     }
 
     updateMouseLocation(mouseList) {
@@ -210,6 +237,8 @@ class Canvas extends Component {
             this.imageHight = this.nextImage.height;
             this.imageWidth = this.nextImage.width;
         }
+        this.imageScale += 1;
+        this.onEmitImg();
     }
 
     onDrawImage() {
@@ -382,8 +411,9 @@ class Canvas extends Component {
         // factor is 1.1
         let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
-        if(this.scale/factor > 1) {
-            factor = 1/this.scale;
+        console.log("factor", [this.initialScale, this.scale, factor, this.initialScale/this.scale]);
+        if(this.scale/factor > this.initialScale) {
+            factor = this.initialScale/this.scale;
         }
         // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
@@ -395,8 +425,11 @@ class Canvas extends Component {
         this.scale /= factor;
         this.offsetX = this.offsetX/factor;
         this.offsetY = this.offsetY/factor;
+        console.log("size pre", [ this.imageHight, this.imageWidth]);
         this.imageHight *= factor;
         this.imageWidth *= factor;
+        console.log([zoom_factor, direction, factor]);
+        console.log("size", [ this.imageHight, this.imageWidth]);
         this.ctx.scale(factor,factor);
         this.mctx.scale(factor,factor);
 
@@ -434,13 +467,12 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.props.socket.emit('command', 'update');
-        this.onEmitImg();
     }
 
     onScrollEvent(event) {
         event.preventDefault();
         let wheel = event.deltaY < 0 ? 1 : -1;
-        console.log(event.ctrlKey);
+
         if(event.ctrlKey)
             this.zoom(wheel, 1.1, this.preX, this.preY);
         else {
