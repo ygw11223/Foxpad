@@ -235,7 +235,7 @@ class Canvas extends Component {
     }
 
     onUploadEvent(e) {
-        e.preventDefault();
+        //e.preventDefault();
         console.log("upload");
         var file = document.getElementById("file");
         var id = this.props.uploader.upload(file);

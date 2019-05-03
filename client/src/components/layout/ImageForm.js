@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import './modal.css'
 
+var fileList = null;
 
 class ImageForm extends Component {
     constructor(props, context) {
@@ -9,6 +10,23 @@ class ImageForm extends Component {
         this.dragOverHandler = this.dragOverHandler.bind(this);
         this.dropHandler = this.dropHandler.bind(this);
         this.handleFile = this.handleFile.bind(this);
+        this.fileSelected = this.fileSelected.bind(this);
+        this.test = this.test.bind(this);
+    }
+
+    test() {
+        // const imgs = document.querySelectorAll(".obj");
+        // console.log("in test");
+        // // for (let i = 0; i < imgs.length; i++) {
+        // //     console.log(imgs[i].file);
+        // // }
+        // console.log(imgs[0].file);
+        this.props.onUploadEvent();
+    }
+
+    fileSelected(e) {
+        var file = e.target.files;
+        this.handleFile(file);
     }
 
     dropHandler(ev) {
@@ -22,7 +40,6 @@ class ImageForm extends Component {
       }
       const dt = ev.dataTransfer;
       const file = dt.files;
-      console.log(file);
       this.handleFile(file);
     }
 
@@ -34,6 +51,7 @@ class ImageForm extends Component {
     }
 
     handleFile(files) {
+        fileList = files;
         var preview = document.getElementById("dropZone");
         //currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
@@ -50,6 +68,7 @@ class ImageForm extends Component {
             reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
             reader.readAsDataURL(file);
         }
+        //this.test();
     }
 
     render() {
@@ -62,7 +81,7 @@ class ImageForm extends Component {
                  </ModalBody>
                  <ModalFooter>
                  <form id="myform" name="myform" onSubmit={this.props.onUploadEvent}>
-                     <input type="file" id="file"/>
+                     <input type="file" id="file" onChange={this.fileSelected}/>
                      <input type="submit" value="Upload" />
                  </form>
 
