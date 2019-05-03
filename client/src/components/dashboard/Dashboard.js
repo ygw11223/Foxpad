@@ -63,9 +63,16 @@ class Dashboard extends Component {
         for (let i in canvases) {
             let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png'
             cards.push(
-                <Card style={{flexShrink: 0}}>
-                    <Card.Img variant="top" src={url} />
-                    <Card.Footer>
+                <Card className="dashboard-card"
+                    style={{
+                    flexShrink: 0,
+                    width: '288px',
+                    height: '187px',
+                    margin: '25px 25px 25px 25px',
+                    borderRadius: '8px'}}
+                    onClick={() => {this.setState({toCanvas: true, id: canvases[i][0]})}}>
+                    <Card.Img variant="top" src={url}/>
+                    <Card.Footer style={{height: '25px', paddingTop: 0, paddingBottom: 0,}}>
                         <small className="text-muted">Last opened {this.timeDifference(now, canvases[i][1])}</small>
                     </Card.Footer>
                 </Card>
@@ -78,8 +85,7 @@ class Dashboard extends Component {
     componentDidMount() {
         if (cookies.get('cd_user_name') == undefined) {
             this.setState({toLogin: true});
-        }
-        else {
+        } else {
             var name = cookies.get('cd_user_name');
             document.getElementById('header').innerHTML = "Welcome " + name;
         }
@@ -107,19 +113,13 @@ class Dashboard extends Component {
         return (
             <div id="wrapper">
                 <div id="welcome">
-                    <h1 id="header"></h1>
+                    <h1 id="header">Your Canvases</h1>
                 </div>
                 <div id="parent">
-                    <div style={{
-                        display: 'flex', 
-                        overflow: 'scroll',
-                        width: '800px',
-                        height: '200px'}}>
-                        {this.renderCards()}
-                    </div>
+                    {this.renderCards()}
                     <div id="addCanvas">
                         <button type="button" id="button" class="btn btn-outline-primary" onClick={() => this.newCanvas()}>
-                            <i class="fas fa-plus"></i> Create a new canvas
+                            <b>+</b>
                         </button>
                     </div>
                 </div>
