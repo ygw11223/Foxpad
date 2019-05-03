@@ -52,6 +52,7 @@ class Dashboard extends Component {
         if (canvases === undefined) {
             return;
         }
+        // Sort canvases based on last open time.
         canvases = Object.keys(canvases).map(function(key) {
             return [key, canvases[key]];
         });
