@@ -7,6 +7,15 @@ class Minimap extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
+        this.generateUrl = this.generateUrl.bind(this);
+    }
+
+    generateUrl() {
+        let previewCanvas = document.createElement("canvas");
+        let previewContext = previewCanvas.getContext("2d");
+
+        previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
+        return previewCanvas.toDataURL('image/png');
     }
 
     componentWillUnmount() {
