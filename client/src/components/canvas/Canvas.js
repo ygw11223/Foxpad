@@ -298,6 +298,11 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
+
+            // Position not changed
+            if(dx === 0 && dy === 0)
+                return;
+
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
