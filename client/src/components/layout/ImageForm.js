@@ -3,6 +3,9 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import './modal.css'
 
 var fileName = null;
+var fileButton = null;
+var submitButton = null;
+var inputText = null;
 
 class ImageForm extends Component {
     constructor(props, context) {
@@ -12,6 +15,20 @@ class ImageForm extends Component {
         this.handleFile = this.handleFile.bind(this);
         this.fileSelected = this.fileSelected.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
+        this.revertPreview = this.revertPreview.bind(this);
+        this.state = {imagePreview: false}
+    }
+
+    revertPreview() {
+        var preview = document.getElementById("dropZone");
+        var form = document.getElementById("myform");
+
+        preview.innerHTML = "";
+        preview.appendChild(inputText);
+        preview.appendChild(fileButton);
+        form.appendChild(submitButton);
+        document.getElementById("file").value = null;
+        this.setState({imagePreview: false});
     }
 
     onUploadEvent(e) {
@@ -51,7 +68,11 @@ class ImageForm extends Component {
     handleFile(files) {
         fileName = files;
         var preview = document.getElementById("dropZone");
-        //currently we only support 1 file, but can be scalable for multiple in the future
+        var inputFile = document.getElementById("file");
+        var inputSubmit = document.getElementById("submit");
+        var text = document.getElementById("text");
+
+        // currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
@@ -60,7 +81,16 @@ class ImageForm extends Component {
             const img = document.createElement("img");
             img.classList.add("obj");
             img.file = file;
+
+            // when setting thumbnail, want to remove all elements inside dropzone
+            if (inputFile != null && inputSubmit != null) {
+                fileButton = inputFile.parentNode.removeChild(inputFile);
+                submitButton = inputSubmit.parentNode.removeChild(inputSubmit);
+                inputText = text.parentNode.removeChild(text);
+            }
+            preview.innerHTML = "";
             preview.appendChild(img);
+            this.setState({imagePreview: true});
 
             const reader = new FileReader();
             reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
@@ -73,15 +103,19 @@ class ImageForm extends Component {
             <Modal isOpen={this.props.modal} toggle={this.props.showForm}>
                 <ModalBody>
                   <h3> Image Upload </h3>
-                  <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
-                  </div>
-                 </ModalBody>
-                 <ModalFooter>
-                 <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                     <input type="file" id="file" onChange={this.fileSelected}/>
-                     <input type="submit" value="Upload" />
-                 </form>
+                  { this.state.imagePreview === true &&
+                      <span id="revertButton" onClick={this.revertPreview}><i class="far fa-times-circle"></i></span>
+                  }
+                  <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
+                      <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
+                        <p id="text"> <center> Drag & Drop <br></br> or </center> </p>
+                        <input type="file" id="file" style={{color: 'transparent'}} onChange={this.fileSelected}/>
+                      </div>
+                      <input type="submit" id="submit" value="Upload" />
+                  </form>
+                </ModalBody>
 
+                <ModalFooter>
                     <Button color="secondary" onClick={this.props.showForm}>Cancel</Button>
                 </ModalFooter>
             </Modal>
