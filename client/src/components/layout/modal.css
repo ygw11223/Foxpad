@@ -1,5 +1,6 @@
 .modal-content {
     border-radius: 20px !important;
+    width: 600px !important;
 }
 
 h3 {
@@ -7,9 +8,23 @@ h3 {
 }
 
 #dropZone {
-    width:  300px;
+    display: flex !important;
+    flex-direction: column;
+    width:  500px;
     height: 300px;
     border: #528FC8 2px solid;
     padding: 15px;
     border-radius: 5px;
+    margin: auto;
+}
+
+#text {
+    font-size: 50px;
+    color: #528FC8;
+}
+
+#file {
+    margin: auto;
+    align-content: center;
+    text-align: center;
 }
