@@ -12,6 +12,8 @@ class Minimap extends Component {
 
     generateUrl() {
         let previewCanvas = document.createElement("canvas");
+        previewCanvas.width = 192;
+        previewCanvas.height = 108;
         let previewContext = previewCanvas.getContext("2d");
 
         previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
