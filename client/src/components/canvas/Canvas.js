@@ -55,8 +55,8 @@ class Canvas extends Component {
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.imageWidth = -1;
         this.imageHight = -1;
         this.canvas_width = 1920;
@@ -102,8 +102,8 @@ class Canvas extends Component {
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
@@ -327,7 +327,7 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
-
+            console.log(dx,dy);
             // Position not changed
             if(dx === 0 && dy === 0)
                 return;
