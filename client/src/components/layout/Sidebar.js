@@ -71,7 +71,6 @@ class Sidebar extends React.Component {
         else {
             this.setState({onPen: true, onEraser: false, popoverEraserOpen: false, popoverColorOpen: false});
             this.props.onDrag(false);
-            console.log(this.state.penWidth);
             this.props.onChangeWidth(this.state.penWidth);
         }
     }
@@ -93,7 +92,7 @@ class Sidebar extends React.Component {
             this.setState({popoverEraserOpen: !this.state.popoverEraserOpen});
         }
         else {
-            this.setState({onEraser: true, onPen: false, popoverPenOpen: false, popoverColorOpen: false, showImageButton: true});
+            this.setState({onEraser: true, onPen: false, popoverPenOpen: false, popoverColorOpen: false});
             this.props.onDrag(false);
             this.props.onEraser(this.state.eraserWidth);
         }
@@ -112,7 +111,7 @@ class Sidebar extends React.Component {
         }
         target.style.backgroundColor = "#4C94CE";
 
-        this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false, showImageButton: false});
+        this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false});
         this.props.onDrag(true);
     }
 
