@@ -69,6 +69,7 @@ class Canvas extends Component {
         // zooming
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
+        this.move_active = true;
         this.initialScale = 1;
     }
 
@@ -300,10 +301,10 @@ class Canvas extends Component {
     }
 
     onMouseSideMove() {
-        if(!this.state.active && this.props.mode) {
-            var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
+        if(!this.state.active && this.move_active) {
+            var dx =  this.mapWindowToCanvas(this.state.width*0.02, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
-            var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
+            var dy =  this.mapWindowToCanvas(this.state.height*0.02, this.offsetY)
                     - this.mapWindowToCanvas(0, this.offsetY);
             //hardcode the boundary, 40px
             if (this.preX > 40 && this.preX < this.state.width - 40)
@@ -326,6 +327,11 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
+
+            // Position not changed
+            if(dx === 0 && dy === 0)
+                return;
+
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
@@ -337,7 +343,7 @@ class Canvas extends Component {
     onMouseMove(e) {
         let currentX = 0;
         let currentY = 0;
-
+        this.move_active = true;
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;
@@ -490,7 +496,7 @@ class Canvas extends Component {
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={this.onMouseUp}
+                    onMouseOut={()=>{this.move_active = false;this.setState({ active: false });}}
                     onTouchStart={this.onMouseDown}
                     onTouchMove={this.onMouseMove}
                     onTouchEnd={this.onMouseUp}
