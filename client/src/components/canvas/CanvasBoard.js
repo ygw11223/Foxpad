@@ -44,7 +44,7 @@ class CanvasBoard extends Component {
 
     onPositionEvent(data) {
         this.setCanvas(parseInt(data.cid));
-        // TODO : Change camera position
+        this.canvas.followCanvas(data.x, data.y, data.w, data.h);
     }
 
     onPreviewEvent(data) {
