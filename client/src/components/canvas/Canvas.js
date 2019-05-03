@@ -45,7 +45,6 @@ class Canvas extends Component {
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onLoadNextImage = this.onLoadNextImage.bind(this);
-        this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
@@ -232,14 +231,6 @@ class Canvas extends Component {
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
-    }
-
-    onUploadEvent(e) {
-        //e.preventDefault();
-        console.log("upload");
-        var file = document.getElementById("file");
-        var id = this.props.uploader.upload(file);
-        this.showForm();
     }
 
     onMouseDown(e) {
@@ -482,8 +473,8 @@ class Canvas extends Component {
 
                 <Modal
                     showForm={this.showForm}
-                    onUploadEvent={this.onUploadEvent}
-                    modal={this.state.modal}/>
+                    modal={this.state.modal}
+                    uploader={this.props.uploader}/>
             </div>
         );
     }
