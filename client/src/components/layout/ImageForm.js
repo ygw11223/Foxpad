@@ -4,8 +4,10 @@ import './modal.css'
 
 var fileName = null;
 var fileButton = null;
-var submitButton = null;
 var inputText = null;
+var orText = null
+var labelText = null;
+const deleteIcon = require('./delete.png');
 
 class ImageForm extends Component {
     constructor(props, context) {
@@ -22,11 +24,13 @@ class ImageForm extends Component {
     revertPreview() {
         var preview = document.getElementById("dropZone");
         var form = document.getElementById("myform");
+        var inputSubmit = document.getElementById("submit");
 
         preview.innerHTML = "";
         preview.appendChild(inputText);
+        preview.appendChild(orText);
+        preview.appendChild(labelText);
         preview.appendChild(fileButton);
-        form.appendChild(submitButton);
         document.getElementById("file").value = null;
         this.setState({imagePreview: false});
     }
@@ -69,8 +73,10 @@ class ImageForm extends Component {
         fileName = files;
         var preview = document.getElementById("dropZone");
         var inputFile = document.getElementById("file");
-        var inputSubmit = document.getElementById("submit");
+        // var inputSubmit = document.getElementById("submit");
         var text = document.getElementById("text");
+        var or = document.getElementById("or");
+        var label = document.getElementById("label");
 
         // currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
@@ -83,13 +89,15 @@ class ImageForm extends Component {
             img.file = file;
 
             // when setting thumbnail, want to remove all elements inside dropzone
-            if (inputFile != null && inputSubmit != null) {
+            if (inputFile != null && text != null && or != null && label != null) {
                 fileButton = inputFile.parentNode.removeChild(inputFile);
-                submitButton = inputSubmit.parentNode.removeChild(inputSubmit);
                 inputText = text.parentNode.removeChild(text);
+                orText = or.parentNode.removeChild(or);
+                labelText = label.parentNode.removeChild(label);
             }
             preview.innerHTML = "";
             preview.appendChild(img);
+            // inputSubmit.style.display = "block";
             this.setState({imagePreview: true});
 
             const reader = new FileReader();
@@ -102,22 +110,21 @@ class ImageForm extends Component {
         return (
             <Modal isOpen={this.props.modal} toggle={this.props.showForm}>
                 <ModalBody>
-                  <h3> Image Upload </h3>
+                  <h2> Image Upload </h2>
                   { this.state.imagePreview === true &&
-                      <span id="revertButton" onClick={this.revertPreview}><i class="far fa-times-circle"></i></span>
+                     <img src={deleteIcon} id="revertButton" class="far fa-times-circle" onClick={this.revertPreview}/>
                   }
                   <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
                       <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
-                        <p id="text"> <center> Drag & Drop <br></br> or </center> </p>
-                        <input type="file" id="file" style={{color: 'transparent'}} onChange={this.fileSelected}/>
+                        <p id="text"> <center> Drag & drop </center> </p> <p id="or"> <center> or </center> </p>
+                        <label id="label" for="file">Click to choose from files</label>
+                        <input type="file" id="file" style={{display: "none"}} onChange={this.fileSelected}/>
                       </div>
-                      <input type="submit" id="submit" value="Upload" />
+                      { this.state.imagePreview === true &&
+                          <input type="submit" id="submit" value="Upload" class="button" />
+                      }
                   </form>
                 </ModalBody>
-
-                <ModalFooter>
-                    <Button color="secondary" onClick={this.props.showForm}>Cancel</Button>
-                </ModalFooter>
             </Modal>
         );
     }

@@ -3,7 +3,9 @@
     width: 600px !important;
 }
 
-h3 {
+h2 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 40px !important;
     color: #528FC8;
 }
 
@@ -12,19 +14,64 @@ h3 {
     flex-direction: column;
     width:  500px;
     height: 300px;
-    border: #528FC8 2px solid;
+    border: #528FC8 3px solid;
     padding: 15px;
     border-radius: 5px;
     margin: auto;
+    justify-content: center;
 }
 
 #text {
-    font-size: 50px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 35px;
     color: #528FC8;
+}
+
+#or {
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
+    color: #9E9E9E;
 }
 
 #file {
     margin: auto;
     align-content: center;
     text-align: center;
+}
+
+#label {
+    font-family: 'Roboto', sans-serif;
+    text-decoration: underline;
+    font-size: 35px;
+    color: #528FC8;
+    text-align: center;
+}
+
+#submit {
+    display: block;
+    margin: auto;
+    margin-top: 20px;
+    color: #FFFFFF !important;
+    font-size: 20px;
+    /* display: none; */
+
+    border: none !important;
+	width: 90px !important;
+	height: 45px !important;
+	background-color: #4c94ce !important;
+	font-family: 'Roboto', sans-serif !important;
+	border-radius: 24px !important;
+    box-shadow: 2px 2px 5px 1px rgb(131, 125, 125, 0.5);
+}
+
+#revertButton {
+    height: 50px;
+    width: 50px;
+    position: relative;
+    float: right;
+    top: 25px;
+    left: 12px;
+    color: #528FC8;
+    font-size: 40px;
+    z-index: 10;
 }
