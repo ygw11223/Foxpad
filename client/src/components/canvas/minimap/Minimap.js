@@ -16,7 +16,6 @@ class Minimap extends Component {
         previewCanvas.height = 108;
         let previewContext = previewCanvas.getContext("2d");
 
-
         previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
         return previewCanvas.toDataURL('image/png');
     }

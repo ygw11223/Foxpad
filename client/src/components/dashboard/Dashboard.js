@@ -48,14 +48,13 @@ class Dashboard extends Component {
         let cards = [];
         let canvases = cookies.get('cd_test_canvases');
         let now = new Date().getTime();
+
         if (canvases === undefined) {
             return;
         }
-
         canvases = Object.keys(canvases).map(function(key) {
             return [key, canvases[key]];
         });
-
         canvases.sort(function(first, second) {
             return second[1] - first[1];
         });
