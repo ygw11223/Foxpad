@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Modal from '../layout/ImageForm.js'
+
 
 const cookies = new Cookies();
 
@@ -44,7 +45,6 @@ class Canvas extends Component {
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onLoadNextImage = this.onLoadNextImage.bind(this);
-        this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
@@ -255,17 +255,6 @@ class Canvas extends Component {
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
-    }
-
-    onUploadEvent(e) {
-        e.preventDefault();
-        console.log("upload");
-        var file = document.getElementById("file");
-        var id = this.props.uploader.upload(file);
-        this.setState(prevState => ({
-            modal: !prevState.modal
-        }));
-        console.log(id);
     }
 
     onMouseDown(e) {
@@ -514,20 +503,10 @@ class Canvas extends Component {
                     height = {this.state.height }
                     width  = {this.state.width }/>
 
-                <div>
-                    <Modal isOpen={this.state.modal} toggle={this.showForm}>
-                        <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
-                        <ModalBody>
-                          <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                            <input type="file" id="file" multiple />
-                            <input type="submit" value="Upload" />
-                          </form>
-                         </ModalBody>
-                         <ModalFooter>
-                            <Button color="secondary" onClick={this.showForm}>Cancel</Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
+                <Modal
+                    showForm={this.showForm}
+                    modal={this.state.modal}
+                    uploader={this.props.uploader}/>
             </div>
         );
     }

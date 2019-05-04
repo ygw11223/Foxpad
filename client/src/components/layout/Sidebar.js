@@ -21,7 +21,23 @@ class Sidebar extends React.Component {
         this.onPen = this.onPen.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onDrag = this.onDrag.bind(this);
+        this.hideImageButton = this.hideImageButton.bind(this);
+        this.showImageButton = this.showImageButton.bind(this);
         this.state = {popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, color: '#EC1D63', onPen: true, onEraser: false};
+    }
+
+    hideImageButton() {
+        let imageButton = document.getElementById("image");
+        let eraserButton = document.getElementById("eraser");
+        imageButton.style.visibility = "hidden";
+        eraserButton.style.borderRadius = "0px 0px 25px 0px";
+    }
+
+    showImageButton() {
+        let imageButton = document.getElementById("image");
+        let eraserButton = document.getElementById("eraser");
+        imageButton.style.visibility = "visible";
+        eraserButton.style.borderRadius = "0px";
     }
 
     updatePenWidth(value) {
@@ -97,6 +113,14 @@ class Sidebar extends React.Component {
 
         this.setState({onDrag: true, onEraser: false, onPen: false, popoverEraserOpen: false, popoverPenOpen: false, popoverColorOpen: false});
         this.props.onDrag(true);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
+    componentDidMount() {
+       this.props.onRef(this);
     }
 
     // Todo: Anze
