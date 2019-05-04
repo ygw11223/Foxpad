@@ -11,14 +11,8 @@ class Minimap extends Component {
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.onDrawImage = this.onDrawImage.bind(this);
-
-        this.image = new Image();
-        this.image.onload = this.onDrawImage;
-        // Buffer for next level of resolution of image. Needed for smooth
-        // zooming
-        this.nextImage = new Image();
-        this.nextImage.onload = this.onLoadNextImage;
         this.generateUrl = this.generateUrl.bind(this);
+        this.clearImage = this.clearImage.bind(this);
     }
 
     generateUrl() {
@@ -82,9 +76,11 @@ class Minimap extends Component {
 
     onDrawImage(data, imgWidth, imgHeight) {
         this.pctx.clearRect(0, 0, width, height);
-        console.log("x", -this.offsetX - imgWidth/2, "y", -this.offsetY - imgHeight/2);
         this.pctx.drawImage(data, -this.offsetX - imgWidth/16, -this.offsetY - imgHeight/16, imgWidth/8, imgHeight/8);
-        console.log("printed minimap img");
+    }
+
+    clearImage() {
+        this.pctx.clearRect(0, 0, width, height);
     }
 
     render() {

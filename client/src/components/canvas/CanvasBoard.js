@@ -32,6 +32,7 @@ class CanvasBoard extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.minimapDraw = this.minimapDraw.bind(this);
         this.minimapImage = this.minimapImage.bind(this);
+        this.minimapClearImage = this.minimapClearImage.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
@@ -116,6 +117,10 @@ class CanvasBoard extends Component {
 
     minimapImage(datadata, imgWidth, imgHeight) {
         this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
+    }
+
+    minimapClearImage() {
+        this.minimap.clearImage();
     }
 
     componentDidMount() {
@@ -212,7 +217,8 @@ class CanvasBoard extends Component {
                             uploader={this.uploader}
                             name = {this.uid}
                             minimapDraw={this.minimapDraw}
-                            minimapImage={this.minimapImage}/>
+                            minimapImage={this.minimapImage}
+                            minimapClearImage={this.minimapClearImage}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck= ref)}
