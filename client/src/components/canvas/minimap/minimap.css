@@ -1,15 +1,14 @@
-#test {
+#mini {
+  z-index: 4;
   position: absolute;
-  bottom: 16px;
   right: 16px;
-  z-index: 2;
+  bottom: 16px;
+  box-shadow: 0px 0px 20px #888888;
 }
 
-#mini {
-  z-index: 3;
-  background-color: PaleTurquoise;
+#minipicture {
+  z-index: 2;
   position: absolute;
   right: 16px;
   bottom: 16px;
-  /* bottom:300px; */
 }
