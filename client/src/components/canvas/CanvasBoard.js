@@ -15,7 +15,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar:true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -35,6 +35,8 @@ class CanvasBoard extends Component {
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
         this.onPositionEvent = this.onPositionEvent.bind(this);
+        this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
+        this.onImageEvent = this.onImageEvent.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -45,6 +47,15 @@ class CanvasBoard extends Component {
     onPositionEvent(data) {
         this.setCanvas(parseInt(data.cid));
         this.canvas.followCanvas(data.x, data.y, data.w, data.h);
+    }
+
+    onImageEvent(data) {
+        if (data === 'NONE') {
+            this.sidebar.showImageButton();
+        } else {
+            this.sidebar.hideImageButton();
+        }
+        this.canvas.onImageEvent(data);
     }
 
     onPreviewEvent(data) {
@@ -92,7 +103,7 @@ class CanvasBoard extends Component {
         this.navbar.setState({'color': color});
     }
 
-    onInitCanvas(){
+    onInitCanvas() {
         this.canvas.initCanvas();
         this.socket.emit('init', {
             user_id: this.uid,
@@ -102,6 +113,16 @@ class CanvasBoard extends Component {
         // Get image and strokes from server.
         this.canvas.onEmitImg();
         this.socket.emit('command', 'update');
+    }
+
+    updateCanvasHistory() {
+        let canvases = cookies.get('cd_test_canvases');
+        if (canvases == undefined) {
+            canvases = {}
+        }
+
+        canvases[this.props.match.params.id] = new Date().getTime();
+        cookies.set('cd_test_canvases', canvases);
     }
 
     onDrawingEvent(data) {
@@ -123,6 +144,7 @@ class CanvasBoard extends Component {
         if (id == undefined) {
             this.setState({toLogin: true});
         } else {
+            this.updateCanvasHistory();
             this.uid = id;
             // On server, we save user and canvas id on the socket object, which
             // will disappear when connection is lost. So we need to init upon
@@ -131,7 +153,7 @@ class CanvasBoard extends Component {
             this.socket.on('drawing', this.onDrawingEvent);
             this.socket.on('position', this.onPositionEvent);
             this.socket.on('preview', this.onPreviewEvent);
-            this.socket.on('image', this.canvas.onImageEvent);
+            this.socket.on('image', this.onImageEvent);
             this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
@@ -221,6 +243,7 @@ class CanvasBoard extends Component {
                             socket={this.socket}/>
 
                     <Sidebar
+                            onRef={ref => (this.sidebar= ref)}
                             onChangeColor={this.changeColor}
                             onChangeWidth={this.changeWidth}
                             onUndo={this.onUndoEvent}

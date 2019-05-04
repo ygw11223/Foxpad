@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Modal from '../layout/ImageForm.js'
+
 
 const cookies = new Cookies();
 
@@ -44,7 +45,6 @@ class Canvas extends Component {
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onLoadNextImage = this.onLoadNextImage.bind(this);
-        this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
@@ -56,8 +56,8 @@ class Canvas extends Component {
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.imageWidth = -1;
         this.imageHight = -1;
         this.canvas_width = 1920;
@@ -70,6 +70,7 @@ class Canvas extends Component {
         // zooming
         this.nextImage = new Image();
         this.nextImage.onload = this.onLoadNextImage;
+        this.move_active = true;
         this.initialScale = 1;
     }
 
@@ -102,8 +103,8 @@ class Canvas extends Component {
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
@@ -315,17 +316,6 @@ class Canvas extends Component {
         }));
     }
 
-    onUploadEvent(e) {
-        e.preventDefault();
-        console.log("upload");
-        var file = document.getElementById("file");
-        var id = this.props.uploader.upload(file);
-        this.setState(prevState => ({
-            modal: !prevState.modal
-        }));
-        console.log(id);
-    }
-
     onMouseDown(e) {
         this.setState({ active: true });
         let currentX = 0;
@@ -359,10 +349,10 @@ class Canvas extends Component {
     }
 
     onMouseSideMove() {
-        if(!this.state.active && this.props.mode) {
-            var dx =  this.mapWindowToCanvas(this.state.width*0.05, this.offsetX)
+        if(!this.state.active && this.move_active) {
+            var dx =  this.mapWindowToCanvas(this.state.width*0.02, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
-            var dy =  this.mapWindowToCanvas(this.state.height*0.05, this.offsetY)
+            var dy =  this.mapWindowToCanvas(this.state.height*0.02, this.offsetY)
                     - this.mapWindowToCanvas(0, this.offsetY);
             //hardcode the boundary, 40px
             if (this.preX > 40 && this.preX < this.state.width - 40)
@@ -385,8 +375,11 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
+
+            // Position not changed
             if(dx === 0 && dy === 0)
                 return;
+
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
@@ -405,7 +398,7 @@ class Canvas extends Component {
     onMouseMove(e) {
         let currentX = 0;
         let currentY = 0;
-
+        this.move_active = true;
         if(e.type === "mousemove") {
             currentX = e.nativeEvent.offsetX;
             currentY = e.nativeEvent.offsetY;
@@ -570,7 +563,7 @@ class Canvas extends Component {
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={this.onMouseUp}
+                    onMouseOut={()=>{this.move_active = false;this.setState({ active: false });}}
                     onTouchStart={this.onMouseDown}
                     onTouchMove={this.onMouseMove}
                     onTouchEnd={this.onMouseUp}
@@ -589,20 +582,10 @@ class Canvas extends Component {
                     height = {this.state.height }
                     width  = {this.state.width }/>
 
-                <div>
-                    <Modal isOpen={this.state.modal} toggle={this.showForm}>
-                        <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
-                        <ModalBody>
-                          <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                            <input type="file" id="file" multiple />
-                            <input type="submit" value="Upload" />
-                          </form>
-                         </ModalBody>
-                         <ModalFooter>
-                            <Button color="secondary" onClick={this.showForm}>Cancel</Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
+                <Modal
+                    showForm={this.showForm}
+                    modal={this.state.modal}
+                    uploader={this.props.uploader}/>
             </div>
         );
     }
