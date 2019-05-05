@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Modal from '../layout/ImageForm.js'
+
 
 const cookies = new Cookies();
 
@@ -44,19 +45,19 @@ class Canvas extends Component {
         this.onImageEvent = this.onImageEvent.bind(this);
         this.zoom = this.zoom.bind(this);
         this.onLoadNextImage = this.onLoadNextImage.bind(this);
-        this.onUploadEvent = this.onUploadEvent.bind(this);
         this.showForm = this.showForm.bind(this);
         this.solveOffSet = this.solveOffSet.bind(this);
         this.updateMouseLocation = this.updateMouseLocation.bind(this);
         this.initCanvas = this.initCanvas.bind(this);
         this.onMouseSideMove = this.onMouseSideMove.bind(this);
         this.initializeScale = this.initializeScale.bind(this);
+        this.followCanvas = this.followCanvas.bind(this);
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
         this.scale = 1;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.imageWidth = -1;
         this.imageHight = -1;
         this.canvas_width = 1920;
@@ -102,11 +103,69 @@ class Canvas extends Component {
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
-        this.preX = -1;
-        this.preY = -1;
+        this.preX = 50;
+        this.preY = 50;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
+    }
+
+    followCanvas(x, y, w, h) {
+        this.imageHight *= this.scale;
+        this.imageWidth *= this.scale;
+        this.scale = 1;
+        this.initialScale = 1;
+        this.imageScale = 0;
+        this.offsetY = -this.state.height/2;
+        this.offsetX = -this.state.width/2;
+        this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.initializeScale();
+        let zoom_factor = 0;
+        let widthScale = Math.floor( Math.log(this.state.width / w)/Math.log(1.1));
+        let hightScale = Math.floor( Math.log(this.state.height / h)/Math.log(1.1));
+        zoom_factor = widthScale > hightScale ? widthScale : hightScale;
+        console.log(zoom_factor);
+        console.log([this.state.width, w, this.state.height, h]);
+        if(zoom_factor > 0){
+            zoom_factor = Math.pow(1.1, zoom_factor);
+            this.scale      /= zoom_factor;
+            this.offsetX     = this.offsetX/zoom_factor;
+            this.offsetY     = this.offsetY/zoom_factor;
+            this.imageHight *= zoom_factor;
+            this.imageWidth *= zoom_factor;
+            this.ctx.scale(zoom_factor,zoom_factor);
+            this.mctx.scale(zoom_factor,zoom_factor);
+        }
+        let dx =  this.mapWindowToCanvas(x + w/2, this.offsetX)
+                - this.mapWindowToCanvas(0, this.offsetX);
+        let dy =  this.mapWindowToCanvas(y + h/2 , this.offsetY)
+                - this.mapWindowToCanvas(0, this.offsetY);
+
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        }
+        if(dx === 0 && dy === 0)
+            return;
+        this.offsetX -= dx;
+        this.offsetY -= dy;
+        this.ctx.translate(dx,dy);
+        this.mctx.translate(dx,dy);
+        this.props.socket.emit('command', 'update');
+        this.props.socket.emit('viewport_position', {
+            x: this.mapWindowToCanvas(0, this.offsetX),
+            y: this.mapWindowToCanvas(0, this.offsetY),
+            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
+        });
+
     }
 
     onEmitImg() {
@@ -155,7 +214,7 @@ class Canvas extends Component {
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
-        this.scale = 1;
+        this.scale = this.initialScale;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
         this.ctx.translate(-this.offsetX, -this.offsetY);
@@ -255,17 +314,6 @@ class Canvas extends Component {
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
-    }
-
-    onUploadEvent(e) {
-        e.preventDefault();
-        console.log("upload");
-        var file = document.getElementById("file");
-        var id = this.props.uploader.upload(file);
-        this.setState(prevState => ({
-            modal: !prevState.modal
-        }));
-        console.log(id);
     }
 
     onMouseDown(e) {
@@ -381,6 +429,8 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
+            if(dx === 0 && dy === 0)
+                return;
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
@@ -392,7 +442,7 @@ class Canvas extends Component {
                 y: this.mapWindowToCanvas(0, this.offsetY),
                 w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
                 h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-            })
+            });
         }
         else if (this.state.active) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -430,7 +480,6 @@ class Canvas extends Component {
         // factor is 1.1
         let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
-        console.log("factor", [this.initialScale, this.scale, factor, this.initialScale/this.scale]);
         if(this.scale/factor > this.initialScale) {
             factor = this.initialScale/this.scale;
         }
@@ -444,11 +493,8 @@ class Canvas extends Component {
         this.scale /= factor;
         this.offsetX = this.offsetX/factor;
         this.offsetY = this.offsetY/factor;
-        console.log("size pre", [ this.imageHight, this.imageWidth]);
         this.imageHight *= factor;
         this.imageWidth *= factor;
-        console.log([zoom_factor, direction, factor]);
-        console.log("size", [ this.imageHight, this.imageWidth]);
         this.ctx.scale(factor,factor);
         this.mctx.scale(factor,factor);
 
@@ -536,20 +582,10 @@ class Canvas extends Component {
                     height = {this.state.height }
                     width  = {this.state.width }/>
 
-                <div>
-                    <Modal isOpen={this.state.modal} toggle={this.showForm}>
-                        <ModalHeader toggle={this.showForm}>Upload Image</ModalHeader>
-                        <ModalBody>
-                          <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                            <input type="file" id="file" multiple />
-                            <input type="submit" value="Upload" />
-                          </form>
-                         </ModalBody>
-                         <ModalFooter>
-                            <Button color="secondary" onClick={this.showForm}>Cancel</Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
+                <Modal
+                    showForm={this.showForm}
+                    modal={this.state.modal}
+                    uploader={this.props.uploader}/>
             </div>
         );
     }

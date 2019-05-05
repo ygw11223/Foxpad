@@ -15,7 +15,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 5, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar:true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -34,8 +34,10 @@ class CanvasBoard extends Component {
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
+        this.onPositionEvent = this.onPositionEvent.bind(this);
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onPositionEvent = this.onPositionEvent.bind(this);
+        this.onImageEvent = this.onImageEvent.bind(this);
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
@@ -44,7 +46,16 @@ class CanvasBoard extends Component {
 
     onPositionEvent(data) {
         this.setCanvas(parseInt(data.cid));
-        // TODO : Change camera position
+        this.canvas.followCanvas(data.x, data.y, data.w, data.h);
+    }
+
+    onImageEvent(data) {
+        if (data === 'NONE') {
+            this.sidebar.showImageButton();
+        } else {
+            this.sidebar.hideImageButton();
+        }
+        this.canvas.onImageEvent(data);
     }
 
     onPreviewEvent(data) {
@@ -142,7 +153,7 @@ class CanvasBoard extends Component {
             this.socket.on('drawing', this.onDrawingEvent);
             this.socket.on('position', this.onPositionEvent);
             this.socket.on('preview', this.onPreviewEvent);
-            this.socket.on('image', this.canvas.onImageEvent);
+            this.socket.on('image', this.onImageEvent);
             this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
@@ -232,6 +243,7 @@ class CanvasBoard extends Component {
                             socket={this.socket}/>
 
                     <Sidebar
+                            onRef={ref => (this.sidebar= ref)}
                             onChangeColor={this.changeColor}
                             onChangeWidth={this.changeWidth}
                             onUndo={this.onUndoEvent}
