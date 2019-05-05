@@ -75,8 +75,8 @@ class Canvas extends Component {
     }
 
     initializeScale() {
-        let widthScale = Math.ceil( Math.log(this.state.width / this.canvas_width)/Math.log(1.1));
-        let hightScale = Math.ceil( Math.log(this.state.height / this.canvas_hight)/Math.log(1.1));
+        let widthScale =  Math.log(this.state.width / this.canvas_width)/Math.log(1.1);
+        let hightScale = Math.log(this.state.height / this.canvas_hight)/Math.log(1.1);
         this.initialScale = widthScale > hightScale ? widthScale : hightScale;
         if(this.initialScale > 0) {
             this.initialScale = Math.pow(1.1, this.initialScale);
@@ -108,6 +108,12 @@ class Canvas extends Component {
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
+        this.props.socket.emit('viewport_position', {
+            x: this.mapWindowToCanvas(0, this.offsetX),
+            y: this.mapWindowToCanvas(0, this.offsetY),
+            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
+        });
     }
 
     followCanvas(x, y, w, h) {
@@ -122,11 +128,9 @@ class Canvas extends Component {
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
         let zoom_factor = 0;
-        let widthScale = Math.floor( Math.log(this.state.width / w)/Math.log(1.1));
-        let hightScale = Math.floor( Math.log(this.state.height / h)/Math.log(1.1));
+        let widthScale = Math.log(this.state.width / w)/Math.log(1.1);
+        let hightScale = Math.log(this.state.height / h)/Math.log(1.1);
         zoom_factor = widthScale > hightScale ? widthScale : hightScale;
-        console.log(zoom_factor);
-        console.log([this.state.width, w, this.state.height, h]);
         if(zoom_factor > 0){
             zoom_factor = Math.pow(1.1, zoom_factor);
             this.scale      /= zoom_factor;
@@ -137,10 +141,8 @@ class Canvas extends Component {
             this.ctx.scale(zoom_factor,zoom_factor);
             this.mctx.scale(zoom_factor,zoom_factor);
         }
-        let dx =  this.mapWindowToCanvas(x + w/2, this.offsetX)
-                - this.mapWindowToCanvas(0, this.offsetX);
-        let dy =  this.mapWindowToCanvas(y + h/2 , this.offsetY)
-                - this.mapWindowToCanvas(0, this.offsetY);
+        let dx = this.mapWindowToCanvas(0, this.offsetX) - x;
+        let dy = this.mapWindowToCanvas(0, this.offsetY) - y;
 
         if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
             dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
@@ -203,6 +205,12 @@ class Canvas extends Component {
        this.ctx.translate(-this.offsetX, -this.offsetY);
        this.mctx.translate(-this.offsetX, -this.offsetY);
        setInterval(this.onMouseSideMove, 50);
+       this.props.socket.emit('viewport_position', {
+           x: this.mapWindowToCanvas(0, this.offsetX),
+           y: this.mapWindowToCanvas(0, this.offsetY),
+           w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+           h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
+       });
     }
 
     componentWillMount() {
@@ -219,8 +227,8 @@ class Canvas extends Component {
         this.offsetX = -this.state.width/2;
         this.ctx.translate(-this.offsetX, -this.offsetY);
         this.mctx.translate(-this.offsetX, -this.offsetY);
-        this.props.socket.emit('command', 'update');
         this.initializeScale();
+        this.props.socket.emit('command', 'update');
     }
 
     updateMouseLocation(mouseList) {
@@ -293,8 +301,8 @@ class Canvas extends Component {
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
         if (this.imageHight <= 0 || this.imageWidth <= 0) {
-            this.imageHight = this.nextImage.height;
-            this.imageWidth = this.nextImage.width;
+            this.imageHight = this.nextImage.height/this.scale;
+            this.imageWidth = this.nextImage.width/this.scale;
         }
         this.imageScale += 1;
         this.onEmitImg();
@@ -375,7 +383,6 @@ class Canvas extends Component {
             } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
-
             // Position not changed
             if(dx === 0 && dy === 0)
                 return;

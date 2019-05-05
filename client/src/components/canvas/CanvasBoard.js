@@ -104,12 +104,12 @@ class CanvasBoard extends Component {
     }
 
     onInitCanvas() {
-        this.canvas.initCanvas();
         this.socket.emit('init', {
             user_id: this.uid,
             room_id: this.props.match.params.id,
             canvas_id: this.props.match.params.id + this.cid,
         });
+        this.canvas.initCanvas();
         // Get image and strokes from server.
         this.canvas.onEmitImg();
         this.socket.emit('command', 'update');
