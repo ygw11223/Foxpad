@@ -36,13 +36,26 @@ class CanvasBoard extends Component {
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
+        this.onPositionEvent = this.onPositionEvent.bind(this);
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
+        this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
+    }
+
+    updateViewportsPosition(data) {
+        for (var key in data) {
+            console.log(data[key]);
+        }
+    }
+
+    onPositionEvent(data) {
+        this.setCanvas(parseInt(data.cid));
+        this.canvas.followCanvas(data.x, data.y, data.w, data.h);
     }
 
     onImageEvent(data) {
@@ -65,7 +78,6 @@ class CanvasBoard extends Component {
     }
 
     setCanvas(id) {
-        console.log('set', id);
         if (this.cid !== id) {
             this.cid = id;
             this.canvasList.setState({current_canvas: this.cid});
@@ -101,12 +113,12 @@ class CanvasBoard extends Component {
     }
 
     onInitCanvas() {
-        this.canvas.initCanvas();
         this.socket.emit('init', {
             user_id: this.uid,
             room_id: this.props.match.params.id,
             canvas_id: this.props.match.params.id + this.cid,
         });
+        this.canvas.initCanvas();
         // Get image and strokes from server.
         this.canvas.onEmitImg();
         this.socket.emit('command', 'update');
@@ -156,12 +168,14 @@ class CanvasBoard extends Component {
             // each connection.
             this.socket.on('connect', this.onInitCanvas);
             this.socket.on('drawing', this.onDrawingEvent);
+            this.socket.on('position', this.onPositionEvent);
             this.socket.on('preview', this.onPreviewEvent);
             this.socket.on('image', this.onImageEvent);
             this.socket.on('redraw', this.onRedrawEvent);
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
+            this.socket.on('viewport_position', this.updateViewportsPosition);
             this.socket.on('update', (cmd)=>{
                 if(cmd === 'image_ready') {
                     this.canvas.onEmitImg();
@@ -245,7 +259,8 @@ class CanvasBoard extends Component {
                     <InfoCards
                             onRef={ref => (this.cardDeck= ref)}
                             name={this.uid}
-                            hideNavbar={this.state.hideNavbar}/>
+                            hideNavbar={this.state.hideNavbar}
+                            socket={this.socket}/>
 
                     <Sidebar
                             onRef={ref => (this.sidebar= ref)}
