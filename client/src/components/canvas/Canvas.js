@@ -392,7 +392,6 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
-            // TODO : add position info
             this.props.socket.emit('viewport_position', {
                 x: this.mapWindowToCanvas(0, this.offsetX),
                 y: this.mapWindowToCanvas(0, this.offsetY),
@@ -443,7 +442,6 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.props.socket.emit('command', 'update');
-            // TODO : add position info
             this.props.socket.emit('viewport_position', {
                 x: this.mapWindowToCanvas(0, this.offsetX),
                 y: this.mapWindowToCanvas(0, this.offsetY),
@@ -539,7 +537,6 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.props.socket.emit('command', 'update');
-        // TODO : add position info
         this.props.socket.emit('viewport_position', {
             x: this.mapWindowToCanvas(0, this.offsetX),
             y: this.mapWindowToCanvas(0, this.offsetY),
