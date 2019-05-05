@@ -36,12 +36,19 @@ class CanvasBoard extends Component {
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
         this.onPositionEvent = this.onPositionEvent.bind(this);
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
-        this.onPositionEvent = this.onPositionEvent.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
+        this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
+
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
+    }
+
+    updateViewportsPosition(data) {
+        for (var key in data) {
+            console.log(data[key]);
+        }
     }
 
     onPositionEvent(data) {
@@ -158,6 +165,7 @@ class CanvasBoard extends Component {
             this.socket.on('session_update', this.session_update);
             this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
+            this.socket.on('viewport_position', this.updateViewportsPosition);
             this.socket.on('update', (cmd)=>{
                 if(cmd === 'image_ready') {
                     this.canvas.onEmitImg();

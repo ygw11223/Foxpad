@@ -235,7 +235,13 @@ function onConnection(socket){
         SESSION_INFO[rid][uid]['width_viewport'] = data.w;
         SESSION_INFO[rid][uid]['height_viewport'] = data.h;
 
-        console.log('position updated', rid);
+        var pos_data = {};
+        for (var key in SESSION_INFO[rid]) {
+            if (cid == SESSION_INFO[rid][key]['canvas_id']) {
+                pos_data[key] = SESSION_INFO[rid][key];
+            }
+        }
+        socket.broadcast.in(cid).emit('viewport_position', pos_data);
     });
 
     socket.on('image', (pos) => {
@@ -328,10 +334,15 @@ function onConnection(socket){
         if (socket.room_id) {
             delete SESSION_INFO[rid][uid];
             var members = {};
+            var pos_data = {};
             for (var key in SESSION_INFO[rid]) {
                 members[key] = SESSION_INFO[rid][key]['color'];
+                if (cid == SESSION_INFO[rid][key]['canvas_id']) {
+                    pos_data[key] = SESSION_INFO[rid][key];
+                }
             }
             socket.broadcast.in(rid).emit('session_update', members);
+            socket.broadcast.in(cid).emit('viewport_position', pos_data);
             console.log(uid, "left", rid);
         }
     });
