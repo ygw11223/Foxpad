@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import ProgressBar from 'react-bootstrap/ProgressBar'
 import './modal.css'
 
 var fileName = null;
@@ -18,7 +19,27 @@ class ImageForm extends Component {
         this.fileSelected = this.fileSelected.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.revertPreview = this.revertPreview.bind(this);
-        this.state = {imagePreview: false}
+        this.onStreamBegin = this.onStreamBegin.bind(this);
+        this.onStream = this.onStream.bind(this);
+        this.onStreamEnd = this.onStreamEnd.bind(this);
+        this.state = {imagePreview: false, uploading: false}
+    }
+
+    onStreamBegin(fileInfo) {
+        console.log('Start uploading', fileInfo);
+        this.setState({uploading: true});
+    }
+
+    onStream(fileInfo) {
+        console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
+        var percent = fileInfo.sent / fileInfo.size * 100;
+        this.setState({uploading: true, percent: percent});
+    }
+
+    onStreamEnd(fileInfo) {
+        console.log('Upload Complete', fileInfo);
+        this.setState({uploading: false});
+        this.props.showForm();
     }
 
     revertPreview() {
@@ -32,7 +53,7 @@ class ImageForm extends Component {
         preview.appendChild(labelText);
         preview.appendChild(fileButton);
         document.getElementById("file").value = null;
-        this.setState({imagePreview: false});
+        this.setState({imagePreview: false, uploading: false, percent: 0});
     }
 
     onUploadEvent(e) {
@@ -40,7 +61,9 @@ class ImageForm extends Component {
         e.preventDefault();
         console.log("upload");
         var id = this.props.uploader.upload(fileName);
-        this.props.showForm();
+        this.props.uploader.on('start', this.onStreamBegin);
+        this.props.uploader.on('stream', this.onStream);
+        this.props.uploader.on('complete', this.onStreamEnd);
     }
 
     fileSelected(e) {
@@ -120,8 +143,11 @@ class ImageForm extends Component {
                         <label id="label" for="file">Click to choose from files</label>
                         <input type="file" id="file" style={{display: "none"}} onChange={this.fileSelected}/>
                       </div>
-                      { this.state.imagePreview === true &&
+                      { this.state.imagePreview === true && this.state.uploading === false &&
                           <input type="submit" id="submit" value="Upload" class="button" />
+                      }
+                      { this.state.uploading === true &&
+                          <ProgressBar now={this.state.percent} />
                       }
                   </form>
                 </ModalBody>

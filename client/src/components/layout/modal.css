@@ -75,3 +75,13 @@ h2 {
     font-size: 40px;
     z-index: 10;
 }
+
+.modal-dialog {
+    /* margin: 0 !important; */
+}
+
+.show {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    height: 100%;
+}
