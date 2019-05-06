@@ -9,6 +9,7 @@ var inputText = null;
 var orText = null
 var labelText = null;
 const deleteIcon = require('./delete.png');
+const pdfImage = require('./pdf.png');
 
 class ImageForm extends Component {
     constructor(props, context) {
@@ -22,7 +23,7 @@ class ImageForm extends Component {
         this.onStreamBegin = this.onStreamBegin.bind(this);
         this.onStream = this.onStream.bind(this);
         this.onStreamEnd = this.onStreamEnd.bind(this);
-        this.state = {imagePreview: false, uploading: false}
+        this.state = {imagePreview: false, uploading: false, percent: 0}
     }
 
     onStreamBegin(fileInfo) {
@@ -33,12 +34,13 @@ class ImageForm extends Component {
     onStream(fileInfo) {
         console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
         var percent = fileInfo.sent / fileInfo.size * 100;
+        console.log(percent);
         this.setState({uploading: true, percent: percent});
     }
 
     onStreamEnd(fileInfo) {
         console.log('Upload Complete', fileInfo);
-        this.setState({uploading: false});
+        this.setState({uploading: false, imagePreview: false});
         this.props.showForm();
     }
 
@@ -57,6 +59,7 @@ class ImageForm extends Component {
     }
 
     onUploadEvent(e) {
+        console.log("fileName is: ");
         console.log(fileName);
         e.preventDefault();
         console.log("upload");
@@ -104,28 +107,37 @@ class ImageForm extends Component {
         // currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-
-            if (!file.type.startsWith('image/')){ continue }
-
             const img = document.createElement("img");
-            img.classList.add("obj");
-            img.file = file;
 
-            // when setting thumbnail, want to remove all elements inside dropzone
-            if (inputFile != null && text != null && or != null && label != null) {
-                fileButton = inputFile.parentNode.removeChild(inputFile);
-                inputText = text.parentNode.removeChild(text);
-                orText = or.parentNode.removeChild(or);
-                labelText = label.parentNode.removeChild(label);
+            //if (!file.type.startsWith('image/')){ continue }
+            if (file.type.startsWith('image/')) {
+                img.classList.add("obj");
+                img.file = file;
+                const reader = new FileReader();
+                reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+                reader.readAsDataURL(file);
             }
-            preview.innerHTML = "";
-            preview.appendChild(img);
-            // inputSubmit.style.display = "block";
-            this.setState({imagePreview: true});
+            else if (file.type.startsWith('application/pdf')) {
+                console.log("in pdf");
+                img.classList.add("obj");
+                img.setAttribute('src', pdfImage);
+            }
 
-            const reader = new FileReader();
-            reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-            reader.readAsDataURL(file);
+                // when setting thumbnail, want to remove all elements inside dropzone
+                if (inputFile != null && text != null && or != null && label != null) {
+                    fileButton = inputFile.parentNode.removeChild(inputFile);
+                    inputText = text.parentNode.removeChild(text);
+                    orText = or.parentNode.removeChild(or);
+                    labelText = label.parentNode.removeChild(label);
+                }
+                preview.innerHTML = "";
+                preview.appendChild(img);
+                // inputSubmit.style.display = "block";
+                this.setState({imagePreview: true});
+
+                // const reader = new FileReader();
+                // reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+                // reader.readAsDataURL(file);
         }
     }
 
