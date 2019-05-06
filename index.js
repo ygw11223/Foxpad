@@ -72,7 +72,6 @@ setInterval(() => {
 
         if (STALE_CANVAS[cid]) {
             STALE_CANVAS[cid] = false;
-            console.log(cid);
             sockets[id].emit('update', 'canvas_preview');
         }
   }
@@ -120,7 +119,7 @@ function onConnection(socket){
         if (!(cid in DATABASE)) {
             DATABASE[cid] = {};
             SESSION_INFO[rid]['.num_canvas'] += 1;
-            console.log('new canvas');
+            console.log('New canvas created.');
             new_canvas = true;
             STALE_CANVAS[cid] = true;
         }
@@ -342,21 +341,29 @@ function onConnection(socket){
 
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
+        const cid = socket.canvas_id;
 
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
             let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 '
-                + fileInfo.uploadDir + ' ./images/' + socket.canvas_id + '.png';
+                + fileInfo.uploadDir + ' ./images/' + cid + '.png';
             exec(file_Exe, function (error, stdout, stderr) {
                 if (error !== null) {
                     console.log('Error when converting pdf: ' + error);
                 } else {
                     console.log('Pdf converted: ' + stdout);
-                    buildImages('./images/'+socket.canvas_id+'.png', socket);
+                    buildImages('./images/'+cid+'.png', socket);
                 }
             });
         } else {
             buildImages(fileInfo.uploadDir, socket)
         }
+
+        // Delay 3 second for image downloading time.
+        setTimeout(() => {
+            if (!STALE_CANVAS[cid]) {
+                STALE_CANVAS[cid] = true;
+            }
+        }, 3000);
     });
 
     uploader.on('error', (err) => {

@@ -1,5 +1,8 @@
 import React, {Component}  from 'react';
-import './minimap.css'
+import './minimap.css';
+
+const height = 135;
+const width = 240;
 
 class Minimap extends Component {
     constructor(props) {
@@ -7,7 +10,9 @@ class Minimap extends Component {
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
+        this.onDrawImage = this.onDrawImage.bind(this);
         this.generateUrl = this.generateUrl.bind(this);
+        this.clearImage = this.clearImage.bind(this);
     }
 
     generateUrl() {
@@ -16,6 +21,7 @@ class Minimap extends Component {
         previewCanvas.height = 108;
         let previewContext = previewCanvas.getContext("2d");
 
+        previewContext.drawImage(this.refs.picture, 0, 0, 192, 108);
         previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
         return previewCanvas.toDataURL('image/png');
     }
@@ -27,6 +33,7 @@ class Minimap extends Component {
     componentDidMount() {
        this.props.onRef(this);
        this.ctx = this.refs.minimap.getContext('2d');
+       this.pctx = this.refs.picture.getContext('2d');
        this.offsetY = -135/2;
        this.offsetX = -120;
        this.ctx.translate(-this.offsetX, -this.offsetY);
@@ -35,7 +42,7 @@ class Minimap extends Component {
     onRedrawEvent(data_array) {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctx.clearRect(0, 0, 240, 135); // clear the whole canvas
+        this.ctx.clearRect(0, 0, width, height); // clear the whole canvas
         this.ctx.restore(); // restore the translate offset
         var i = 0;
         for (i = 0; i < data_array.length; i++) {
@@ -69,15 +76,28 @@ class Minimap extends Component {
                       data.isEraser)
     }
 
+    onDrawImage(data, imgWidth, imgHeight) {
+        this.pctx.clearRect(0, 0, width, height);
+        this.pctx.drawImage(data, -this.offsetX - imgWidth/16, -this.offsetY - imgHeight/16, imgWidth/8, imgHeight/8);
+    }
+
+    clearImage() {
+        this.pctx.clearRect(0, 0, width, height);
+    }
+
     render() {
         return (
             <div>
               <canvas
                   ref="minimap"
                   id = "mini"
-                  height = {135}
-                  width  = {240}
-                  />
+                  height = {height}
+                  width  = {width}/>
+              <canvas
+                  ref="picture"
+                  id = "minipicture"
+                  height = {height}
+                  width  = {width}/>
             </div>
         );
     }
