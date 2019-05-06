@@ -1,9 +1,12 @@
 import React, {Component}  from 'react';
 import './minimap.css';
-
+// minimap ration is 1/8 of original canvas size
+// 16 pixel offset from right edge and bottom edge
 const height = 135;
 const width = 240;
 
+// ctx.strokeRect(50, 100, 10, 50);
+//x-position, y-position, width, height
 class Minimap extends Component {
     constructor(props) {
         super(props);
@@ -34,6 +37,7 @@ class Minimap extends Component {
        this.props.onRef(this);
        this.ctx = this.refs.minimap.getContext('2d');
        this.pctx = this.refs.picture.getContext('2d');
+       this.rctx = this.refs.rectangle.getContext('2d');
        this.offsetY = -135/2;
        this.offsetX = -120;
        this.ctx.translate(-this.offsetX, -this.offsetY);
@@ -85,6 +89,17 @@ class Minimap extends Component {
         this.pctx.clearRect(0, 0, width, height);
     }
 
+    displayUserPosition(data) {
+        this.rctx.clearRect(0, 0, width, height);
+        for (var key in data) {
+            // current doesnt update when user moves their own view
+            // only updates after other user moves
+            this.rctx.strokeStyle = data[key].color;
+            this.rctx.lineWidth = 2;
+            this.rctx.strokeRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, data[key].width_viewport/8, data[key].height_viewport/8);
+        }
+    }
+
     render() {
         return (
             <div>
@@ -96,6 +111,11 @@ class Minimap extends Component {
               <canvas
                   ref="picture"
                   id = "minipicture"
+                  height = {height}
+                  width  = {width}/>
+              <canvas
+                  ref="rectangle"
+                  id = "minirectangle"
                   height = {height}
                   width  = {width}/>
             </div>

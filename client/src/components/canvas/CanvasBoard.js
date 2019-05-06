@@ -48,6 +48,7 @@ class CanvasBoard extends Component {
     }
 
     updateViewportsPosition(data) {
+      this.minimap.displayUserPosition(data);
         for (var key in data) {
             console.log(data[key]);
         }
