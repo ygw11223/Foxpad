@@ -24,6 +24,9 @@ class ImageForm extends Component {
         this.onStream = this.onStream.bind(this);
         this.onStreamEnd = this.onStreamEnd.bind(this);
         this.state = {imagePreview: false, uploading: false, percent: 0}
+        this.props.uploader.on('start', this.onStreamBegin);
+        this.props.uploader.on('stream', this.onStream);
+        this.props.uploader.on('complete', this.onStreamEnd);
     }
 
     onStreamBegin(fileInfo) {
@@ -64,9 +67,6 @@ class ImageForm extends Component {
         e.preventDefault();
         console.log("upload");
         var id = this.props.uploader.upload(fileName);
-        this.props.uploader.on('start', this.onStreamBegin);
-        this.props.uploader.on('stream', this.onStream);
-        this.props.uploader.on('complete', this.onStreamEnd);
     }
 
     fileSelected(e) {
