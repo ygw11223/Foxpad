@@ -30,17 +30,17 @@ class Dashboard extends Component {
         var elapsed = current - previous;
 
         if (elapsed < msPerMinute) {
-            return Math.round(elapsed/1000) + ' seconds ago';
+            return Math.round(elapsed/1000) + ' seconds';
         } else if (elapsed < msPerHour) {
-            return Math.round(elapsed/msPerMinute) + ' minutes ago';
+            return Math.round(elapsed/msPerMinute) + ' minutes';
         } else if (elapsed < msPerDay ) {
-            return Math.round(elapsed/msPerHour ) + ' hours ago';
+            return Math.round(elapsed/msPerHour ) + ' hours';
         } else if (elapsed < msPerMonth) {
-            return Math.round(elapsed/msPerDay) + ' days ago';
+            return Math.round(elapsed/msPerDay) + ' days';
         } else if (elapsed < msPerYear) {
-            return Math.round(elapsed/msPerMonth) + ' months ago';
+            return Math.round(elapsed/msPerMonth) + ' months';
         } else {
-            return Math.round(elapsed/msPerYear ) + ' years ago';
+            return Math.round(elapsed/msPerYear ) + ' years';
         }
     }
 
@@ -63,19 +63,15 @@ class Dashboard extends Component {
         for (let i in canvases) {
             let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png'
             cards.push(
-                <Card className="dashboard-card"
-                    style={{
-                    flexShrink: 0,
-                    width: '288px',
-                    height: '187px',
-                    margin: '25px 25px 25px 25px',
-                    borderRadius: '8px'}}
+                <div className="dashboardCard"
                     onClick={() => {this.setState({toCanvas: true, id: canvases[i][0]})}}>
-                    <Card.Img variant="top" src={url}/>
-                    <Card.Footer style={{height: '25px', paddingTop: 0, paddingBottom: 0,}}>
-                        <small className="text-muted">Last opened {this.timeDifference(now, canvases[i][1])}</small>
-                    </Card.Footer>
-                </Card>
+                    <img className='dashboardImg' src={url}/>
+                    <div className='dashboardCardFooter'>
+                        <div className='footerBackground'></div>
+                        <i class="fas fa-history"></i>
+                        <b className='time'>{this.timeDifference(now, canvases[i][1])}</b>
+                    </div>
+                </div>
             );
         }
 
@@ -86,8 +82,8 @@ class Dashboard extends Component {
         if (cookies.get('cd_user_name') == undefined) {
             this.setState({toLogin: true});
         } else {
-            var name = cookies.get('cd_user_name');
-            document.getElementById('header').innerHTML = "Welcome " + name;
+            let name = cookies.get('cd_user_name');
+            document.getElementById('hello-name').innerHTML = "Hi! " + name;
         }
     }
 
@@ -112,14 +108,18 @@ class Dashboard extends Component {
         }
         return (
             <div id="wrapper">
+                <div id="hello">
+                    <h1 id="hello-name"></h1>
+                </div>
                 <div id="welcome">
                     <h1 id="header">Your Canvases</h1>
                 </div>
                 <div id="parent">
                     {this.renderCards()}
                     <div id="addCanvas">
-                        <button type="button" id="button" class="btn btn-outline-primary" onClick={() => this.newCanvas()}>
-                            <b>+</b>
+                        <button type="button" id="button" onClick={() => this.newCanvas()}>
+                            <p className='plus'>+</p>
+                            <b className='create'>Create New</b>
                         </button>
                     </div>
                 </div>
