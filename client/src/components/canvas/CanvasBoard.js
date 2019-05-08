@@ -45,15 +45,19 @@ class CanvasBoard extends Component {
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
+        this.following = null;
     }
 
     updateViewportsPosition(data) {
-        for (var key in data) {
-            console.log(data[key]);
+        for (let key in data) {
+            if (key === this.following) {
+                this.canvas.followCanvas(data[key].pos_x_viewport, data[key].pos_y_viewport, data[key].width_viewport, data[key].height_viewport);
+            }
         }
     }
 
     onPositionEvent(data) {
+        this.following = (data.uid === this.following ? null : data.uid);
         this.setCanvas(parseInt(data.cid));
         this.canvas.followCanvas(data.x, data.y, data.w, data.h);
     }

@@ -179,6 +179,7 @@ function onConnection(socket){
             w: SESSION_INFO[rid][uid]['width_viewport'],
             h: SESSION_INFO[rid][uid]['height_viewport'],
             cid: SESSION_INFO[rid][uid]['canvas_id'].substr(-1),
+            uid: uid,
         }
         socket.emit('position', pos);
     });

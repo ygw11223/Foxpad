@@ -118,6 +118,7 @@ class Canvas extends Component {
     }
 
     followCanvas(x, y, w, h) {
+        console.log(x, y, w, h);
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
         this.scale = 1;
@@ -311,6 +312,7 @@ class Canvas extends Component {
     }
 
     onDrawImage() {
+        console.log('drawImg', this.imageWidth, this.imageHight);
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         this.props.minimapClearImage();
         if (this.image.src === null || this.imageHight <= 0 || this.imageWidth <= 0) return;
