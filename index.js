@@ -68,10 +68,12 @@ setInterval(() => {
     for (let id in sockets) {
         let cid = sockets[id].canvas_id;
         if (cid === undefined) continue;
-        if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = true;
+        // Here and below: update preview of stale canvas in the next 2 period
+        // to compensate for data race problems.
+        if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = 2;
 
-        if (STALE_CANVAS[cid]) {
-            STALE_CANVAS[cid] = false;
+        if (STALE_CANVAS[cid] > 0) {
+            STALE_CANVAS[cid] -= 1;
             sockets[id].emit('update', 'canvas_preview');
         }
   }
@@ -125,7 +127,6 @@ function onConnection(socket){
             SESSION_INFO[rid]['.num_canvas'] += 1;
             console.log('New canvas created.');
             new_canvas = true;
-            STALE_CANVAS[cid] = true;
         }
         // Initilize user information
         if (!(uid in DATABASE[cid])) {
@@ -143,6 +144,7 @@ function onConnection(socket){
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
         socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
+        STALE_CANVAS[cid] = 2;
     });
 
     // Save drawing data and broadcast to all of its peers
@@ -160,7 +162,7 @@ function onConnection(socket){
         socket.broadcast.in(cid).emit('drawing', data);
         // Mark canvas as stale
         if (!STALE_CANVAS[cid]) {
-            STALE_CANVAS[cid] = true;
+            STALE_CANVAS[cid] = 2;
         }
     });
 
@@ -252,25 +254,24 @@ function onConnection(socket){
 
         // We assume each canvas only have one background image.
         if (cid in IMAGES) {
-            // Find the proper default resolution level of the image,
-            // which is the image of biggest size that can fit into the canvas.
-            var level = MaxImageLevel;
-            var width = IMAGES[cid].w;
-            var height = IMAGES[cid].h;
-            while (level > 0) {
-                if (1280 >= width && 720 >= height) {
-                    break;
-                }
-                level -= 1;
-                width /= 2;
-                height /= 2;
+            let level = pos.l;
+            let data = {
+                w: IMAGES[cid].w,
+                h: IMAGES[cid].h,
+                url: IMAGES[cid].name + level + '.png'
+            };
+            // Determine image width and height, fitting into a area of 864x1568
+            if (data.w/data.h > 1568/864) {
+                data.h = Math.floor(1568*data.h/data.w);
+                data.w = 1568;
+            } else {
+                data.w = Math.floor(864*data.w/data.h);
+                data.h = 864;
             }
-            // Add the relative zooming level of the canvas.
-            level += pos.l;
 
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
-                socket.emit('image', IMAGES[cid].name + level + '.png');
+                socket.emit('image', data);
                 console.log('Image sent.');
             }
         } else {
@@ -408,12 +409,7 @@ function onConnection(socket){
             buildImages(fileInfo.uploadDir, socket)
         }
 
-        // Delay 3 second for image downloading time.
-        setTimeout(() => {
-            if (!STALE_CANVAS[cid]) {
-                STALE_CANVAS[cid] = true;
-            }
-        }, 3000);
+        STALE_CANVAS[cid] = 2;
     });
 
     uploader.on('error', (err) => {

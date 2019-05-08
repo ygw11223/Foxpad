@@ -52,6 +52,7 @@ class Canvas extends Component {
         this.onMouseSideMove = this.onMouseSideMove.bind(this);
         this.initializeScale = this.initializeScale.bind(this);
         this.followCanvas = this.followCanvas.bind(this);
+
         this.fileInput = React.createRef();
         this.offsetX = 0;
         this.offsetY = 0;
@@ -292,18 +293,19 @@ class Canvas extends Component {
 
     onImageEvent(data) {
         if (data === 'NONE') {
+            this.nextImage.src = null;
             this.image.src = null;
         } else {
-            this.nextImage.src = data;
+            if (this.imageHight <= 0 || this.imageWidth <= 0) {
+                this.imageHight = data.h/this.scale;
+                this.imageWidth = data.w/this.scale;
+            }
+            this.nextImage.src = data.url;
         }
     }
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
-        if (this.imageHight <= 0 || this.imageWidth <= 0) {
-            this.imageHight = this.nextImage.height/this.scale;
-            this.imageWidth = this.nextImage.width/this.scale;
-        }
         this.imageScale += 1;
         this.onEmitImg();
     }
