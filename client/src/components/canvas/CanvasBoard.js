@@ -129,9 +129,8 @@ class CanvasBoard extends Component {
         if (canvases == undefined) {
             canvases = {}
         }
-
         canvases[this.props.match.params.id] = new Date().getTime();
-        cookies.set('cd_test_canvases', canvases);
+        cookies.set('cd_test_canvases', canvases, {path: '/'});
     }
 
     onDrawingEvent(data) {

@@ -25,7 +25,7 @@ class Login extends React.Component {
     }
 
     onSubmit() {
-        cookies.set('cd_user_name', this.state.user_name);
+        cookies.set('cd_user_name', this.state.user_name,  {path: '/'});
         console.log(this.props.location);
         if (this.props.location.state === undefined) {
             this.setState({toDashboard: true});
