@@ -386,9 +386,12 @@ class Canvas extends Component {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
             // Position not changed
-            if(dx === 0 && dy === 0)
+            if(dx === 0 && dy === 0) {
+                document.getElementById('mainCanvas').style.cursor = 'default';
                 return;
+            }
 
+            document.getElementById('mainCanvas').style.cursor = 'move';
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
@@ -560,7 +563,7 @@ class Canvas extends Component {
 
     render() {
         return (
-            <div>
+            <div id="mainCanvas">
                 <canvas
                     ref="mouse"
                     style={styleMouse}
