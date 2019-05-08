@@ -10,6 +10,7 @@ const styleMouse = {
     position:'absolute',
     left:'0px',
     top:'0px',
+    touchAction: 'none',
 };
 
 const styleCanvas = {
@@ -211,10 +212,16 @@ class Canvas extends Component {
            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
        });
+       let id = "mouse-listener"
+       document.getElementById(id).addEventListener('touchstart',  this.onMouseDown, { passive: false });
+       document.getElementById(id).addEventListener('touchmove',   this.onMouseMove, { passive: false });
+       document.getElementById(id).addEventListener('touchend',    this.onMouseUp,   { passive: false });
+       document.getElementById(id).addEventListener('touchcancel', this.onMouseUp,   { passive: false });
     }
 
     componentWillMount() {
         this.setState({height: window.innerHeight, width: window.innerWidth});
+
     }
 
     updateDimensions() {
@@ -404,6 +411,7 @@ class Canvas extends Component {
     }
 
     onMouseMove(e) {
+        e.preventDefault();
         let currentX = 0;
         let currentY = 0;
         this.move_active = true;
@@ -473,7 +481,8 @@ class Canvas extends Component {
         // console.log(this.preX, this.preY);
     }
 
-    onMouseUp() {
+    onMouseUp(e) {
+        e.preventDefault();
         this.setState({ active: false });
     }
 
@@ -563,17 +572,18 @@ class Canvas extends Component {
             <div>
                 <canvas
                     ref="mouse"
+                    id="mouse-listener"
                     style={styleMouse}
                     height = {this.state.height }
                     width  = {this.state.width}
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={()=>{this.move_active = false;this.setState({ active: false });}}
-                    onTouchStart={this.onMouseDown}
-                    onTouchMove={this.onMouseMove}
-                    onTouchEnd={this.onMouseUp}
-                    onTouchCancel={this.onMouseUp}
+                    onMouseOut={(e)=>{
+                                        e.preventDefault();
+                                        this.move_active = false;
+                                        this.setState({ active: false });
+                                    }}
                     onWheel={this.onScrollEvent}/>
 
                 <canvas
