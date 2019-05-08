@@ -421,7 +421,7 @@ class Canvas extends Component {
             this.props.socket.emit("mouse_position",
                                    {x: this.mapWindowToCanvas(currentX, this.offsetX),
                                     y: this.mapWindowToCanvas(currentY, this.offsetY),
-                                    w: this.props.lineWidth});
+                                    w: this.props.lineWidth * this.scale / 2 });
         }
         else if(e.type === "touchmove") {
             let rect = this.refs.canvas.getBoundingClientRect();
@@ -465,7 +465,7 @@ class Canvas extends Component {
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
-                          this.props.lineWidth,
+                          this.props.lineWidth * this.scale,
                           this.props.eraser,
                           1)
             this.props.minimapDraw(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -473,7 +473,7 @@ class Canvas extends Component {
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
-                          this.props.lineWidth,
+                          this.props.lineWidth * this.scale,
                           this.props.eraser);
         }
         this.preX = currentX;
