@@ -131,9 +131,9 @@ class Canvas extends Component {
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
         let zoom_factor = 0;
-        let widthScale = Math.log(this.state.width / w)/Math.log(1.1);
-        let hightScale = Math.log(this.state.height / h)/Math.log(1.1);
-        zoom_factor = widthScale > hightScale ? widthScale : hightScale;
+        let widthScale = Math.floor(Math.log(this.state.width / w)/Math.log(1.1));
+        let hightScale = Math.floor(Math.log(this.state.height / h)/Math.log(1.1));
+        zoom_factor = widthScale < hightScale ? widthScale : hightScale;
         if(zoom_factor > 0){
             zoom_factor = Math.pow(1.1, zoom_factor);
             this.scale      /= zoom_factor;
@@ -144,19 +144,19 @@ class Canvas extends Component {
             this.ctx.scale(zoom_factor,zoom_factor);
             this.mctx.scale(zoom_factor,zoom_factor);
         }
-        let dx = this.mapWindowToCanvas(0, this.offsetX) - x;
-        let dy = this.mapWindowToCanvas(0, this.offsetY) - y;
+        let dx = this.mapWindowToCanvas(this.state.width/2, this.offsetX) - x - w/2;
+        let dy = this.mapWindowToCanvas(this.state.height/2, this.offsetY) - y - h/2;
 
-        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
-            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
-        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
-            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
-        }
-        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
-            dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
-        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
-            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
-        }
+        // if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+        //     dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        // } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+        //     dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        // }
+        // if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+        //     dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        // } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+        //     dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        // }
         if(dx === 0 && dy === 0)
             return;
         this.offsetX -= dx;
@@ -170,7 +170,7 @@ class Canvas extends Component {
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
-
+        console.log(w,h,this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY));
     }
 
     onEmitImg() {
@@ -188,6 +188,9 @@ class Canvas extends Component {
         }
         this.onDrawImage();
         this.ctx.beginPath();
+        this.ctx.arc(this.mapWindowToCanvas(this.state.width/2, this.offsetX), this.mapWindowToCanvas(this.state.height/2, this.offsetY), 5, 0, 2 * Math.PI);
+        this.ctx.fillStyle = "blue";
+        this.ctx.fill();
         this.ctx.rect(-960,-540,1920,1080);
         this.ctx.stroke();
         this.ctx.closePath();
@@ -319,7 +322,6 @@ class Canvas extends Component {
     }
 
     onDrawImage() {
-        console.log('drawImg', this.imageWidth, this.imageHight);
         this.pctx.clearRect(0, 0, this.state.width, this.state.height);
         this.props.minimapClearImage();
         if (this.image.src === null || this.imageHight <= 0 || this.imageWidth <= 0) return;
