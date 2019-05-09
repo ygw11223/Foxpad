@@ -14,9 +14,21 @@ class CardStack extends React.Component {
             color: '#42c8f4',
             members: {},
             current_canvas: 1,
+            lock: false,
         }
         this.updateHoverId = this.updateHoverId.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
+        this.lockCard = this.lockCard.bind(this);
+    }
+
+    lockCard(id) {
+        if (id != this.state.hoverId) {
+            this.setState({hoverId: id});
+        } else {
+            this.setState((prevState) => ({
+                lock: !prevState.lock,
+            }));
+        }
     }
 
     renderCard(key, index) {
@@ -26,15 +38,20 @@ class CardStack extends React.Component {
                     color={this.state.members[key]}
                     updateHoverId={this.updateHoverId}
                     hoverId={this.state.hoverId}
-                    socket={this.props.socket}/>
+                    socket={this.props.socket}
+                    lockCard={this.lockCard}/>
     }
 
     updateHoverId(id) {
-        this.setState({hoverId : id});
+        if (!this.state.lock) {
+            this.setState({hoverId : id});
+        }
     }
 
     onMouseOut() {
-        this.setState({hoverId : 0});
+        if (!this.state.lock) {
+            this.setState({hoverId : 0});
+        }
     }
 
     componentDidMount() {
