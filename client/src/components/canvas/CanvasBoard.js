@@ -15,7 +15,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar: true, following: null};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -45,20 +45,25 @@ class CanvasBoard extends Component {
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
         this.cid = 1;
-        this.following = null;
     }
 
     updateViewportsPosition(data) {
         for (let key in data) {
-            if (key === this.following) {
+            if (key === this.state.following) {
+                let cid = parseInt(data[key].canvas_id.substr(-1));
+                if (cid === 0) cid = 10;
+                this.setCanvas(cid);
                 this.canvas.followCanvas(data[key].pos_x_viewport, data[key].pos_y_viewport, data[key].width_viewport, data[key].height_viewport);
             }
         }
     }
 
     onPositionEvent(data) {
-        this.following = (data.uid === this.following ? null : data.uid);
-        this.setCanvas(parseInt(data.cid));
+        let following = (data.uid === this.state.following ? null : data.uid);
+        this.setState({following: following});
+        let cid = parseInt(data.cid);
+        if (cid === 0) cid = 10;
+        this.setCanvas(cid);
         this.canvas.followCanvas(data.x, data.y, data.w, data.h);
     }
 
@@ -101,6 +106,7 @@ class CanvasBoard extends Component {
         }
     }
 
+    // Function will be called after server init.
     canvas_update(num) {
         this.canvasList.setState({num_canvas: num});
     }
