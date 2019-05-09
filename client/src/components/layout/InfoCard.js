@@ -50,8 +50,11 @@ class InfoCard extends Component {
         }
 
         return (
-            <div style={styleD} onClick={() => {
-                this.props.socket.emit('position', this.props.name);}}>
+            <div style={styleD} 
+                onClick={() => {
+                    this.props.socket.emit('position', this.props.name);
+                    this.props.lockCard(this.props.id);
+                }}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
                     <CardBody style={{padding: 10}}>
