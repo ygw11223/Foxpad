@@ -94,9 +94,16 @@ class Minimap extends Component {
         for (var key in data) {
             // current doesnt update when user moves their own view
             // only updates after other user moves
-            this.rctx.strokeStyle = data[key].color;
-            this.rctx.lineWidth = 2;
-            this.rctx.strokeRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, data[key].width_viewport/8, data[key].height_viewport/8);
+            var viewport_width = data[key].width_viewport/8;
+            var viewport_height = data[key].height_viewport/8;
+            if (viewport_width <= 10 || viewport_height <= 6) {
+                this.rctx.fillStyle = data[key].color;
+                this.rctx.fillRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, viewport_width, viewport_height);
+            } else {
+                this.rctx.strokeStyle = data[key].color;
+                this.rctx.lineWidth = 2;
+                this.rctx.strokeRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, viewport_width, viewport_height);
+            }
         }
     }
 

@@ -167,7 +167,6 @@ class Canvas extends Component {
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
-
     }
 
     onEmitImg() {
@@ -399,7 +398,7 @@ class Canvas extends Component {
                 y: this.mapWindowToCanvas(0, this.offsetY),
                 w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
                 h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-            })
+            });
         }
     }
 
@@ -450,6 +449,13 @@ class Canvas extends Component {
                 w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
                 h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
             });
+            // this.props.minimapDisplayUserPosition(
+            //   {
+            //       x: this.mapWindowToCanvas(0, this.offsetX),
+            //       y: this.mapWindowToCanvas(0, this.offsetY),
+            //       w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
+            //       h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
+            //   });
         }
         else if (this.state.active) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -544,7 +550,7 @@ class Canvas extends Component {
             y: this.mapWindowToCanvas(0, this.offsetY),
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-        })
+        });
     }
 
     onScrollEvent(event) {
