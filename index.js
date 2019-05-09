@@ -64,6 +64,8 @@ app.get('*', function (req, res) {
 
 setInterval(() => {
     let sockets = io.sockets.clients()['connected'];
+    let updated = new Set();
+
 
     for (let id in sockets) {
         let cid = sockets[id].canvas_id;
@@ -72,8 +74,9 @@ setInterval(() => {
         // to compensate for data race problems.
         if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = 2;
 
-        if (STALE_CANVAS[cid] > 0) {
+        if (STALE_CANVAS[cid] > 0 && !updated.has(cid)) {
             STALE_CANVAS[cid] -= 1;
+            updated.add(cid);
             sockets[id].emit('update', 'canvas_preview');
         }
   }
@@ -237,13 +240,7 @@ function onConnection(socket){
         SESSION_INFO[rid][uid]['width_viewport'] = data.w;
         SESSION_INFO[rid][uid]['height_viewport'] = data.h;
 
-        var pos_data = {};
-        for (var key in SESSION_INFO[rid]) {
-            if (cid == SESSION_INFO[rid][key]['canvas_id']) {
-                pos_data[key] = SESSION_INFO[rid][key];
-            }
-        }
-        socket.broadcast.in(cid).emit('viewport_position', pos_data);
+        socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
     });
 
     socket.on('image', (pos) => {

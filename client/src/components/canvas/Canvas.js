@@ -119,7 +119,7 @@ class Canvas extends Component {
     }
 
     followCanvas(x, y, w, h) {
-        console.log(x, y, w, h);
+        // console.log(x, y, w, h);
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
         this.scale = 1;
@@ -170,7 +170,7 @@ class Canvas extends Component {
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
-        console.log(w,h,this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY));
+        // console.log(w,h,this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY));
     }
 
     onEmitImg() {
