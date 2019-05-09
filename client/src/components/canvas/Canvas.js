@@ -130,8 +130,8 @@ class Canvas extends Component {
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
         let zoom_factor = 0;
-        let widthScale = Math.floor(Math.log(this.state.width / w)/Math.log(1.1));
-        let hightScale = Math.floor(Math.log(this.state.height / h)/Math.log(1.1));
+        let widthScale = Math.log(this.state.width / w)/Math.log(1.1);
+        let hightScale = Math.log(this.state.height / h)/Math.log(1.1);
         zoom_factor = widthScale < hightScale ? widthScale : hightScale;
         if(zoom_factor > 0){
             zoom_factor = Math.pow(1.1, zoom_factor);
@@ -169,7 +169,6 @@ class Canvas extends Component {
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
-        // console.log(w,h,this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY));
     }
 
     onEmitImg() {
