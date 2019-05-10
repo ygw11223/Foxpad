@@ -74,10 +74,12 @@ class CanvasBoard extends Component {
     }
 
     onImageEvent(data) {
-        if (data === 'NONE') {
-            this.sidebar.showImageButton();
-        } else {
-            this.sidebar.hideImageButton();
+        if (this.sidebar !== null) {
+            if (data === 'NONE') {
+                this.sidebar.showImageButton();
+            } else {
+                this.sidebar.hideImageButton();
+            }
         }
         this.canvas.onImageEvent(data);
     }
@@ -124,8 +126,10 @@ class CanvasBoard extends Component {
         this.cardDeck.state.color = color;
         this.cardDeck.state.members = data;
         this.cardDeck.forceUpdate();
-        this.canvasList.setState({'color': color});
-        this.navbar.setState({'color': color});
+        if(this.canvasList !== null)
+            this.canvasList.setState({'color': color});
+        if(this.navbar !== null)
+            this.navbar.setState({'color': color});
     }
 
     onInitCanvas() {
