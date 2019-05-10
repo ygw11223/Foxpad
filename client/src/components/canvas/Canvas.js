@@ -308,6 +308,7 @@ class Canvas extends Component {
                 this.imageWidth = data.w/this.scale;
             }
             this.nextImage.src = data.url;
+            this.setState({modal: false});
         }
     }
 

@@ -39,17 +39,16 @@ class ImageForm extends Component {
         var percent = Math.round(fileInfo.sent / fileInfo.size * 100);
         var incrementPercent = 0;
         console.log(percent);
-        if (percent == incrementPercent + 10) {
-            incrementPercent = percent;
-            console.log(incrementPercent);
-            this.setState({uploading: true, percent: incrementPercent});
+        if (percent % 10 == 0) {;
+            console.log("here");
+            console.log(percent);
+            this.setState({uploading: true, percent: percent});
         }
     }
 
     onStreamEnd(fileInfo) {
         console.log('Upload Complete', fileInfo);
         this.setState({uploading: false, imagePreview: false});
-        this.props.showForm();
     }
 
     revertPreview() {
