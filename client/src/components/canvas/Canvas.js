@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
 import Modal from '../layout/ImageForm.js'
-
+import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
 
@@ -10,6 +10,7 @@ const styleMouse = {
     position:'absolute',
     left:'0px',
     top:'0px',
+    touchAction: 'none',
 };
 
 const styleCanvas = {
@@ -146,16 +147,17 @@ class Canvas extends Component {
         let dx = this.mapWindowToCanvas(this.state.width/2, this.offsetX) - x - w/2;
         let dy = this.mapWindowToCanvas(this.state.height/2, this.offsetY) - y - h/2;
 
-        // if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
-        //     dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
-        // } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
-        //     dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
-        // }
-        // if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
-        //     dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
-        // } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
-        //     dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
-        // }
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        }
+
         if(dx === 0 && dy === 0)
             return;
         this.offsetX -= dx;
@@ -215,10 +217,16 @@ class Canvas extends Component {
            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
        });
+       let id = "mouse-listener"
+       document.getElementById(id).addEventListener('touchstart',  this.onMouseDown, { passive: false });
+       document.getElementById(id).addEventListener('touchmove',   this.onMouseMove, { passive: false });
+       document.getElementById(id).addEventListener('touchend',    this.onMouseUp,   { passive: false });
+       document.getElementById(id).addEventListener('touchcancel', this.onMouseUp,   { passive: false });
     }
 
     componentWillMount() {
         this.setState({height: window.innerHeight, width: window.innerWidth});
+
     }
 
     updateDimensions() {
@@ -350,7 +358,7 @@ class Canvas extends Component {
         }
         this.preX = currentX;
         this.preY = currentY;
-        if(!this.props.mode){
+        if(this.props.mode === DRAWING){
             this.props.socket.emit('command', 'new_stroke');
         }
     }
@@ -364,6 +372,8 @@ class Canvas extends Component {
     }
 
     onMouseSideMove() {
+        if (this.props.mode === VIEWING)
+            return;
         if(!this.state.active && this.move_active) {
             var dx =  this.mapWindowToCanvas(this.state.width*0.02, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
@@ -412,6 +422,7 @@ class Canvas extends Component {
     }
 
     onMouseMove(e) {
+        e.preventDefault();
         let currentX = 0;
         let currentY = 0;
         this.move_active = true;
@@ -421,7 +432,7 @@ class Canvas extends Component {
             this.props.socket.emit("mouse_position",
                                    {x: this.mapWindowToCanvas(currentX, this.offsetX),
                                     y: this.mapWindowToCanvas(currentY, this.offsetY),
-                                    w: this.props.lineWidth});
+                                    w: this.props.lineWidth * this.scale / 2 });
         }
         else if(e.type === "touchmove") {
             let rect = this.refs.canvas.getBoundingClientRect();
@@ -429,7 +440,7 @@ class Canvas extends Component {
             currentY = e.touches[0].clientY - rect.top;
         }
 
-        if(this.props.mode && this.state.active){
+        if(this.props.mode === DRAGGING && this.state.active){
             let dx =  this.mapWindowToCanvas(currentX , this.offsetX)
                     - this.mapWindowToCanvas(this.preX, this.offsetX);
             let dy =  this.mapWindowToCanvas(currentY , this.offsetY)
@@ -459,13 +470,13 @@ class Canvas extends Component {
                 h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
             });
         }
-        else if (this.state.active) {
+        else if (this.state.active && this.props.mode === DRAWING) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
-                          this.props.lineWidth,
+                          this.props.lineWidth * this.scale,
                           this.props.eraser,
                           1)
             this.props.minimapDraw(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -473,7 +484,7 @@ class Canvas extends Component {
                           this.mapWindowToCanvas(currentX, this.offsetX),
                           this.mapWindowToCanvas(currentY, this.offsetY),
                           this.props.color,
-                          this.props.lineWidth,
+                          this.props.lineWidth * this.scale,
                           this.props.eraser);
         }
         this.preX = currentX;
@@ -481,11 +492,14 @@ class Canvas extends Component {
         // console.log(this.preX, this.preY);
     }
 
-    onMouseUp() {
+    onMouseUp(e) {
+        e.preventDefault();
         this.setState({ active: false });
     }
 
     zoom(direction, zoom_factor, x, y) {
+        if (this.props.mode === VIEWING)
+            return;
         // cursor positon; if using button, set center of view port as cursor positon.
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
@@ -496,7 +510,7 @@ class Canvas extends Component {
         let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
         if(this.scale/factor > this.initialScale) {
-            factor = this.initialScale/this.scale;
+            factor = this.scale/this.initialScale;
         }
         // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
@@ -571,17 +585,18 @@ class Canvas extends Component {
             <div id="mainCanvas">
                 <canvas
                     ref="mouse"
+                    id="mouse-listener"
                     style={styleMouse}
                     height = {this.state.height }
                     width  = {this.state.width}
                     onMouseDown={this.onMouseDown}
                     onMouseMove={this.onMouseMove}
                     onMouseUp={this.onMouseUp}
-                    onMouseOut={()=>{this.move_active = false;this.setState({ active: false });}}
-                    onTouchStart={this.onMouseDown}
-                    onTouchMove={this.onMouseMove}
-                    onTouchEnd={this.onMouseUp}
-                    onTouchCancel={this.onMouseUp}
+                    onMouseOut={(e)=>{
+                                        e.preventDefault();
+                                        this.move_active = false;
+                                        this.setState({ active: false });
+                                    }}
                     onWheel={this.onScrollEvent}/>
 
                 <canvas

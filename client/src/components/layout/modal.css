@@ -1,8 +1,14 @@
 .modal-content {
     border-radius: 20px !important;
     width: 600px !important;
+    box-shadow: 0 5px 5px #333;
+    margin: 0 auto;
 }
-
+.modal {
+    background-color: transparent;
+    box-shadow: none;
+    margin: 0 auto;
+}
 h2 {
     font-family: 'Roboto', sans-serif;
     font-size: 40px !important;

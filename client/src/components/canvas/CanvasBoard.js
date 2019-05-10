@@ -9,13 +9,14 @@ import Minimap from './minimap/Minimap';
 import CanvasList from './CanvasList';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
+import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
 
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar: true, following: null};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: null};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -60,6 +61,11 @@ class CanvasBoard extends Component {
 
     onPositionEvent(data) {
         let following = (data.uid === this.state.following ? null : data.uid);
+        if(following === null) {
+            this.setState({mode: DRAWING});
+        } else {
+            this.setState({mode: VIEWING});
+        }
         this.setState({following: following});
         let cid = parseInt(data.cid);
         if (cid === 0) cid = 10;
@@ -215,7 +221,7 @@ class CanvasBoard extends Component {
     }
 
     onDrag(mode){
-        this.setState({mode: mode});
+        this.setState({mode: mode ? DRAGGING : DRAWING});
     }
 
     onEraser(e) {
@@ -266,27 +272,28 @@ class CanvasBoard extends Component {
                             minimapClearImage={this.minimapClearImage}/>
 
                     <InfoCards
-                            onRef={ref => (this.cardDeck= ref)}
+                            onRef={ref => (this.cardDeck = ref)}
                             name={this.uid}
                             hideNavbar={this.state.hideNavbar}
                             socket={this.socket}/>
 
-                    <Sidebar
-                            onRef={ref => (this.sidebar= ref)}
-                            onChangeColor={this.changeColor}
-                            onChangeWidth={this.changeWidth}
-                            onUndo={this.onUndoEvent}
-                            onDrag={this.onDrag}
-                            onZoom={this.onZoom}
-                            showForm={this.showForm}
-                            onEraser={this.onEraser}
-                            hideNavbar={this.state.hideNavbar}/>
-
-                    <Navbar
+                    {this.state.mode === VIEWING ? (""):(
+                        <Sidebar
+                                onRef={ref => (this.sidebar= ref)}
+                                onChangeColor={this.changeColor}
+                                onChangeWidth={this.changeWidth}
+                                onUndo={this.onUndoEvent}
+                                onDrag={this.onDrag}
+                                onZoom={this.onZoom}
+                                showForm={this.showForm}
+                                onEraser={this.onEraser}
+                                hideNavbar={this.state.hideNavbar}/>)}
+                    {this.state.mode === VIEWING ? (""):(
+                        <Navbar
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
-                            hideNavbar={this.state.hideNavbar}/>
+                            hideNavbar={this.state.hideNavbar}/>)}
                 </div>
             </div>
         );
