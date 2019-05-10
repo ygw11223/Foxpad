@@ -147,16 +147,16 @@ class Canvas extends Component {
         let dx = this.mapWindowToCanvas(this.state.width/2, this.offsetX) - x - w/2;
         let dy = this.mapWindowToCanvas(this.state.height/2, this.offsetY) - y - h/2;
 
-        // if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
-        //     dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
-        // } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
-        //     dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
-        // }
-        // if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
-        //     dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
-        // } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
-        //     dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
-        // }
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        }
         if(dx === 0 && dy === 0)
             return;
         this.offsetX -= dx;
@@ -188,9 +188,6 @@ class Canvas extends Component {
         }
         this.onDrawImage();
         this.ctx.beginPath();
-        this.ctx.arc(this.mapWindowToCanvas(this.state.width/2, this.offsetX), this.mapWindowToCanvas(this.state.height/2, this.offsetY), 5, 0, 2 * Math.PI);
-        this.ctx.fillStyle = "blue";
-        this.ctx.fill();
         this.ctx.rect(-960,-540,1920,1080);
         this.ctx.stroke();
         this.ctx.closePath();
@@ -506,7 +503,7 @@ class Canvas extends Component {
         let factor = Math.pow(zoom_factor === undefined ? 2 : zoom_factor, direction);//set scale factor to 2
         // set base scale, cannot zoom out further
         if(this.scale/factor > this.initialScale) {
-            factor = this.initialScale/this.scale;
+            factor = this.scale/this.initialScale;
         }
         // translate (0, 0) to cursor point
         this.ctx.translate(preX_T, preY_T);
