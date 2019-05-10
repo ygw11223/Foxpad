@@ -2,13 +2,18 @@
     border-radius: 20px !important;
     width: 600px !important;
     box-shadow: 0 5px 5px #333;
-    margin: 0 auto;
+    position: absolute;
+    left: 50%;
+    margin-left: -300px;
+    margin-top: 100px;
 }
+
 .modal {
     background-color: transparent;
     box-shadow: none;
-    margin: 0 auto;
+    max-height: 100%;
 }
+
 h2 {
     font-family: 'Roboto', sans-serif;
     font-size: 40px !important;
@@ -59,7 +64,6 @@ h2 {
     margin-top: 20px;
     color: #FFFFFF !important;
     font-size: 20px;
-    /* display: none; */
 
     border: none !important;
 	width: 90px !important;
@@ -82,12 +86,8 @@ h2 {
     z-index: 10;
 }
 
-.modal-dialog {
-    /* margin: 0 !important; */
-}
-
-.show {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    height: 100%;
+#progressBar {
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 20px;
 }
