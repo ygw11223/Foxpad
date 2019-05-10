@@ -50,6 +50,7 @@ class Sidebar extends React.Component {
 
     updateColor(value) {
         this.setState({color: value});
+        this.onPen();
     }
 
     onPen() {

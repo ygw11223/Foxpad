@@ -31,14 +31,19 @@ class ImageForm extends Component {
 
     onStreamBegin(fileInfo) {
         console.log('Start uploading', fileInfo);
-        this.setState({uploading: true});
+        this.setState({uploading: true, percent: 0});
     }
 
     onStream(fileInfo) {
         console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
-        var percent = fileInfo.sent / fileInfo.size * 100;
+        var percent = Math.round(fileInfo.sent / fileInfo.size * 100);
+        var incrementPercent = 0;
         console.log(percent);
-        this.setState({uploading: true, percent: percent});
+        if (percent == incrementPercent + 10) {
+            incrementPercent = percent;
+            console.log(incrementPercent);
+            this.setState({uploading: true, percent: incrementPercent});
+        }
     }
 
     onStreamEnd(fileInfo) {
@@ -113,6 +118,8 @@ class ImageForm extends Component {
             if (file.type.startsWith('image/')) {
                 img.classList.add("obj");
                 img.file = file;
+                img.style.width = "450px";
+                img.style.height = "250px";
                 const reader = new FileReader();
                 reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
                 reader.readAsDataURL(file);
@@ -132,12 +139,7 @@ class ImageForm extends Component {
                 }
                 preview.innerHTML = "";
                 preview.appendChild(img);
-                // inputSubmit.style.display = "block";
                 this.setState({imagePreview: true});
-
-                // const reader = new FileReader();
-                // reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-                // reader.readAsDataURL(file);
         }
     }
 
@@ -159,7 +161,7 @@ class ImageForm extends Component {
                           <input type="submit" id="submit" value="Upload" class="button" />
                       }
                       { this.state.uploading === true &&
-                          <ProgressBar now={this.state.percent} />
+                          <ProgressBar id="progressBar" now={this.state.percent} />
                       }
                   </form>
                 </ModalBody>
