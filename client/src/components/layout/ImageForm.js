@@ -37,11 +37,8 @@ class ImageForm extends Component {
     onStream(fileInfo) {
         console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
         var percent = Math.round(fileInfo.sent / fileInfo.size * 100);
-        var incrementPercent = 0;
         console.log(percent);
         if (percent % 10 == 0) {;
-            console.log("here");
-            console.log(percent);
             this.setState({uploading: true, percent: percent});
         }
     }
