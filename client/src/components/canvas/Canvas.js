@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
 import Modal from '../layout/ImageForm.js'
-
+import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
 
@@ -355,7 +355,7 @@ class Canvas extends Component {
         }
         this.preX = currentX;
         this.preY = currentY;
-        if(!this.props.mode){
+        if(this.props.mode === DRAWING){
             this.props.socket.emit('command', 'new_stroke');
         }
     }
@@ -369,6 +369,8 @@ class Canvas extends Component {
     }
 
     onMouseSideMove() {
+        if (this.props.mode === VIEWING)
+            return;
         if(!this.state.active && this.move_active) {
             var dx =  this.mapWindowToCanvas(this.state.width*0.02, this.offsetX)
                     - this.mapWindowToCanvas(0, this.offsetX);
@@ -435,7 +437,7 @@ class Canvas extends Component {
             currentY = e.touches[0].clientY - rect.top;
         }
 
-        if(this.props.mode && this.state.active){
+        if(this.props.mode === DRAGGING && this.state.active){
             let dx =  this.mapWindowToCanvas(currentX , this.offsetX)
                     - this.mapWindowToCanvas(this.preX, this.offsetX);
             let dy =  this.mapWindowToCanvas(currentY , this.offsetY)
@@ -465,7 +467,7 @@ class Canvas extends Component {
                 h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
             });
         }
-        else if (this.state.active) {
+        else if (this.state.active && this.props.mode === DRAWING) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
                           this.mapWindowToCanvas(this.preY, this.offsetY),
                           this.mapWindowToCanvas(currentX, this.offsetX),
@@ -493,6 +495,8 @@ class Canvas extends Component {
     }
 
     zoom(direction, zoom_factor, x, y) {
+        if (this.props.mode === VIEWING)
+            return;
         // cursor positon; if using button, set center of view port as cursor positon.
         let preX = (x === undefined ? this.state.width/2 : x);
         let preY = (y === undefined ? this.state.height/2: y);
