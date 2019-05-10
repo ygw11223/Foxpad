@@ -332,15 +332,11 @@ function onConnection(socket){
         if (socket.room_id) {
             delete SESSION_INFO[rid][uid];
             var members = {};
-            var pos_data = {};
             for (var key in SESSION_INFO[rid]) {
                 members[key] = SESSION_INFO[rid][key]['color'];
-                if (cid == SESSION_INFO[rid][key]['canvas_id']) {
-                    pos_data[key] = SESSION_INFO[rid][key];
-                }
             }
             socket.broadcast.in(rid).emit('session_update', members);
-            socket.broadcast.in(cid).emit('viewport_position', pos_data);
+            socket.broadcast.in(cid).emit('viewport_position', SESSION_INFO[rid]);
             console.log(uid, "left", rid);
         }
     });

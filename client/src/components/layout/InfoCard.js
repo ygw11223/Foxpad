@@ -29,13 +29,20 @@ class InfoCard extends Component {
     }
 
     onMouseOver () {
-        this.props.updateHoverId(this.props.id);
+        if (this.props.color !== 'gray') {
+            this.props.updateHoverId(this.props.id);
+        } else {
+            this.props.updateHoverId(0);
+        }
     }
 
     render() {
         // Set offset of each card according to which card the user hovers
         var offset = this.props.id * -125;
         if (this.props.hoverId && this.props.id >= this.props.hoverId) {
+            offset += 100;
+        }
+        if (this.props.followId && this.props.hoverId !== this.props.followId && this.props.id >= this.props.followId) {
             offset += 100;
         }
 
@@ -53,7 +60,7 @@ class InfoCard extends Component {
             <div style={styleD} 
                 onClick={() => {
                     this.props.socket.emit('position', this.props.name);
-                    this.props.lockCard(this.props.id);
+                    this.props.lockCard(this.props.name);
                 }}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
