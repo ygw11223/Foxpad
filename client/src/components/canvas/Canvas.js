@@ -228,6 +228,7 @@ class Canvas extends Component {
             this.image.src = null;
         } else {
             this.nextImage.src = data;
+            this.setState({modal: false});
         }
     }
 
