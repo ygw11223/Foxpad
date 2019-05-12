@@ -102,7 +102,6 @@ class CanvasBoard extends Component {
             this.canvas.reconnect = false;
             this.onInitCanvas();
             this.props.socket.emit('command', 'update');
-
         }
     }
 

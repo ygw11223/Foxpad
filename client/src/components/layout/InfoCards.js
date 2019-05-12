@@ -76,6 +76,8 @@ class CardStack extends React.Component {
             }
             if (this.state.hoverId !== this.followId) width += 100;
             if (lastCard) width += 25;
+        } else {
+            this.followId = 0;
         }
         const style = {
             ...stackStyles,
@@ -131,7 +133,6 @@ const stackStyles = {
     borderRadius: '0 0 25px 0',
     height: 100,
     color: 'white',
-    transition: '0.5s',
     border: 0,
 };
 // TODO : Pass in background through props

@@ -40,8 +40,7 @@ class Navbar extends React.Component {
         return (
             <Button style={style}
                 eventKey="white"
-                onClick={() => this.props.onHideNavbar()}
-                backgroundColor='blue'>
+                onClick={() => this.props.onHideNavbar()}>
             <b>{this.props.icon}</b>
             </Button>
         );

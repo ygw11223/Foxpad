@@ -138,7 +138,6 @@ class Canvas extends Component {
         this.imageWidth *= this.scale;
         this.scale = 1;
         this.initialScale = 1;
-        this.imageScale = 0;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
