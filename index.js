@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
-const port =  3000;
+const port = 3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 const { exec } = require('child_process');
@@ -270,7 +270,6 @@ function onConnection(socket){
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
                 socket.emit('image', data);
-                console.log('Image sent.');
             }
         } else {
             socket.emit('image', 'NONE');
