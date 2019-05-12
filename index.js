@@ -355,6 +355,7 @@ function onConnection(socket){
         // TODO(Guowei) : Add accept format and adjust parameters later.
         // accepts: [],
         maxFileSize: 50000000,
+        overwrite: true,
     });
 
     uploader.on('start', (fileInfo) => {
