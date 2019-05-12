@@ -299,6 +299,10 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
+        // Finish progress bar when recieved image.
+        if (this.modal) {
+            this.modal.onStreamEnd();
+        }
         if (data === 'NONE') {
             this.nextImage.src = null;
             this.image.src = null;
@@ -605,6 +609,7 @@ class Canvas extends Component {
                     width  = {this.state.width }/>
 
                 <Modal
+                    onRef={ref => (this.modal= ref)}
                     showForm={this.showForm}
                     modal={this.state.modal}
                     uploader={this.props.uploader}/>

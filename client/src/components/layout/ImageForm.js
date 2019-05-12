@@ -26,7 +26,14 @@ class ImageForm extends Component {
         this.state = {imagePreview: false, uploading: false, percent: 0}
         this.props.uploader.on('start', this.onStreamBegin);
         this.props.uploader.on('stream', this.onStream);
-        this.props.uploader.on('complete', this.onStreamEnd);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
+    componentDidMount() {
+       this.props.onRef(this);
     }
 
     onStreamBegin(fileInfo) {
@@ -35,10 +42,10 @@ class ImageForm extends Component {
     }
 
     onStream(fileInfo) {
-        console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
-        var percent = Math.round(fileInfo.sent / fileInfo.size * 100);
-        console.log(percent);
-        if (percent % 10 == 0) {;
+        // console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
+        // Fake 1 percent for server image processing time.
+        var percent = Math.round(fileInfo.sent / fileInfo.size * 100) - 1;
+        if (percent >= this.state.percent + 10) {
             this.setState({uploading: true, percent: percent});
         }
     }
