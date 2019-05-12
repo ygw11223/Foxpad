@@ -77,6 +77,10 @@ class Canvas extends Component {
         this.move_active = true;
         this.initialScale = 1;
         this.stroke_array = [];
+        this.preOffsetX = -1;
+        this.preOffsetY = -1;
+        this.preScale = 1024;
+
     }
 
     initializeScale() {
@@ -171,19 +175,22 @@ class Canvas extends Component {
             dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
         }
 
-        if(dx === 0 && dy === 0)
-            return;
         this.offsetX -= dx;
         this.offsetY -= dy;
         this.ctx.translate(dx,dy);
         this.mctx.translate(dx,dy);
         this.onRedrawEvent();
+        if(this.preOffsetX === this.offsetX && this.preOffsetY === this.offsetY && this.preScale === this.scale)
+            return;
         this.props.socket.emit('viewport_position', {
             x: this.mapWindowToCanvas(0, this.offsetX),
             y: this.mapWindowToCanvas(0, this.offsetY),
             w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
+        this.preOffsetX = this.offsetX;
+        this.preOffsetY = this.offsetY;
+        this.preScale = this.scale;
     }
 
     onEmitImg() {
