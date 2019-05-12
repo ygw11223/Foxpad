@@ -115,13 +115,13 @@ class Dashboard extends Component {
                     <h1 id="header">Your Canvases</h1>
                 </div>
                 <div id="parent">
-                    {this.renderCards()}
                     <div id="addCanvas">
                         <button type="button" id="button" onClick={() => this.newCanvas()}>
                             <p className='plus'>+</p>
-                            <b className='create'>Create New</b>
+                            <p className='create'>Create New</p>
                         </button>
                     </div>
+                    {this.renderCards()}
                 </div>
             </div>
         );
