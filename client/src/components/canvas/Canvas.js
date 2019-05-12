@@ -53,6 +53,8 @@ class Canvas extends Component {
         this.onMouseSideMove = this.onMouseSideMove.bind(this);
         this.initializeScale = this.initializeScale.bind(this);
         this.followCanvas = this.followCanvas.bind(this);
+        this.cacheStroke = this.cacheStroke.bind(this);
+        this.resetStroke = this.resetStroke.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -74,6 +76,7 @@ class Canvas extends Component {
         this.nextImage.onload = this.onLoadNextImage;
         this.move_active = true;
         this.initialScale = 1;
+        this.stroke_array = [];
     }
 
     initializeScale() {
@@ -117,6 +120,17 @@ class Canvas extends Component {
             h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
         });
     }
+
+    cacheStroke(data) {
+        this.stroke_array.push(data);
+    }
+    getCachedStroke(){
+        return this.stroke_array;
+    }
+    resetStroke(data_array){
+        this.stroke_array = Array.from(data_array)
+    }
+
 
     followCanvas(x, y, w, h) {
         // console.log(x, y, w, h);
@@ -164,7 +178,7 @@ class Canvas extends Component {
         this.offsetY -= dy;
         this.ctx.translate(dx,dy);
         this.mctx.translate(dx,dy);
-        this.props.socket.emit('command', 'update');
+        this.onRedrawEvent();
         this.props.socket.emit('viewport_position', {
             x: this.mapWindowToCanvas(0, this.offsetX),
             y: this.mapWindowToCanvas(0, this.offsetY),
@@ -177,14 +191,14 @@ class Canvas extends Component {
         this.props.socket.emit('image',{w:this.state.width, h:this.state.height, l:this.imageScale});
     }
 
-    onRedrawEvent(data_array) {
+    onRedrawEvent() {
         this.ctx.save();    // save the current state of our canvas (translate offset)
         this.ctx.setTransform(1,0,0,1,0,0);
         this.ctx.clearRect(0,0,this.state.width,this.state.height); // clear the whole canvas
         this.ctx.restore(); // restore the translate offset
         var i = 0;
-        for (i = 0; i < data_array.length; i++) {
-            this.onDrawingEvent(data_array[i]);
+        for (i = 0; i < this.stroke_array.length; i++) {
+            this.onDrawingEvent(this.stroke_array[i]);
         }
         this.onDrawImage();
         this.ctx.beginPath();
@@ -240,7 +254,7 @@ class Canvas extends Component {
         this.ctx.translate(-this.offsetX, -this.offsetY);
         this.mctx.translate(-this.offsetX, -this.offsetY);
         this.initializeScale();
-        this.props.socket.emit('command', 'update');
+        this.onRedrawEvent()
     }
 
     updateMouseLocation(mouseList) {
@@ -290,6 +304,15 @@ class Canvas extends Component {
             lineWidth: lineWidth,
             isEraser: this.props.eraser,
         });
+        this.stroke_array.push({
+            x0: x0,
+            y0: y0,
+            x1: x1,
+            y1: y1,
+            color: color,
+            lineWidth: lineWidth,
+            isEraser: this.props.eraser,
+        })
     }
 
     onDrawingEvent(data) {
@@ -411,7 +434,7 @@ class Canvas extends Component {
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
-            this.props.socket.emit('command', 'update');
+            this.onRedrawEvent();
             this.props.socket.emit('viewport_position', {
                 x: this.mapWindowToCanvas(0, this.offsetX),
                 y: this.mapWindowToCanvas(0, this.offsetY),
@@ -462,7 +485,7 @@ class Canvas extends Component {
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
-            this.props.socket.emit('command', 'update');
+            this.onRedrawEvent();
             this.props.socket.emit('viewport_position', {
                 x: this.mapWindowToCanvas(0, this.offsetX),
                 y: this.mapWindowToCanvas(0, this.offsetY),
@@ -560,7 +583,7 @@ class Canvas extends Component {
             this.ctx.translate(-dx,-dy);
             this.mctx.translate(-dx,-dy);
         }
-        this.props.socket.emit('command', 'update');
+        this.onRedrawEvent();
         this.props.socket.emit('viewport_position', {
             x: this.mapWindowToCanvas(0, this.offsetX),
             y: this.mapWindowToCanvas(0, this.offsetY),

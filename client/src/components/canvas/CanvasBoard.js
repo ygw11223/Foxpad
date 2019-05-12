@@ -101,6 +101,8 @@ class CanvasBoard extends Component {
             this.cardDeck.setState({current_canvas: this.cid});
             this.canvas.reconnect = false;
             this.onInitCanvas();
+            this.props.socket.emit('command', 'update');
+
         }
     }
 
@@ -154,13 +156,15 @@ class CanvasBoard extends Component {
     }
 
     onDrawingEvent(data) {
+        this.canvas.cacheStroke(data);
         this.canvas.onDrawingEvent(data);
         this.minimap.onDrawingEvent(data);
     }
 
     onRedrawEvent(data_array) {
-        this.canvas.onRedrawEvent(data_array);
-        this.minimap.onRedrawEvent(data_array);
+        this.canvas.resetStroke(data_array);
+        this.canvas.onRedrawEvent();
+        this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
     }
 
     minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
