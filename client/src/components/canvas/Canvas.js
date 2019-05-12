@@ -300,7 +300,7 @@ class Canvas extends Component {
 
     onImageEvent(data) {
         // Finish progress bar when recieved image.
-        if (this.modal) {
+        if (this.modal && this.modal.state.uploading) {
             this.modal.onStreamEnd();
         }
         if (data === 'NONE') {

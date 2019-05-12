@@ -26,6 +26,8 @@ class ImageForm extends Component {
         this.state = {imagePreview: false, uploading: false, percent: 0}
         this.props.uploader.on('start', this.onStreamBegin);
         this.props.uploader.on('stream', this.onStream);
+        this.props.uploader.on('end', (fileInfo) => {this.fileId = -1;});
+        this.fileId = null;
     }
 
     componentWillUnmount() {
@@ -50,15 +52,22 @@ class ImageForm extends Component {
         }
     }
 
-    onStreamEnd(fileInfo) {
-        console.log('Upload Complete', fileInfo);
+    onStreamEnd() {
+        console.log('Upload Complete.');
+        this.fileId = null;
         this.setState({uploading: false, imagePreview: false});
     }
 
     revertPreview() {
-        var preview = document.getElementById("dropZone");
-        var form = document.getElementById("myform");
-        var inputSubmit = document.getElementById("submit");
+        // Doesn't allow aborting when uploading finished.
+        if (this.fileId === -1) {
+            return;
+        }
+        this.props.uploader.abort(this.fileId);
+        this.fileId = null;
+        let preview = document.getElementById("dropZone");
+        let form = document.getElementById("myform");
+        let inputSubmit = document.getElementById("submit");
 
         preview.innerHTML = "";
         preview.appendChild(inputText);
@@ -74,7 +83,7 @@ class ImageForm extends Component {
         console.log(fileName);
         e.preventDefault();
         console.log("upload");
-        var id = this.props.uploader.upload(fileName);
+        this.fileId = this.props.uploader.upload(fileName);
     }
 
     fileSelected(e) {
