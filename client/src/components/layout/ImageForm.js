@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import ProgressBar from 'react-bootstrap/ProgressBar'
 import './modal.css'
 
 var fileName = null;
@@ -8,6 +9,7 @@ var inputText = null;
 var orText = null
 var labelText = null;
 const deleteIcon = require('./delete.png');
+const pdfImage = require('./pdf.png');
 
 class ImageForm extends Component {
     constructor(props, context) {
@@ -18,13 +20,54 @@ class ImageForm extends Component {
         this.fileSelected = this.fileSelected.bind(this);
         this.onUploadEvent = this.onUploadEvent.bind(this);
         this.revertPreview = this.revertPreview.bind(this);
-        this.state = {imagePreview: false}
+        this.onStreamBegin = this.onStreamBegin.bind(this);
+        this.onStream = this.onStream.bind(this);
+        this.onStreamEnd = this.onStreamEnd.bind(this);
+        this.state = {imagePreview: false, uploading: false, percent: 0}
+        this.props.uploader.on('start', this.onStreamBegin);
+        this.props.uploader.on('stream', this.onStream);
+        this.props.uploader.on('end', (fileInfo) => {this.fileId = -1;});
+        this.fileId = null;
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(null)
+    }
+
+    componentDidMount() {
+       this.props.onRef(this);
+    }
+
+    onStreamBegin(fileInfo) {
+        console.log('Start uploading', fileInfo);
+        this.setState({uploading: true, percent: 0});
+    }
+
+    onStream(fileInfo) {
+        // console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
+        // Fake 1 percent for server image processing time.
+        var percent = Math.round(fileInfo.sent / fileInfo.size * 100) - 1;
+        if (percent >= this.state.percent + 10) {
+            this.setState({percent: percent});
+        }
+    }
+
+    onStreamEnd() {
+        console.log('Upload Complete.');
+        this.fileId = null;
+        this.setState({uploading: false, imagePreview: false});
     }
 
     revertPreview() {
-        var preview = document.getElementById("dropZone");
-        var form = document.getElementById("myform");
-        var inputSubmit = document.getElementById("submit");
+        // Doesn't allow aborting when uploading finished.
+        if (this.fileId === -1) {
+            return;
+        }
+        this.props.uploader.abort(this.fileId);
+        this.fileId = null;
+        let preview = document.getElementById("dropZone");
+        let form = document.getElementById("myform");
+        let inputSubmit = document.getElementById("submit");
 
         preview.innerHTML = "";
         preview.appendChild(inputText);
@@ -32,15 +75,15 @@ class ImageForm extends Component {
         preview.appendChild(labelText);
         preview.appendChild(fileButton);
         document.getElementById("file").value = null;
-        this.setState({imagePreview: false});
+        this.setState({imagePreview: false, uploading: false, percent: 0});
     }
 
     onUploadEvent(e) {
+        console.log("fileName is: ");
         console.log(fileName);
         e.preventDefault();
         console.log("upload");
-        var id = this.props.uploader.upload(fileName);
-        this.props.showForm();
+        this.fileId = this.props.uploader.upload(fileName);
     }
 
     fileSelected(e) {
@@ -81,28 +124,34 @@ class ImageForm extends Component {
         // currently we only support 1 file, but can be scalable for multiple in the future
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-
-            if (!file.type.startsWith('image/')){ continue }
-
             const img = document.createElement("img");
-            img.classList.add("obj");
-            img.file = file;
 
-            // when setting thumbnail, want to remove all elements inside dropzone
-            if (inputFile != null && text != null && or != null && label != null) {
-                fileButton = inputFile.parentNode.removeChild(inputFile);
-                inputText = text.parentNode.removeChild(text);
-                orText = or.parentNode.removeChild(or);
-                labelText = label.parentNode.removeChild(label);
+            //if (!file.type.startsWith('image/')){ continue }
+            if (file.type.startsWith('image/')) {
+                img.classList.add("obj");
+                img.file = file;
+                img.style.width = "450px";
+                img.style.height = "250px";
+                const reader = new FileReader();
+                reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+                reader.readAsDataURL(file);
             }
-            preview.innerHTML = "";
-            preview.appendChild(img);
-            // inputSubmit.style.display = "block";
-            this.setState({imagePreview: true});
+            else if (file.type.startsWith('application/pdf')) {
+                console.log("in pdf");
+                img.classList.add("obj");
+                img.setAttribute('src', pdfImage);
+            }
 
-            const reader = new FileReader();
-            reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-            reader.readAsDataURL(file);
+                // when setting thumbnail, want to remove all elements inside dropzone
+                if (inputFile != null && text != null && or != null && label != null) {
+                    fileButton = inputFile.parentNode.removeChild(inputFile);
+                    inputText = text.parentNode.removeChild(text);
+                    orText = or.parentNode.removeChild(or);
+                    labelText = label.parentNode.removeChild(label);
+                }
+                preview.innerHTML = "";
+                preview.appendChild(img);
+                this.setState({imagePreview: true});
         }
     }
 
@@ -120,8 +169,11 @@ class ImageForm extends Component {
                         <label id="label" for="file">Click to choose from files</label>
                         <input type="file" id="file" style={{display: "none"}} onChange={this.fileSelected}/>
                       </div>
-                      { this.state.imagePreview === true &&
+                      { this.state.imagePreview === true && this.state.uploading === false &&
                           <input type="submit" id="submit" value="Upload" class="button" />
+                      }
+                      { this.state.uploading === true &&
+                          <ProgressBar id="progressBar" now={this.state.percent} />
                       }
                   </form>
                 </ModalBody>

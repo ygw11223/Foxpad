@@ -34,6 +34,7 @@ class CanvasBoard extends Component {
         this.minimapDraw = this.minimapDraw.bind(this);
         this.minimapImage = this.minimapImage.bind(this);
         this.minimapClearImage = this.minimapClearImage.bind(this);
+        this.minimapDisplayUserPosition = this.minimapDisplayUserPosition.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
@@ -49,6 +50,7 @@ class CanvasBoard extends Component {
     }
 
     updateViewportsPosition(data) {
+        this.minimap.displayUserPosition(data);
         for (let key in data) {
             if (key === this.state.following) {
                 let cid = parseInt(data[key].canvas_id.substr(-1));
@@ -173,6 +175,10 @@ class CanvasBoard extends Component {
         this.minimap.clearImage();
     }
 
+    minimapDisplayUserPosition(data) {
+        this.minimap.displayUserPosition(data);
+    }
+
     componentDidMount() {
         let id = cookies.get('cd_user_name');
         if (id == undefined) {
@@ -269,10 +275,11 @@ class CanvasBoard extends Component {
                             eraser={this.state.eraser}
                             socket={this.socket}
                             uploader={this.uploader}
-                            name = {this.uid}
+                            name={this.uid}
                             minimapDraw={this.minimapDraw}
                             minimapImage={this.minimapImage}
-                            minimapClearImage={this.minimapClearImage}/>
+                            minimapClearImage={this.minimapClearImage}
+                            minimapDisplayUserPosition={this.minimapDisplayUserPosition}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}

@@ -11,4 +11,12 @@
   position: absolute;
   right: 16px;
   bottom: 16px;
+  background-color: white;
+}
+
+#minirectangle {
+  z-index: 4;
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
 }
