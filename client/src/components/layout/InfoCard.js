@@ -20,6 +20,7 @@ const cardDivStyle = {
     textAlign: 'center',
     flexShrink: 0,
     fontWeight: 'bold',
+    transition: '0.5s',
 }
 
 class InfoCard extends Component {
@@ -29,13 +30,20 @@ class InfoCard extends Component {
     }
 
     onMouseOver () {
-        this.props.updateHoverId(this.props.id);
+        if (this.props.color !== 'gray') {
+            this.props.updateHoverId(this.props.id);
+        } else {
+            this.props.updateHoverId(0);
+        }
     }
 
     render() {
         // Set offset of each card according to which card the user hovers
         var offset = this.props.id * -125;
         if (this.props.hoverId && this.props.id >= this.props.hoverId) {
+            offset += 100;
+        }
+        if (this.props.followId && this.props.hoverId !== this.props.followId && this.props.id >= this.props.followId) {
             offset += 100;
         }
 
@@ -50,8 +58,8 @@ class InfoCard extends Component {
         }
 
         return (
-            <div style={styleD} onClick={() => {
-                this.props.socket.emit('position', this.props.name);}}>
+            <div style={styleD} 
+                onClick={() => {this.props.lockCard(this.props.name)}}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
                     <CardBody style={{padding: 10}}>

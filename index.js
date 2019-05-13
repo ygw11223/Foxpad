@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const SocketIOFile = require('socket.io-file');
-const port =  3000;
+const port = 3000;
 const hashes = require('short-id');
 const cv = require('opencv4nodejs');
 const { exec } = require('child_process');
@@ -64,6 +64,8 @@ app.get('*', function (req, res) {
 
 setInterval(() => {
     let sockets = io.sockets.clients()['connected'];
+    let updated = new Set();
+
 
     for (let id in sockets) {
         let cid = sockets[id].canvas_id;
@@ -72,8 +74,9 @@ setInterval(() => {
         // to compensate for data race problems.
         if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = 2;
 
-        if (STALE_CANVAS[cid] > 0) {
+        if (STALE_CANVAS[cid] > 0 && !updated.has(cid)) {
             STALE_CANVAS[cid] -= 1;
+            updated.add(cid);
             sockets[id].emit('update', 'canvas_preview');
         }
   }
@@ -107,19 +110,23 @@ function onConnection(socket){
         }
         if (!(uid in SESSION_INFO[rid])) {
             console.log(uid, "joined", cid);
-        }
-        SESSION_INFO[rid][uid] = {
-            color: USER_INFO[rid][uid],
-            pos_x_mouse: 0,
-            pos_y_mouse: 0,
-            pos_x_viewport: 0,
-            pos_y_viewport: 0,
-            width_viewport: 0,
-            height_viewport: 0,
-            timestamp: 0,
-            pen_color: 0,
-            pen_width: 0,
-            canvas_id: cid,
+            SESSION_INFO[rid][uid] = {
+                color: USER_INFO[rid][uid],
+                pos_x_mouse: 0,
+                pos_y_mouse: 0,
+                pos_x_viewport: 0,
+                pos_y_viewport: 0,
+                width_viewport: 0,
+                height_viewport: 0,
+                timestamp: 0,
+                pen_color: 0,
+                pen_width: 0,
+                canvas_id: cid,
+                num: 1,
+            }
+        } else {
+            SESSION_INFO[rid][uid]['num'] += 1;
+            SESSION_INFO[rid][uid]['canvas_id'] = cid;
         }
         // Create canvas in database
         if (!(cid in DATABASE)) {
@@ -179,6 +186,7 @@ function onConnection(socket){
             w: SESSION_INFO[rid][uid]['width_viewport'],
             h: SESSION_INFO[rid][uid]['height_viewport'],
             cid: SESSION_INFO[rid][uid]['canvas_id'].substr(-1),
+            uid: uid,
         }
         socket.emit('position', pos);
     });
@@ -236,13 +244,7 @@ function onConnection(socket){
         SESSION_INFO[rid][uid]['width_viewport'] = data.w;
         SESSION_INFO[rid][uid]['height_viewport'] = data.h;
 
-        var pos_data = {};
-        for (var key in SESSION_INFO[rid]) {
-            if (cid == SESSION_INFO[rid][key]['canvas_id']) {
-                pos_data[key] = SESSION_INFO[rid][key];
-            }
-        }
-        socket.broadcast.in(cid).emit('viewport_position', pos_data);
+        socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
     });
 
     socket.on('image', (pos) => {
@@ -272,7 +274,6 @@ function onConnection(socket){
             // Update client only if the corresponding level exists in the image pyramid
             if (level >= 0 && level <= MaxImageLevel) {
                 socket.emit('image', data);
-                console.log('Image sent.');
             }
         } else {
             socket.emit('image', 'NONE');
@@ -332,18 +333,18 @@ function onConnection(socket){
         const uid = socket.user_id;
 
         if (socket.room_id) {
-            delete SESSION_INFO[rid][uid];
-            var members = {};
-            var pos_data = {};
-            for (var key in SESSION_INFO[rid]) {
-                members[key] = SESSION_INFO[rid][key]['color'];
-                if (cid == SESSION_INFO[rid][key]['canvas_id']) {
-                    pos_data[key] = SESSION_INFO[rid][key];
+            if (SESSION_INFO[rid][uid]['num'] > 1) {
+                SESSION_INFO[rid][uid]['num'] -= 1;
+            } else {
+                delete SESSION_INFO[rid][uid];
+                var members = {};
+                for (var key in SESSION_INFO[rid]) {
+                    members[key] = SESSION_INFO[rid][key]['color'];
                 }
+                socket.broadcast.in(rid).emit('session_update', members);
+                socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
+                console.log(uid, "left", rid);
             }
-            socket.broadcast.in(rid).emit('session_update', members);
-            socket.broadcast.in(cid).emit('viewport_position', pos_data);
-            console.log(uid, "left", rid);
         }
     });
 

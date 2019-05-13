@@ -9,13 +9,14 @@ import Minimap from './minimap/Minimap';
 import CanvasList from './CanvasList';
 import openSocket from 'socket.io-client';
 import SocketIOFileClient from 'socket.io-file-client';
+import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
 
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: false, eraser: false, toLogin: false, hideNavbar:true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue'};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -41,6 +42,7 @@ class CanvasBoard extends Component {
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
+        this.releaseFollowing = this.releaseFollowing.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -49,22 +51,37 @@ class CanvasBoard extends Component {
     }
 
     updateViewportsPosition(data) {
-      this.minimap.displayUserPosition(data);
-        // for (var key in data) {
-        //     console.log(data[key]);
-        // }
+        this.minimap.displayUserPosition(data);
+        if (this.state.following === false) return;
+        for (let key in data) {
+            if (key === this.state.following) {
+                let cid = parseInt(data[key].canvas_id.substr(-1));
+                if (cid === 0) cid = 10;
+                this.setCanvas(cid);
+                this.canvas.followCanvas(data[key].pos_x_viewport, data[key].pos_y_viewport, data[key].width_viewport, data[key].height_viewport);
+            }
+        }
     }
 
     onPositionEvent(data) {
-        this.setCanvas(parseInt(data.cid));
+        this.setState({mode: VIEWING, hideNavbar: true, following: data.uid});
+        let cid = parseInt(data.cid);
+        if (cid === 0) cid = 10;
+        this.setCanvas(cid);
         this.canvas.followCanvas(data.x, data.y, data.w, data.h);
     }
 
+    releaseFollowing() {
+        this.setState({mode: DRAWING, following: false});
+    }
+
     onImageEvent(data) {
-        if (data === 'NONE') {
-            this.sidebar.showImageButton();
-        } else {
-            this.sidebar.hideImageButton();
+        if (this.sidebar !== null) {
+            if (data === 'NONE') {
+                this.sidebar.showImageButton();
+            } else {
+                this.sidebar.hideImageButton();
+            }
         }
         this.canvas.onImageEvent(data);
     }
@@ -86,6 +103,7 @@ class CanvasBoard extends Component {
             this.cardDeck.setState({current_canvas: this.cid});
             this.canvas.reconnect = false;
             this.onInitCanvas();
+            this.props.socket.emit('command', 'update');
         }
     }
 
@@ -99,19 +117,17 @@ class CanvasBoard extends Component {
         }
     }
 
+    // Function will be called after server init.
     canvas_update(num) {
         this.canvasList.setState({num_canvas: num});
     }
 
     session_update(data){
         this.cardDeck.state.totalIds = Object.keys(data).length;
-        var color = data[this.uid];
+        let color = data[this.uid];
         delete data[this.uid];
-        this.cardDeck.state.color = color;
-        this.cardDeck.state.members = data;
-        this.cardDeck.forceUpdate();
-        this.canvasList.setState({'color': color});
-        this.navbar.setState({'color': color});
+        this.cardDeck.setState({members: data});
+        this.setState({bgColor: color})
     }
 
     onInitCanvas() {
@@ -136,13 +152,15 @@ class CanvasBoard extends Component {
     }
 
     onDrawingEvent(data) {
+        this.canvas.cacheStroke(data);
         this.canvas.onDrawingEvent(data);
         this.minimap.onDrawingEvent(data);
     }
 
     onRedrawEvent(data_array) {
-        this.canvas.onRedrawEvent(data_array);
-        this.minimap.onRedrawEvent(data_array);
+        this.canvas.resetStroke(data_array);
+        this.canvas.onRedrawEvent();
+        this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
     }
 
     minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
@@ -211,7 +229,7 @@ class CanvasBoard extends Component {
     }
 
     onDrag(mode){
-        this.setState({mode: mode});
+        this.setState({mode: mode ? DRAGGING : DRAWING});
     }
 
     onEraser(e) {
@@ -239,7 +257,8 @@ class CanvasBoard extends Component {
                         hideNavbar={this.state.hideNavbar}
                         newCanvas={this.newCanvas}
                         setCanvas={this.setCanvas}
-                        rid={this.props.match.params.id}/>
+                        rid={this.props.match.params.id}
+                        color={this.state.bgColor}/>
 
                 <div>
                     <Minimap
@@ -263,27 +282,31 @@ class CanvasBoard extends Component {
                             minimapDisplayUserPosition={this.minimapDisplayUserPosition}/>
 
                     <InfoCards
-                            onRef={ref => (this.cardDeck= ref)}
+                            onRef={ref => (this.cardDeck = ref)}
                             name={this.uid}
                             hideNavbar={this.state.hideNavbar}
-                            socket={this.socket}/>
+                            socket={this.socket}
+                            color={this.state.bgColor}
+                            releaseFollowing={this.releaseFollowing}/>
 
-                    <Sidebar
-                            onRef={ref => (this.sidebar= ref)}
-                            onChangeColor={this.changeColor}
-                            onChangeWidth={this.changeWidth}
-                            onUndo={this.onUndoEvent}
-                            onDrag={this.onDrag}
-                            onZoom={this.onZoom}
-                            showForm={this.showForm}
-                            onEraser={this.onEraser}
-                            hideNavbar={this.state.hideNavbar}/>
-
-                    <Navbar
+                    {this.state.mode === VIEWING ? (""):(
+                        <Sidebar
+                                onRef={ref => (this.sidebar= ref)}
+                                onChangeColor={this.changeColor}
+                                onChangeWidth={this.changeWidth}
+                                onUndo={this.onUndoEvent}
+                                onDrag={this.onDrag}
+                                onZoom={this.onZoom}
+                                showForm={this.showForm}
+                                onEraser={this.onEraser}
+                                hideNavbar={this.state.hideNavbar}/>)}
+                    {this.state.mode === VIEWING ? (""):(
+                        <Navbar
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
-                            hideNavbar={this.state.hideNavbar}/>
+                            hideNavbar={this.state.hideNavbar}
+                            color={this.state.bgColor}/>)}
                 </div>
             </div>
         );

@@ -11,22 +11,37 @@ class CardStack extends React.Component {
             hoverId : 0, // Card id which user hovers on
             totalIds : 1, // Total number of cards
             name: this.props.name,
-            color: '#42c8f4',
             members: {},
             current_canvas: 1,
+            followName: null,
         }
         this.updateHoverId = this.updateHoverId.bind(this);
         this.onMouseOut = this.onMouseOut.bind(this);
+        this.lockCard = this.lockCard.bind(this);
+        this.followId = 0;
     }
 
-    renderCard(key, index) {
+    lockCard(name) {
+        if (name === this.state.followName) {
+            this.setState({followName: null});
+            this.props.releaseFollowing();
+        } else {
+            this.props.socket.emit('position', name);
+            this.setState({followName: name});
+        }
+    }
+
+    renderCard(key, index, lastCard) {
+        if (!lastCard) return;
+        let color = (this.state.members[key] !== undefined ? this.state.members[key] : 'gray');
         return <InfoCard
                     id={index+1}
                     name={key}
-                    color={this.state.members[key]}
+                    color={color}
                     updateHoverId={this.updateHoverId}
                     hoverId={this.state.hoverId}
-                    socket={this.props.socket}/>
+                    followId={this.followId}
+                    lockCard={this.lockCard}/>
     }
 
     updateHoverId(id) {
@@ -46,16 +61,33 @@ class CardStack extends React.Component {
     }
 
     render () {
-        var left = this.props.hideNavbar ? '0' : '212px';
+        let left = this.props.hideNavbar ? '0' : '212px';
+        let width = 225 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0);
+        let lastCard = false;
+        if (this.state.followName) {
+            lastCard = true;
+            this.followId = 1;
+            for (let key in this.state.members) {
+                if (key === this.state.followName) {
+                    lastCard = false;
+                    break;
+                }
+                this.followId += 1;
+            }
+            if (this.state.hoverId !== this.followId) width += 100;
+            if (lastCard) width += 25;
+        } else {
+            this.followId = 0;
+        }
         const style = {
             ...stackStyles,
             // Update width of the card deck to prevent white space
-            width: 225 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0),
+            width: width,
             left: left
         };
         const mainCardStyle = {
             ...card1Style,
-            background: this.state.color
+            background: this.props.color
         };
 
         return (
@@ -79,7 +111,8 @@ class CardStack extends React.Component {
                     </CardBody>
                 </Card>
 
-                {Object.keys(this.state.members).map((key, index) => this.renderCard(key, index))}
+                {Object.keys(this.state.members).map((key, index) => this.renderCard(key, index, true))}
+                {this.renderCard(this.state.followName, this.followId-1, lastCard)}
             </ul>
         );
     }
@@ -100,8 +133,8 @@ const stackStyles = {
     borderRadius: '0 0 25px 0',
     height: 100,
     color: 'white',
-    transition: '0.5s',
     border: 0,
+    transition: '0.5s',
 };
 // TODO : Pass in background through props
 const card1Style = {
