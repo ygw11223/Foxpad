@@ -12,6 +12,11 @@ import SocketIOFileClient from 'socket.io-file-client';
 import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
+const styleButton = {
+    position: 'absolute',
+    bottom: '15px',
+    zIndex: '50',
+};
 
 class CanvasBoard extends Component {
     constructor(props) {
@@ -41,8 +46,12 @@ class CanvasBoard extends Component {
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
+<<<<<<< HEAD
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
+=======
+        this.toDashboard = this.toDashboard.bind(this);
+>>>>>>> preliminary back to dashboard button, can click enter to submit, accept images and pdf
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -51,6 +60,11 @@ class CanvasBoard extends Component {
 
     displayOwnPosition(x, y, w, h) {
         this.minimap.displayOwnPosition(x, y, w, h);
+    }
+
+    toDashboard(e) {
+        console.log("here");
+        this.setState({toDashboard: true});
     }
 
     updateViewportsPosition(data) {
@@ -267,6 +281,10 @@ class CanvasBoard extends Component {
             }} />
         }
 
+        if (this.state.toDashboard === true) {
+            return <Redirect to={'/dashboard'} />
+        }
+
         var icon = (this.state.hideNavbar === true ? '>' : '<');
 
         return(
@@ -330,8 +348,14 @@ class CanvasBoard extends Component {
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
+<<<<<<< HEAD
                             hideNavbar={this.state.hideNavbar}
                             color={this.state.bgColor}/>)}
+=======
+                            hideNavbar={this.state.hideNavbar}/>
+
+                    <button onClick={this.toDashboard} style={styleButton}> Back to Dashboard </button>
+>>>>>>> preliminary back to dashboard button, can click enter to submit, accept images and pdf
                 </div>
             </div>
         );
