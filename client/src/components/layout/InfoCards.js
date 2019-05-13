@@ -24,7 +24,9 @@ class CardStack extends React.Component {
     lockCard(name) {
         if (name === this.state.followName) {
             this.setState({followName: null});
+            this.props.releaseFollowing();
         } else {
+            this.props.socket.emit('position', name);
             this.setState({followName: name});
         }
     }
@@ -39,7 +41,6 @@ class CardStack extends React.Component {
                     updateHoverId={this.updateHoverId}
                     hoverId={this.state.hoverId}
                     followId={this.followId}
-                    socket={this.props.socket}
                     lockCard={this.lockCard}/>
     }
 

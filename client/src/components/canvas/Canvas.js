@@ -207,13 +207,6 @@ class Canvas extends Component {
             this.onDrawingEvent(this.stroke_array[i]);
         }
         this.onDrawImage();
-        this.ctx.beginPath();
-        this.ctx.arc(this.mapWindowToCanvas(this.state.width/2, this.offsetX), this.mapWindowToCanvas(this.state.height/2, this.offsetY), 5, 0, 2 * Math.PI);
-        this.ctx.fillStyle = "blue";
-        this.ctx.fill();
-        this.ctx.rect(-960,-540,1920,1080);
-        this.ctx.stroke();
-        this.ctx.closePath();
     }
 
     componentWillUnmount() {
@@ -242,6 +235,7 @@ class Canvas extends Component {
        document.getElementById(id).addEventListener('touchmove',   this.onMouseMove, { passive: false });
        document.getElementById(id).addEventListener('touchend',    this.onMouseUp,   { passive: false });
        document.getElementById(id).addEventListener('touchcancel', this.onMouseUp,   { passive: false });
+       document.getElementById(id).addEventListener('wheel',   this.onScrollEvent,   { passive: false });
     }
 
     componentWillMount() {
@@ -436,11 +430,15 @@ class Canvas extends Component {
             }
             // Position not changed
             if(dx === 0 && dy === 0) {
-                document.getElementById('mainCanvas').style.cursor = 'default';
+                if (document.getElementById('mouse-listener')) {
+                    document.getElementById('mouse-listener').style.cursor = 'default';
+                }
                 return;
             }
 
-            document.getElementById('mainCanvas').style.cursor = 'move';
+            if (document.getElementById('mouse-listener')) {
+                document.getElementById('mouse-listener').style.cursor = 'move';
+            }
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
@@ -638,7 +636,7 @@ class Canvas extends Component {
                                         this.move_active = false;
                                         this.setState({ active: false });
                                     }}
-                    onWheel={this.onScrollEvent}/>
+                    />
 
                 <canvas
                     ref="canvas"

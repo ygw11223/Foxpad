@@ -110,19 +110,23 @@ function onConnection(socket){
         }
         if (!(uid in SESSION_INFO[rid])) {
             console.log(uid, "joined", cid);
-        }
-        SESSION_INFO[rid][uid] = {
-            color: USER_INFO[rid][uid],
-            pos_x_mouse: 0,
-            pos_y_mouse: 0,
-            pos_x_viewport: 0,
-            pos_y_viewport: 0,
-            width_viewport: 0,
-            height_viewport: 0,
-            timestamp: 0,
-            pen_color: 0,
-            pen_width: 0,
-            canvas_id: cid,
+            SESSION_INFO[rid][uid] = {
+                color: USER_INFO[rid][uid],
+                pos_x_mouse: 0,
+                pos_y_mouse: 0,
+                pos_x_viewport: 0,
+                pos_y_viewport: 0,
+                width_viewport: 0,
+                height_viewport: 0,
+                timestamp: 0,
+                pen_color: 0,
+                pen_width: 0,
+                canvas_id: cid,
+                num: 1,
+            }
+        } else {
+            SESSION_INFO[rid][uid]['num'] += 1;
+            SESSION_INFO[rid][uid]['canvas_id'] = cid;
         }
         // Create canvas in database
         if (!(cid in DATABASE)) {
@@ -329,14 +333,18 @@ function onConnection(socket){
         const uid = socket.user_id;
 
         if (socket.room_id) {
-            delete SESSION_INFO[rid][uid];
-            var members = {};
-            for (var key in SESSION_INFO[rid]) {
-                members[key] = SESSION_INFO[rid][key]['color'];
+            if (SESSION_INFO[rid][uid]['num'] > 1) {
+                SESSION_INFO[rid][uid]['num'] -= 1;
+            } else {
+                delete SESSION_INFO[rid][uid];
+                var members = {};
+                for (var key in SESSION_INFO[rid]) {
+                    members[key] = SESSION_INFO[rid][key]['color'];
+                }
+                socket.broadcast.in(rid).emit('session_update', members);
+                socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
+                console.log(uid, "left", rid);
             }
-            socket.broadcast.in(rid).emit('session_update', members);
-            socket.broadcast.in(cid).emit('viewport_position', SESSION_INFO[rid]);
-            console.log(uid, "left", rid);
         }
     });
 

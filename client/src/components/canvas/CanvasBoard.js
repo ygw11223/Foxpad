@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: null, bgColor: 'blue'};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue'};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -42,6 +42,7 @@ class CanvasBoard extends Component {
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
+        this.releaseFollowing = this.releaseFollowing.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -51,6 +52,7 @@ class CanvasBoard extends Component {
 
     updateViewportsPosition(data) {
         this.minimap.displayUserPosition(data);
+        if (this.state.following === false) return;
         for (let key in data) {
             if (key === this.state.following) {
                 let cid = parseInt(data[key].canvas_id.substr(-1));
@@ -62,17 +64,15 @@ class CanvasBoard extends Component {
     }
 
     onPositionEvent(data) {
-        let following = (data.uid === this.state.following ? null : data.uid);
-        if(following === null) {
-            this.setState({mode: DRAWING});
-        } else {
-            this.setState({mode: VIEWING, hideNavbar: true});
-        }
-        this.setState({following: following});
+        this.setState({mode: VIEWING, hideNavbar: true, following: data.uid});
         let cid = parseInt(data.cid);
         if (cid === 0) cid = 10;
         this.setCanvas(cid);
         this.canvas.followCanvas(data.x, data.y, data.w, data.h);
+    }
+
+    releaseFollowing() {
+        this.setState({mode: DRAWING, following: false});
     }
 
     onImageEvent(data) {
@@ -124,7 +124,7 @@ class CanvasBoard extends Component {
 
     session_update(data){
         this.cardDeck.state.totalIds = Object.keys(data).length;
-        var color = data[this.uid];
+        let color = data[this.uid];
         delete data[this.uid];
         this.cardDeck.setState({members: data});
         this.setState({bgColor: color})
@@ -286,7 +286,8 @@ class CanvasBoard extends Component {
                             name={this.uid}
                             hideNavbar={this.state.hideNavbar}
                             socket={this.socket}
-                            color={this.state.bgColor}/>
+                            color={this.state.bgColor}
+                            releaseFollowing={this.releaseFollowing}/>
 
                     {this.state.mode === VIEWING ? (""):(
                         <Sidebar
