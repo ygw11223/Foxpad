@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: null};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: null, bgColor: 'blue'};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -64,7 +64,7 @@ class CanvasBoard extends Component {
         if(following === null) {
             this.setState({mode: DRAWING});
         } else {
-            this.setState({mode: VIEWING});
+            this.setState({mode: VIEWING, hideNavbar: true});
         }
         this.setState({following: following});
         let cid = parseInt(data.cid);
@@ -124,13 +124,8 @@ class CanvasBoard extends Component {
         this.cardDeck.state.totalIds = Object.keys(data).length;
         var color = data[this.uid];
         delete data[this.uid];
-        this.cardDeck.state.color = color;
-        this.cardDeck.state.members = data;
-        this.cardDeck.forceUpdate();
-        if(this.canvasList !== null)
-            this.canvasList.setState({'color': color});
-        if(this.navbar !== null)
-            this.navbar.setState({'color': color});
+        this.cardDeck.setState({members: data});
+        this.setState({bgColor: color})
     }
 
     onInitCanvas() {
@@ -256,7 +251,8 @@ class CanvasBoard extends Component {
                         hideNavbar={this.state.hideNavbar}
                         newCanvas={this.newCanvas}
                         setCanvas={this.setCanvas}
-                        rid={this.props.match.params.id}/>
+                        rid={this.props.match.params.id}
+                        color={this.state.bgColor}/>
 
                 <div>
                     <Minimap
@@ -282,7 +278,8 @@ class CanvasBoard extends Component {
                             onRef={ref => (this.cardDeck = ref)}
                             name={this.uid}
                             hideNavbar={this.state.hideNavbar}
-                            socket={this.socket}/>
+                            socket={this.socket}
+                            color={this.state.bgColor}/>
 
                     {this.state.mode === VIEWING ? (""):(
                         <Sidebar
@@ -300,7 +297,8 @@ class CanvasBoard extends Component {
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
-                            hideNavbar={this.state.hideNavbar}/>)}
+                            hideNavbar={this.state.hideNavbar}
+                            color={this.state.bgColor}/>)}
                 </div>
             </div>
         );

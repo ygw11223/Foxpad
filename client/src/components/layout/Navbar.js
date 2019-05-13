@@ -19,7 +19,6 @@ const styleNavbar = {
 class Navbar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'blue'};
     }
 
     componentDidMount() {
@@ -31,11 +30,11 @@ class Navbar extends React.Component {
     }
 
     render() {
-        var left = this.props.hideNavbar ? '0' : '212px';
+        let left = this.props.hideNavbar ? '0' : '212px';
         const style = {
             ...styleNavbar,
             left: left,
-            backgroundColor: this.state.color,
+            backgroundColor: this.props.color,
         }
         return (
             <Button style={style}

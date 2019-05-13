@@ -11,7 +11,6 @@ class CardStack extends React.Component {
             hoverId : 0, // Card id which user hovers on
             totalIds : 1, // Total number of cards
             name: this.props.name,
-            color: '#42c8f4',
             members: {},
             current_canvas: 1,
             followName: null,
@@ -87,7 +86,7 @@ class CardStack extends React.Component {
         };
         const mainCardStyle = {
             ...card1Style,
-            background: this.state.color
+            background: this.props.color
         };
 
         return (
@@ -134,6 +133,7 @@ const stackStyles = {
     height: 100,
     color: 'white',
     border: 0,
+    transition: '0.5s',
 };
 // TODO : Pass in background through props
 const card1Style = {

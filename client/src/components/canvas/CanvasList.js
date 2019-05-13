@@ -19,7 +19,7 @@ const CanvasListStyle = {
 class CanvasList extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: 'blue', num_canvas: 1, current_canvas: 1};
+        this.state = {num_canvas: 1, current_canvas: 1};
         this.renderCanvas = this.renderCanvas.bind(this);
         this.renderButton = this.renderButton.bind(this);
         this.updatePreview = this.updatePreview.bind(this);
@@ -90,7 +90,7 @@ class CanvasList extends Component {
         const style = {
             ...CanvasListStyle,
             width: width,
-            backgroundColor: this.state.color,
+            backgroundColor: this.props.color,
         }
         return (
             <div style={style} class='canvasList'>

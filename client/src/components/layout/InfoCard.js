@@ -20,6 +20,7 @@ const cardDivStyle = {
     textAlign: 'center',
     flexShrink: 0,
     fontWeight: 'bold',
+    transition: '0.5s',
 }
 
 class InfoCard extends Component {
