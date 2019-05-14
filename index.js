@@ -122,10 +122,8 @@ function onConnection(socket){
                 pen_color: 0,
                 pen_width: 0,
                 canvas_id: cid,
-                num: 1,
             }
         } else {
-            SESSION_INFO[rid][uid]['num'] += 1;
             SESSION_INFO[rid][uid]['canvas_id'] = cid;
         }
         // Create canvas in database
@@ -194,6 +192,10 @@ function onConnection(socket){
     socket.on('preivew', (data) => {
         const cid = socket.canvas_id;
         const rid = socket.room_id;
+
+        if (rid === undefined || cid === undefined) {
+            return;
+        }
 
         socket.broadcast.in(rid).emit('preview', data);
         let base64Data = data.url.replace(/^data:image\/png;base64,/, "");
@@ -332,20 +334,18 @@ function onConnection(socket){
         const cid = socket.canvas_id;
         const uid = socket.user_id;
 
-        if (socket.room_id) {
-            if (SESSION_INFO[rid][uid]['num'] > 1) {
-                SESSION_INFO[rid][uid]['num'] -= 1;
-            } else {
-                delete SESSION_INFO[rid][uid];
-                var members = {};
-                for (var key in SESSION_INFO[rid]) {
-                    members[key] = SESSION_INFO[rid][key]['color'];
-                }
-                socket.broadcast.in(rid).emit('session_update', members);
-                socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
-                console.log(uid, "left", rid);
-            }
+        if (cid === undefined || uid === undefined || rid === undefined || SESSION_INFO[rid][uid] === undefined) {
+            return
         }
+
+        delete SESSION_INFO[rid][uid];
+        let members = {};
+        for (let key in SESSION_INFO[rid]) {
+            members[key] = SESSION_INFO[rid][key]['color'];
+        }
+        socket.broadcast.in(rid).emit('session_update', members);
+        socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
+        console.log(uid, "left", rid);
     });
 
     var uploader = new SocketIOFile(socket, {
@@ -369,9 +369,10 @@ function onConnection(socket){
     });
 
     function buildImages(filePath, socket) {
+        let cid = socket.canvas_id;
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(filePath, (err, mat) => {
-            if (mat.cols && mat.rows) {
+            if (mat.cols && mat.rows && cid && !IMAGES[socket.canvas_id]) {
                 IMAGES[socket.canvas_id] = {
                     'w': mat.cols,
                     'h': mat.rows,

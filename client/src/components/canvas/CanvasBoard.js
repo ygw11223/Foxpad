@@ -101,22 +101,20 @@ class CanvasBoard extends Component {
 
     setCanvas(id) {
         if (this.state.cid !== id) {
-            this.setState({cid: id});
-            this.canvasList.setState({current_canvas: this.state.cid});
-            this.cardDeck.setState({current_canvas: this.state.cid});
+            this.canvasList.setState({current_canvas: id});
+            this.cardDeck.setState({current_canvas: id});
             this.canvas.reconnect = false;
-            this.onInitCanvas();
-            this.props.socket.emit('command', 'update');
+            this.setState({cid: id});
         }
     }
 
     newCanvas() {
         if (this.canvasList.state.num_canvas < 10) {
-            this.setState({cid: this.canvasList.state.num_canvas+1});
-            this.canvasList.setState({num_canvas: this.state.cid, current_canvas: this.state.cid});
-            this.cardDeck.setState({current_canvas: this.state.cid})
+            let cid = this.canvasList.state.num_canvas + 1;
+            this.canvasList.setState({num_canvas: cid, current_canvas: cid});
+            this.cardDeck.setState({current_canvas: cid})
             this.canvas.reconnect = false;
-            this.onInitCanvas();
+            this.setState({cid: cid});
         }
     }
 
@@ -127,12 +125,17 @@ class CanvasBoard extends Component {
     }
 
     session_update(data){
-        this.cardDeck.state.totalIds = Object.keys(data).length;
-        let color = data[this.uid];
-        delete data[this.uid];
-        this.cardDeck.setState({members: data});
-        this.setState({bgColor: color})
-        this.canvas.updatePosition();
+        if (!data[this.uid]) {
+            console.log('refresh');
+            window.location.reload();
+        } else {
+            this.cardDeck.state.totalIds = Object.keys(data).length;
+            let color = data[this.uid];
+            delete data[this.uid];
+            this.cardDeck.setState({members: data});
+            this.setState({bgColor: color})
+            this.canvas.updatePosition();
+        }
     }
 
     onInitCanvas() {
@@ -239,6 +242,12 @@ class CanvasBoard extends Component {
 
     onHideNavbar() {
         this.setState({hideNavbar: !this.state.hideNavbar})
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.cid !== this.state.cid) {
+            this.onInitCanvas();
+        }
     }
 
     render(){
