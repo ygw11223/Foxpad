@@ -47,7 +47,7 @@ class InfoCard extends Component {
                 top: '-100px',
                 left: '-50px',
                 width: '50px',
-                padding: '5px 2.5 5px 27.5px',
+                padding: '5px 2.5px 5px 27.5px',
                 height: '100px',
                 backgroundColor: '#292929',
                 opacity: '0.76',
