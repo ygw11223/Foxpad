@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import {Card, CardText, CardBody, CardTitle} from 'reactstrap';
 
+const followIcon = require('./follow.png');
+
 // Set flexShrink to fix card size
 const InfoCardStyle = {
     height: '100%',
     width: '100%',
-    padding: '25px 25px 0 25px',
+    padding: '25px 25px 0 50px',
     margin: 0,
     borderRadius: '0 0 25px 0',
 };
@@ -27,6 +29,7 @@ class InfoCard extends Component {
     constructor (props) {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
+        this.renderFollowIcon = this.renderFollowIcon.bind(this);
     }
 
     onMouseOver () {
@@ -34,6 +37,21 @@ class InfoCard extends Component {
             this.props.updateHoverId(this.props.id);
         } else {
             this.props.updateHoverId(0);
+        }
+    }
+
+    renderFollowIcon() {
+        if (this.props.followId === this.props.id) {
+            return(<img src={followIcon} style={{
+                position: 'relative',
+                top: '-100px',
+                left: '-50px',
+                width: '50px',
+                padding: '5px 2.5px 5px 27.5px',
+                height: '100px',
+                backgroundColor: '#292929',
+                opacity: '0.76',
+            }}/>)
         }
     }
 
@@ -66,6 +84,7 @@ class InfoCard extends Component {
                         <CardText> {this.props.name} </CardText>
                     </CardBody>
                 </Card>
+                {this.renderFollowIcon()}
             </div>
         );
     }

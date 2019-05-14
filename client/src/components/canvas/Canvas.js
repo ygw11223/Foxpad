@@ -55,6 +55,7 @@ class Canvas extends Component {
         this.followCanvas = this.followCanvas.bind(this);
         this.cacheStroke = this.cacheStroke.bind(this);
         this.resetStroke = this.resetStroke.bind(this);
+        this.updatePosition = this.updatePosition.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -80,7 +81,20 @@ class Canvas extends Component {
         this.preOffsetX = -1;
         this.preOffsetY = -1;
         this.preScale = 1024;
+    }
 
+    updatePosition() {
+        let x = this.mapWindowToCanvas(0, this.offsetX);
+        let y = this.mapWindowToCanvas(0, this.offsetY);
+        let w = this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX);
+        let h = this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY);
+        this.props.socket.emit('viewport_position', {
+            x: x,
+            y: y,
+            w: w,
+            h: h,
+        });
+        this.props.displayOwnPosition(x, y, w, h);
     }
 
     initializeScale() {
@@ -108,6 +122,7 @@ class Canvas extends Component {
         this.scale = 1;
         this.initialScale = 1;
         this.imageScale = 0;
+        this.nextImage.src = null;
         this.imageHight = -1;
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
@@ -117,12 +132,7 @@ class Canvas extends Component {
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
-        this.props.socket.emit('viewport_position', {
-            x: this.mapWindowToCanvas(0, this.offsetX),
-            y: this.mapWindowToCanvas(0, this.offsetY),
-            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-        });
+        this.updatePosition();
     }
 
     cacheStroke(data) {
@@ -182,12 +192,9 @@ class Canvas extends Component {
         this.onRedrawEvent();
         if(this.preOffsetX === this.offsetX && this.preOffsetY === this.offsetY && this.preScale === this.scale)
             return;
-        this.props.socket.emit('viewport_position', {
-            x: this.mapWindowToCanvas(0, this.offsetX),
-            y: this.mapWindowToCanvas(0, this.offsetY),
-            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-        });
+
+        this.updatePosition();
+
         this.preOffsetX = this.offsetX;
         this.preOffsetY = this.offsetY;
         this.preScale = this.scale;
@@ -214,28 +221,23 @@ class Canvas extends Component {
     }
 
     componentDidMount() {
-       window.addEventListener("resize", this.updateDimensions);
-       this.props.onRef(this);
-       this.ctx = this.refs.canvas.getContext('2d');
-       this.pctx = this.refs.picture.getContext('2d');
-       this.mctx = this.refs.mouse.getContext('2d');
-       this.offsetY = -this.state.height/2;
-       this.offsetX = -this.state.width/2;
-       this.ctx.translate(-this.offsetX, -this.offsetY);
-       this.mctx.translate(-this.offsetX, -this.offsetY);
-       setInterval(this.onMouseSideMove, 50);
-       this.props.socket.emit('viewport_position', {
-           x: this.mapWindowToCanvas(0, this.offsetX),
-           y: this.mapWindowToCanvas(0, this.offsetY),
-           w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-           h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-       });
-       let id = "mouse-listener"
-       document.getElementById(id).addEventListener('touchstart',  this.onMouseDown, { passive: false });
-       document.getElementById(id).addEventListener('touchmove',   this.onMouseMove, { passive: false });
-       document.getElementById(id).addEventListener('touchend',    this.onMouseUp,   { passive: false });
-       document.getElementById(id).addEventListener('touchcancel', this.onMouseUp,   { passive: false });
-       document.getElementById(id).addEventListener('wheel',   this.onScrollEvent,   { passive: false });
+        window.addEventListener("resize", this.updateDimensions);
+        this.props.onRef(this);
+        this.ctx = this.refs.canvas.getContext('2d');
+        this.pctx = this.refs.picture.getContext('2d');
+        this.mctx = this.refs.mouse.getContext('2d');
+        this.offsetY = -this.state.height/2;
+        this.offsetX = -this.state.width/2;
+        this.ctx.translate(-this.offsetX, -this.offsetY);
+        this.mctx.translate(-this.offsetX, -this.offsetY);
+        setInterval(this.onMouseSideMove, 50);
+
+        let id = "mouse-listener"
+        document.getElementById(id).addEventListener('touchstart',  this.onMouseDown, { passive: false });
+        document.getElementById(id).addEventListener('touchmove',   this.onMouseMove, { passive: false });
+        document.getElementById(id).addEventListener('touchend',    this.onMouseUp,   { passive: false });
+        document.getElementById(id).addEventListener('touchcancel', this.onMouseUp,   { passive: false });
+        document.getElementById(id).addEventListener('wheel',   this.onScrollEvent,   { passive: false });
     }
 
     componentWillMount() {
@@ -326,27 +328,26 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
+        if (data !== 'NONE' && data.cid.substr(-1) == (this.props.cid%10)) {
+            this.imageHight = data.h/this.scale;
+            this.imageWidth = data.w/this.scale;
+            this.nextImage.src = data.url;
+        }
         // Finish progress bar when recieved image.
         if (this.modal && this.modal.state.uploading) {
             this.modal.onStreamEnd();
         }
-        if (data === 'NONE') {
-            this.nextImage.src = null;
-            this.image.src = null;
-        } else {
-            if (this.imageHight <= 0 || this.imageWidth <= 0) {
-                this.imageHight = data.h/this.scale;
-                this.imageWidth = data.w/this.scale;
-            }
-            this.nextImage.src = data.url;
+        if (this.state.modal) {
             this.setState({modal: false});
         }
     }
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
-        this.imageScale += 1;
-        this.onEmitImg();
+        if (this.nextImage.src !== null) {
+            this.imageScale += 1;
+            setTimeout(this.onEmitImg, 500);
+        }
     }
 
     onDrawImage() {
@@ -361,7 +362,8 @@ class Canvas extends Component {
         this.props.socket.emit('command', 'undo');
     }
 
-    showForm(e) {
+    showForm(uploading) {
+        if (uploading) return;
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
@@ -444,12 +446,7 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.onRedrawEvent();
-            this.props.socket.emit('viewport_position', {
-                x: this.mapWindowToCanvas(0, this.offsetX),
-                y: this.mapWindowToCanvas(0, this.offsetY),
-                w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-                h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-            });
+            this.updatePosition();
         }
     }
 
@@ -495,19 +492,7 @@ class Canvas extends Component {
             this.ctx.translate(dx,dy);
             this.mctx.translate(dx,dy);
             this.onRedrawEvent();
-            this.props.socket.emit('viewport_position', {
-                x: this.mapWindowToCanvas(0, this.offsetX),
-                y: this.mapWindowToCanvas(0, this.offsetY),
-                w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-                h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-            });
-            // this.props.minimapDisplayUserPosition(
-            //   {
-            //       x: this.mapWindowToCanvas(0, this.offsetX),
-            //       y: this.mapWindowToCanvas(0, this.offsetY),
-            //       w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-            //       h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-            //   });
+            this.updatePosition();
         }
         else if (this.state.active && this.props.mode === DRAWING) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -600,12 +585,7 @@ class Canvas extends Component {
             this.mctx.translate(-dx,-dy);
         }
         this.onRedrawEvent();
-        this.props.socket.emit('viewport_position', {
-            x: this.mapWindowToCanvas(0, this.offsetX),
-            y: this.mapWindowToCanvas(0, this.offsetY),
-            w: this.mapWindowToCanvas(this.state.width, this.offsetX) - this.mapWindowToCanvas(0, this.offsetX),
-            h: this.mapWindowToCanvas(this.state.height, this.offsetY) - this.mapWindowToCanvas(0, this.offsetY),
-        });
+        this.updatePosition();
     }
 
     onScrollEvent(event) {

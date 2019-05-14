@@ -122,10 +122,8 @@ function onConnection(socket){
                 pen_color: 0,
                 pen_width: 0,
                 canvas_id: cid,
-                num: 1,
             }
         } else {
-            SESSION_INFO[rid][uid]['num'] += 1;
             SESSION_INFO[rid][uid]['canvas_id'] = cid;
         }
         // Create canvas in database
@@ -150,7 +148,7 @@ function onConnection(socket){
         }
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
-        socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
+        socket.emit('canvas_update',SESSION_INFO[rid]);
         STALE_CANVAS[cid] = 2;
     });
 
@@ -195,9 +193,13 @@ function onConnection(socket){
         const cid = socket.canvas_id;
         const rid = socket.room_id;
 
+        if (rid === undefined || cid === undefined) {
+            return;
+        }
+
         socket.broadcast.in(rid).emit('preview', data);
         let base64Data = data.url.replace(/^data:image\/png;base64,/, "");
-        fs.writeFile('images/preview' + cid + '.png', base64Data, 'base64', function(err) {
+        fs.writeFile('images/preview' + rid + data.id + '.png', base64Data, 'base64', function(err) {
             if (err) console.log(err);
         });
     });
@@ -260,7 +262,8 @@ function onConnection(socket){
             let data = {
                 w: IMAGES[cid].w,
                 h: IMAGES[cid].h,
-                url: IMAGES[cid].name + level + '.png'
+                url: IMAGES[cid].name + level + '.png',
+                cid: cid,
             };
             // Determine image width and height, fitting into a area of 864x1568
             if (data.w/data.h > 1568/864) {
@@ -332,20 +335,18 @@ function onConnection(socket){
         const cid = socket.canvas_id;
         const uid = socket.user_id;
 
-        if (socket.room_id) {
-            if (SESSION_INFO[rid][uid]['num'] > 1) {
-                SESSION_INFO[rid][uid]['num'] -= 1;
-            } else {
-                delete SESSION_INFO[rid][uid];
-                var members = {};
-                for (var key in SESSION_INFO[rid]) {
-                    members[key] = SESSION_INFO[rid][key]['color'];
-                }
-                socket.broadcast.in(rid).emit('session_update', members);
-                socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
-                console.log(uid, "left", rid);
-            }
+        if (cid === undefined || uid === undefined || rid === undefined || SESSION_INFO[rid][uid] === undefined) {
+            return
         }
+
+        delete SESSION_INFO[rid][uid];
+        let members = {};
+        for (let key in SESSION_INFO[rid]) {
+            members[key] = SESSION_INFO[rid][key]['color'];
+        }
+        socket.broadcast.in(rid).emit('session_update', members);
+        socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
+        console.log(uid, "left", rid);
     });
 
     var uploader = new SocketIOFile(socket, {
@@ -365,30 +366,35 @@ function onConnection(socket){
     });
 
     uploader.on('stream', (fileInfo) => {
-        console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
+        //console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
     });
 
     function buildImages(filePath, socket) {
+        let cid = socket.canvas_id;
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(filePath, (err, mat) => {
-            IMAGES[socket.canvas_id] = {
-                'w': mat.cols,
-                'h': mat.rows,
-                'name': filePath,
-            };
-            console.log(IMAGES[socket.canvas_id]);
-            // Hardcoded building up 6 levels from lowest to highest resolution.
-            // TODO : Decide levels based on image size.
-            cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
-            cv.imwrite(filePath + '4.png', mat.pyrDown());
-            cv.imwrite(filePath + '5.png', mat);
-
-            socket.emit('update', 'image_ready');
-            socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
-            console.log('Image uploaded.');
+            if (mat && mat.cols && mat.rows && cid && !IMAGES[socket.canvas_id]) {
+                IMAGES[socket.canvas_id] = {
+                    'w': mat.cols,
+                    'h': mat.rows,
+                    'name': filePath,
+                };
+                console.log(IMAGES[socket.canvas_id]);
+                // Hardcoded building up 6 levels from lowest to highest resolution.
+                // TODO : Decide levels based on image size.
+                cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
+                cv.imwrite(filePath + '4.png', mat.pyrDown());
+                cv.imwrite(filePath + '5.png', mat);
+                socket.emit('update', 'image_ready');
+                socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
+                console.log('Image uploaded.');
+            } else {
+                socket.emit('update', 'image_ready');
+            }
+            STALE_CANVAS[cid] = 2;
         });
     }
 
@@ -410,8 +416,6 @@ function onConnection(socket){
         } else {
             buildImages(fileInfo.uploadDir, socket)
         }
-
-        STALE_CANVAS[cid] = 2;
     });
 
     uploader.on('error', (err) => {

@@ -27,8 +27,10 @@ class CanvasList extends Component {
 
     updatePreview(id, url) {
         // console.log('update preivew canvas:', id);
-        document.getElementsByClassName('canvasPreview' + id)[0].style.backgroundImage 
-            = 'url(' + url + ')';
+        let canvas = document.getElementsByClassName('canvasPreview' + id)[0];
+        if (canvas) {
+            canvas.style.backgroundImage = 'url(' + url + ')';
+        }
     }
 
     componentDidMount() {
