@@ -66,7 +66,6 @@ setInterval(() => {
     let sockets = io.sockets.clients()['connected'];
     let updated = new Set();
 
-
     for (let id in sockets) {
         let cid = sockets[id].canvas_id;
         if (cid === undefined) continue;
@@ -142,8 +141,8 @@ function onConnection(socket){
             socket.broadcast.in(rid).emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
         }
 
-        var members = {};
-        for (var key in SESSION_INFO[rid]) {
+        let members = {};
+        for (let key in SESSION_INFO[rid]) {
             members[key] = SESSION_INFO[rid][key]['color'];
         }
         socket.broadcast.in(rid).emit('session_update', members);
@@ -161,6 +160,10 @@ function onConnection(socket){
             return;
         }
 
+        if (DATABASE[cid][uid].length === 0) {
+            DATABASE[cid][uid].push([]);
+        }
+
         // TODO(Guowei) : Update when connecting firebase to server.
         var idx_last = DATABASE[cid][uid].length - 1;
         DATABASE[cid][uid][idx_last].push(data);
@@ -174,7 +177,7 @@ function onConnection(socket){
     socket.on('position', (uid) => {
         const rid = socket.room_id;
 
-        if (rid === undefined || SESSION_INFO[rid][uid] === undefined) {
+        if (rid === undefined || uid === undefined ||  SESSION_INFO[rid] === undefined || SESSION_INFO[rid][uid] === undefined) {
             return;
         }
 
@@ -219,8 +222,8 @@ function onConnection(socket){
         SESSION_INFO[rid][uid]['pen_width'] = data.w;
         SESSION_INFO[rid][uid]['timestamp'] = new Date().getTime();
 
-        var mouse_data = {};
-        for (var key in SESSION_INFO[rid]) {
+        let mouse_data = {};
+        for (let key in SESSION_INFO[rid]) {
             if (cid == SESSION_INFO[rid][key]['canvas_id']) {
                 mouse_data[key] = SESSION_INFO[rid][key];
             }
@@ -287,7 +290,7 @@ function onConnection(socket){
         const cid = socket.canvas_id;
         const uid = socket.user_id;
 
-        if (cid === undefined || uid === undefined) {
+        if (cid === undefined || uid === undefined || DATABASE[cid] === undefined || DATABASE[cid][uid] == undefined) {
             return;
         }
 
@@ -296,9 +299,9 @@ function onConnection(socket){
             case 'update':
                 // TODO : Currently not considering order of strokes. Same for undo.
                 data_array = [];
-                for (var user in DATABASE[cid]) {
-                    for (var stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
+                for (let user in DATABASE[cid]) {
+                    for (let stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
+                        for (let seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
                             data_array.push(DATABASE[cid][user][stroke][seg]);
                         }
                     }
@@ -308,9 +311,9 @@ function onConnection(socket){
             case 'undo':
                 DATABASE[cid][uid].pop();
                 data_array = [];
-                for (var user in DATABASE[cid]) {
-                    for (var stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
-                        for (var seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
+                for (let user in DATABASE[cid]) {
+                    for (let stroke = 0; stroke < DATABASE[cid][user].length; stroke++) {
+                        for (let seg = 0; seg < DATABASE[cid][user][stroke].length; seg++) {
                             data_array.push(DATABASE[cid][user][stroke][seg]);
                         }
                     }
@@ -335,7 +338,7 @@ function onConnection(socket){
         const cid = socket.canvas_id;
         const uid = socket.user_id;
 
-        if (cid === undefined || uid === undefined || rid === undefined || SESSION_INFO[rid][uid] === undefined) {
+        if (cid === undefined || uid === undefined || rid === undefined || SESSION_INFO[rid] === undefined || SESSION_INFO[rid][uid] === undefined) {
             return
         }
 
@@ -352,8 +355,10 @@ function onConnection(socket){
     var uploader = new SocketIOFile(socket, {
         uploadDir: 'images',
         rename: function(filename, fileInfo) {
+            let cid = socket.canvas_id;
+            if (cid === undefined) return filename;
             // Make sure of unique file name.
-            return socket.canvas_id + filename;},
+            return cid + filename;},
         // TODO(Guowei) : Add accept format and adjust parameters later.
         // accepts: [],
         maxFileSize: 50000000,
@@ -373,7 +378,7 @@ function onConnection(socket){
         let cid = socket.canvas_id;
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(filePath, (err, mat) => {
-            if (mat && mat.cols && mat.rows && cid && !IMAGES[socket.canvas_id]) {
+            if (mat && mat.cols && mat.rows && cid && !IMAGES[cid]) {
                 IMAGES[socket.canvas_id] = {
                     'w': mat.cols,
                     'h': mat.rows,
@@ -401,6 +406,8 @@ function onConnection(socket){
     uploader.on('complete', (fileInfo) => {
         console.log('Upload Complete.');
         const cid = socket.canvas_id;
+
+        if (cid === undefined) return;
 
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
             let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 '
