@@ -373,7 +373,7 @@ function onConnection(socket){
         let cid = socket.canvas_id;
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(filePath, (err, mat) => {
-            if (mat.cols && mat.rows && cid && !IMAGES[socket.canvas_id]) {
+            if (mat && mat.cols && mat.rows && cid && !IMAGES[socket.canvas_id]) {
                 IMAGES[socket.canvas_id] = {
                     'w': mat.cols,
                     'h': mat.rows,

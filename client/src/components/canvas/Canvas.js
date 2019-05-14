@@ -328,14 +328,16 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
-        // Finish progress bar when recieved image.
-        if (this.modal && this.modal.state.uploading) {
-            this.modal.onStreamEnd();
-        }
         if (data !== 'NONE' && data.cid.substr(-1) == (this.props.cid%10)) {
             this.imageHight = data.h/this.scale;
             this.imageWidth = data.w/this.scale;
             this.nextImage.src = data.url;
+        }
+        // Finish progress bar when recieved image.
+        if (this.modal && this.modal.state.uploading) {
+            this.modal.onStreamEnd();
+        }
+        if (this.state.modal) {
             this.setState({modal: false});
         }
     }
