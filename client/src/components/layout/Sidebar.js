@@ -69,7 +69,7 @@ class Sidebar extends React.Component {
         }
         target.style.backgroundColor = "#4C94CE";
 
-        if (this.state.onPen) {
+        if (this.state.onPen && !this.state.popoverColorOpen) {
             this.setState({popoverPenOpen: !this.state.popoverPenOpen});
         }
         else {
