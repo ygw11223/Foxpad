@@ -250,11 +250,11 @@ class Canvas extends Component {
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
-        this.scale = this.initialScale;
+        this.scale = 1;
         this.offsetY = -this.state.height/2;
         this.offsetX = -this.state.width/2;
-        this.ctx.translate(-this.offsetX, -this.offsetY);
-        this.mctx.translate(-this.offsetX, -this.offsetY);
+        this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
         this.onRedrawEvent()
     }
