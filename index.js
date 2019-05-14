@@ -138,7 +138,7 @@ function onConnection(socket){
         }
         socket.join([cid, rid]);
         if (new_canvas) {
-            socket.broadcast.in(rid).emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
+            socket.broadcast.in(rid).emit('canvas_update',SESSION_INFO[rid]);
         }
 
         let members = {};
@@ -410,11 +410,12 @@ function onConnection(socket){
         if (cid === undefined) return;
 
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
-            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 '
-                + fileInfo.uploadDir + ' ./images/' + cid + '.png';
+            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 \"'
+                + fileInfo.uploadDir + '\" ./images/' + cid + '.png';
             exec(file_Exe, function (error, stdout, stderr) {
                 if (error !== null) {
                     console.log('Error when converting pdf: ' + error);
+                    socket.emit('update', 'image_ready');
                 } else {
                     console.log('Pdf converted: ' + stdout);
                     buildImages('./images/'+cid+'.png', socket);
