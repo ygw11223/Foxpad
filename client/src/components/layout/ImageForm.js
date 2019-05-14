@@ -26,7 +26,7 @@ class ImageForm extends Component {
         this.state = {imagePreview: false, uploading: false, percent: 0}
         this.props.uploader.on('start', this.onStreamBegin);
         this.props.uploader.on('stream', this.onStream);
-        this.props.uploader.on('end', (fileInfo) => {this.fileId = -1;});
+        this.props.uploader.on('complete', (fileInfo) => {this.fileId = -1;});
         this.fileId = null;
     }
 
@@ -157,7 +157,7 @@ class ImageForm extends Component {
 
     render() {
         return (
-            <Modal isOpen={this.props.modal} toggle={this.props.showForm}>
+            <Modal isOpen={this.props.modal} toggle={() => {this.props.showForm(this.state.uploading)}}>
                 <ModalBody>
                   <h2> Image Upload </h2>
                   { this.state.imagePreview === true &&

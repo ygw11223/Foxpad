@@ -360,7 +360,8 @@ class Canvas extends Component {
         this.props.socket.emit('command', 'undo');
     }
 
-    showForm(e) {
+    showForm(uploading) {
+        if (uploading) return;
         this.setState(prevState => ({
             modal: !prevState.modal
         }));
