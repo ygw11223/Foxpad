@@ -16,8 +16,8 @@
 
 #minimap_background {
   z-index: 4;
-  background-color: black;
-  opacity: 0.2;
+  background-color: white;
+  opacity: 0.3;
   position: absolute;
   right: 16px;
   bottom: 16px;
@@ -26,6 +26,7 @@
 #minirectangle_peers {
   z-index: 4;
   position: absolute;
+  opacity: 0.9;
   right: 16px;
   bottom: 16px;
 }

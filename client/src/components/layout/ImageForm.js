@@ -159,22 +159,22 @@ class ImageForm extends Component {
         return (
             <Modal isOpen={this.props.modal} toggle={() => {this.props.showForm(this.state.uploading)}}>
                 <ModalBody>
-                  <h2> Image Upload </h2>
-                  { this.state.imagePreview === true &&
-                     <img src={deleteIcon} id="revertButton" class="far fa-times-circle" onClick={this.revertPreview}/>
-                  }
-                  <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
-                      <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
-                        <p id="text"> <center> Drag & drop </center> </p> <p id="or"> <center> or </center> </p>
-                        <label id="label" for="file">Click to choose from files</label>
-                        <input type="file" id="file" style={{display: "none"}} onChange={this.fileSelected}/>
-                      </div>
-                      { this.state.imagePreview === true && this.state.uploading === false &&
-                          <input type="submit" id="submit" value="Upload" class="button" />
-                      }
-                      { this.state.uploading === true &&
-                          <ProgressBar id="progressBar" now={this.state.percent} />
-                      }
+                    <h2> Image Upload </h2>
+                    { this.state.imagePreview === true &&
+                        <img src={deleteIcon} id="revertButton" class="far fa-times-circle" onClick={this.revertPreview}/>
+                    }
+                    <form id="myform" name="myform" onSubmit={this.onUploadEvent}>
+                        <div id="dropZone" onDrop={this.dropHandler} onDragOver={this.dragOverHandler}>
+                            <p id="text"> <center> Drag & drop </center> </p> <p id="or"> <center> or </center> </p>
+                            <label id="label" for="file">Click to choose from files</label>
+                            <input type="file" id="file" style={{display: "none"}} onChange={this.fileSelected}/>
+                        </div>
+                        {this.state.imagePreview === true && this.state.uploading === false &&
+                            <input type="submit" id="submit" value="Upload" class="button" />
+                        }
+                        {this.state.uploading === true &&
+                            <ProgressBar id="progressBar" now={this.state.percent} />
+                        }
                   </form>
                 </ModalBody>
             </Modal>
