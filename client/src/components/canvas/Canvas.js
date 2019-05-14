@@ -122,6 +122,7 @@ class Canvas extends Component {
         this.scale = 1;
         this.initialScale = 1;
         this.imageScale = 0;
+        this.nextImage.src = null;
         this.imageHight = -1;
         this.imageWidth = -1;
         this.offsetY = -this.state.height/2;
@@ -331,10 +332,7 @@ class Canvas extends Component {
         if (this.modal && this.modal.state.uploading) {
             this.modal.onStreamEnd();
         }
-        if (data === 'NONE') {
-            this.nextImage.src = null;
-            this.image.src = null;
-        } else {
+        if (data !== 'NONE') {
             if (this.imageHight <= 0 || this.imageWidth <= 0) {
                 this.imageHight = data.h/this.scale;
                 this.imageWidth = data.w/this.scale;
@@ -346,8 +344,10 @@ class Canvas extends Component {
 
     onLoadNextImage() {
         this.image.src = this.nextImage.src;
-        this.imageScale += 1;
-        this.onEmitImg();
+        if (this.nextImage.src !== null) {
+            this.imageScale += 1;
+            this.onEmitImg();
+        }
     }
 
     onDrawImage() {
