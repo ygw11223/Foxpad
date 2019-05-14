@@ -150,7 +150,7 @@ function onConnection(socket){
         }
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
-        socket.emit('canvas_update',SESSION_INFO[rid]['.num_canvas']);
+        socket.emit('canvas_update',SESSION_INFO[rid]);
         STALE_CANVAS[cid] = 2;
     });
 
@@ -371,24 +371,27 @@ function onConnection(socket){
     function buildImages(filePath, socket) {
         // Build image pyramid for multiple resolutions
         cv.imreadAsync(filePath, (err, mat) => {
-            IMAGES[socket.canvas_id] = {
-                'w': mat.cols,
-                'h': mat.rows,
-                'name': filePath,
-            };
-            console.log(IMAGES[socket.canvas_id]);
-            // Hardcoded building up 6 levels from lowest to highest resolution.
-            // TODO : Decide levels based on image size.
-            cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
-            cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
-            cv.imwrite(filePath + '4.png', mat.pyrDown());
-            cv.imwrite(filePath + '5.png', mat);
-
-            socket.emit('update', 'image_ready');
-            socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
-            console.log('Image uploaded.');
+            if (mat.cols && mat.rows) {
+                IMAGES[socket.canvas_id] = {
+                    'w': mat.cols,
+                    'h': mat.rows,
+                    'name': filePath,
+                };
+                console.log(IMAGES[socket.canvas_id]);
+                // Hardcoded building up 6 levels from lowest to highest resolution.
+                // TODO : Decide levels based on image size.
+                cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
+                cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
+                cv.imwrite(filePath + '4.png', mat.pyrDown());
+                cv.imwrite(filePath + '5.png', mat);
+                socket.emit('update', 'image_ready');
+                socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
+                console.log('Image uploaded.');
+            } else {
+                socket.emit('update', 'image_ready');
+            }
         });
     }
 

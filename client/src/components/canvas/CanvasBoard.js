@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue'};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -34,7 +34,6 @@ class CanvasBoard extends Component {
         this.minimapDraw = this.minimapDraw.bind(this);
         this.minimapImage = this.minimapImage.bind(this);
         this.minimapClearImage = this.minimapClearImage.bind(this);
-        this.minimapDisplayUserPosition = this.minimapDisplayUserPosition.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
         this.broadcastPreview = this.broadcastPreview.bind(this);
         this.onPreviewEvent = this.onPreviewEvent.bind(this);
@@ -43,11 +42,15 @@ class CanvasBoard extends Component {
         this.onImageEvent = this.onImageEvent.bind(this);
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
         this.releaseFollowing = this.releaseFollowing.bind(this);
+        this.displayOwnPosition = this.displayOwnPosition.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
-        this.cid = 1;
+    }
+
+    displayOwnPosition(x, y, w, h) {
+        this.minimap.displayOwnPosition(x, y, w, h);
     }
 
     updateViewportsPosition(data) {
@@ -92,15 +95,15 @@ class CanvasBoard extends Component {
 
     broadcastPreview() {
         let url = this.minimap.generateUrl();
-        this.socket.emit('preivew', {id: this.cid, url: url});
-        this.canvasList.updatePreview(this.cid, url);
+        this.socket.emit('preivew', {id: this.state.cid, url: url});
+        this.canvasList.updatePreview(this.state.cid, url);
     }
 
     setCanvas(id) {
-        if (this.cid !== id) {
-            this.cid = id;
-            this.canvasList.setState({current_canvas: this.cid});
-            this.cardDeck.setState({current_canvas: this.cid});
+        if (this.state.cid !== id) {
+            this.setState({cid: id});
+            this.canvasList.setState({current_canvas: this.state.cid});
+            this.cardDeck.setState({current_canvas: this.state.cid});
             this.canvas.reconnect = false;
             this.onInitCanvas();
             this.props.socket.emit('command', 'update');
@@ -109,17 +112,18 @@ class CanvasBoard extends Component {
 
     newCanvas() {
         if (this.canvasList.state.num_canvas < 10) {
-            this.cid = this.canvasList.state.num_canvas += 1;
-            this.canvasList.setState({num_canvas: this.cid, current_canvas: this.cid});
-            this.cardDeck.setState({current_canvas: this.cid})
+            this.setState({cid: this.canvasList.state.num_canvas+1});
+            this.canvasList.setState({num_canvas: this.state.cid, current_canvas: this.state.cid});
+            this.cardDeck.setState({current_canvas: this.state.cid})
             this.canvas.reconnect = false;
             this.onInitCanvas();
         }
     }
 
     // Function will be called after server init.
-    canvas_update(num) {
-        this.canvasList.setState({num_canvas: num});
+    canvas_update(data) {
+        this.canvasList.setState({num_canvas: data['.num_canvas']});
+        this.minimap.displayUserPosition(data);
     }
 
     session_update(data){
@@ -128,13 +132,14 @@ class CanvasBoard extends Component {
         delete data[this.uid];
         this.cardDeck.setState({members: data});
         this.setState({bgColor: color})
+        this.canvas.updatePosition();
     }
 
     onInitCanvas() {
         this.socket.emit('init', {
             user_id: this.uid,
             room_id: this.props.match.params.id,
-            canvas_id: this.props.match.params.id + this.cid,
+            canvas_id: this.props.match.params.id + this.state.cid,
         });
         this.canvas.initCanvas();
         // Get image and strokes from server.
@@ -173,10 +178,6 @@ class CanvasBoard extends Component {
 
     minimapClearImage() {
         this.minimap.clearImage();
-    }
-
-    minimapDisplayUserPosition(data) {
-        this.minimap.displayUserPosition(data);
     }
 
     componentDidMount() {
@@ -262,7 +263,10 @@ class CanvasBoard extends Component {
 
                 <div>
                     <Minimap
-                            onRef={ref => (this.minimap= ref)}/>
+                            onRef={ref => (this.minimap= ref)}
+                            cid={this.state.cid}
+                            uid={this.uid}
+                            color={this.state.bgColor}/>
 
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
@@ -279,7 +283,7 @@ class CanvasBoard extends Component {
                             minimapDraw={this.minimapDraw}
                             minimapImage={this.minimapImage}
                             minimapClearImage={this.minimapClearImage}
-                            minimapDisplayUserPosition={this.minimapDisplayUserPosition}/>
+                            displayOwnPosition={this.displayOwnPosition}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}

@@ -14,7 +14,23 @@
   background-color: white;
 }
 
-#minirectangle {
+#minimap_background {
+  z-index: 4;
+  background-color: black;
+  opacity: 0.2;
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
+
+#minirectangle_peers {
+  z-index: 4;
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+}
+
+#minirectangle_own {
   z-index: 4;
   position: absolute;
   right: 16px;

@@ -37,7 +37,8 @@ class Minimap extends Component {
        this.props.onRef(this);
        this.ctx = this.refs.minimap.getContext('2d');
        this.pctx = this.refs.picture.getContext('2d');
-       this.rctx = this.refs.rectangle.getContext('2d');
+       this.rctx = this.refs.rectangle_peers.getContext('2d');
+       this.octx = this.refs.rectangle_own.getContext('2d');
        this.offsetY = -135/2;
        this.offsetX = -120;
        this.ctx.translate(-this.offsetX, -this.offsetY);
@@ -91,19 +92,39 @@ class Minimap extends Component {
 
     displayUserPosition(data) {
         this.rctx.clearRect(0, 0, width, height);
-        for (var key in data) {
+        for (let key in data) {
+            if (key === '.num_canvas') continue;
+
+            let cid = parseInt(data[key].canvas_id.substr(-1));
+            if (cid === 0) cid = 10;
+            if (cid !== this.props.cid || key === this.props.uid) continue;
+
             // current doesnt update when user moves their own view
             // only updates after other user moves
             var viewport_width = data[key].width_viewport/8;
             var viewport_height = data[key].height_viewport/8;
-            if (viewport_width <= 10 || viewport_height <= 6) {
+            if (viewport_width <= 10 || viewport_height <= 10) {
                 this.rctx.fillStyle = data[key].color;
-                this.rctx.fillRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, viewport_width, viewport_height);
+                this.rctx.fillRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, 10, 10);
             } else {
                 this.rctx.strokeStyle = data[key].color;
-                this.rctx.lineWidth = 2;
+                this.rctx.lineWidth = 3;
                 this.rctx.strokeRect(-this.offsetX + data[key].pos_x_viewport/8, -this.offsetY + data[key].pos_y_viewport/8, viewport_width, viewport_height);
             }
+        }
+    }
+
+    displayOwnPosition(pos_x_viewport, pos_y_viewport, width_viewport, height_viewport) {
+        this.octx.clearRect(0, 0, width, height);
+        width_viewport = width_viewport/8;
+        height_viewport = height_viewport/8;
+        if (width_viewport <= 10 || height_viewport <= 10) {
+            this.octx.fillStyle = this.props.color;
+            this.octx.fillRect(-this.offsetX + pos_x_viewport/8, -this.offsetY + pos_y_viewport/8, 10, 10);
+        } else {
+            this.octx.strokeStyle = this.props.color;
+            this.octx.lineWidth = 6;
+            this.octx.strokeRect(-this.offsetX + pos_x_viewport/8, -this.offsetY + pos_y_viewport/8, width_viewport, height_viewport);
         }
     }
 
@@ -120,9 +141,15 @@ class Minimap extends Component {
                   id = "minipicture"
                   height = {height}
                   width  = {width}/>
+              <div style={{width: '240px', height: '135px'}} id='minimap_background'></div>
               <canvas
-                  ref="rectangle"
-                  id = "minirectangle"
+                  ref="rectangle_peers"
+                  id = "minirectangle_peers"
+                  height = {height}
+                  width  = {width}/>
+              <canvas
+                  ref="rectangle_own"
+                  id = "minirectangle_own"
                   height = {height}
                   width  = {width}/>
             </div>
