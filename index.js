@@ -394,6 +394,7 @@ function onConnection(socket){
             } else {
                 socket.emit('update', 'image_ready');
             }
+            STALE_CANVAS[cid] = 2;
         });
     }
 
@@ -415,8 +416,6 @@ function onConnection(socket){
         } else {
             buildImages(fileInfo.uploadDir, socket)
         }
-
-        STALE_CANVAS[cid] = 2;
     });
 
     uploader.on('error', (err) => {
