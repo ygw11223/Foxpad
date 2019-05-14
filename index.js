@@ -68,7 +68,7 @@ setInterval(() => {
 
     for (let id in sockets) {
         let cid = sockets[id].canvas_id;
-        if (cid === undefined) continue;
+        if (cid === undefined || !(sockets[id].stable)) continue;
         // Here and below: update preview of stale canvas in the next 2 period
         // to compensate for data race problems.
         if (!(cid in STALE_CANVAS)) STALE_CANVAS[cid] = 2;
@@ -76,7 +76,7 @@ setInterval(() => {
         if (STALE_CANVAS[cid] > 0 && !updated.has(cid)) {
             STALE_CANVAS[cid] -= 1;
             updated.add(cid);
-            sockets[id].emit('update', 'canvas_preview');
+            sockets[id].emit('canvas_preview', cid);
         }
   }
 }, 5000);
@@ -96,6 +96,7 @@ function onConnection(socket){
         socket.room_id = rid;
         socket.canvas_id = cid;
         socket.user_id = uid;
+        socket.stable = false;
 
         // Check if room id is valid.
         if (!(rid in USER_INFO)) {
@@ -173,6 +174,10 @@ function onConnection(socket){
             STALE_CANVAS[cid] = 2;
         }
     });
+
+    socket.on('stable', (bool) => {
+        socket.stable = bool;
+    })
 
     socket.on('position', (uid) => {
         const rid = socket.room_id;

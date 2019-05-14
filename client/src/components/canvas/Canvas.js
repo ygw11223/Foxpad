@@ -333,6 +333,9 @@ class Canvas extends Component {
             this.imageWidth = data.w/this.scale;
             this.nextImage.src = data.url;
         }
+        if (data === 'NONE') {
+            this.props.socket.emit('stable', true);
+        }
         // Finish progress bar when recieved image.
         if (this.modal && this.modal.state.uploading) {
             this.modal.onStreamEnd();
@@ -347,6 +350,9 @@ class Canvas extends Component {
         if (this.nextImage.src !== null) {
             this.imageScale += 1;
             setTimeout(this.onEmitImg, 500);
+            if (this.imageScale > 5) {
+                this.props.socket.emit('stable', true);
+            }
         }
     }
 

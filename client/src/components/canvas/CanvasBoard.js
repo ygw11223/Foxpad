@@ -93,8 +93,10 @@ class CanvasBoard extends Component {
         this.canvasList.updatePreview(data.id, data.url);
     }
 
-    broadcastPreview() {
+    broadcastPreview(cid) {
         let data = this.minimap.generateUrl();
+        console.log(cid, data['id'], cid.substr(-1), data['id'] % 10);
+        if (cid.substr(-1) != data['id'] % 10) return;
         this.socket.emit('preivew', data);
         this.canvasList.updatePreview(data['id'], data['url']);
     }
@@ -203,11 +205,10 @@ class CanvasBoard extends Component {
             this.socket.on('canvas_update', this.canvas_update);
             this.socket.on('mouse_position', this.canvas.updateMouseLocation);
             this.socket.on('viewport_position', this.updateViewportsPosition);
+            this.socket.on('canvas_preview', this.broadcastPreview);
             this.socket.on('update', (cmd)=>{
                 if(cmd === 'image_ready') {
                     this.canvas.onEmitImg();
-                } else if (cmd === 'canvas_preview') {
-                    this.broadcastPreview();
                 }
             });
         }
@@ -247,6 +248,12 @@ class CanvasBoard extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevState.cid !== this.state.cid) {
             this.onInitCanvas();
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.cid !== this.state.cid) {
+            this.socket.emit('stable', false);
         }
     }
 
