@@ -16,6 +16,20 @@ const CanvasListStyle = {
     border: 0,
 };
 
+const styleButton = {
+    alignItems: 'center',
+    textAlign: 'center',
+    width: '180px',
+    height: '35px',
+    lineHeight: '30px',
+    fontSize: '20px',
+    zIndex: '5',
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderStyle: 'solid',
+    borderRadius: '6px',
+};
+
 class CanvasList extends Component {
     constructor(props) {
         super(props);
@@ -97,6 +111,7 @@ class CanvasList extends Component {
         return (
             <div style={style} class='canvasList'>
                 <p style={{width: '150px', textAlign: 'center'}}> Canvases </p>
+                <p><button onClick={this.props.toDashboard} style={styleButton}> Dashboard </button></p>
 
                 {this.renderCanvas()}
 

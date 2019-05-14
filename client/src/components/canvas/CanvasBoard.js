@@ -12,11 +12,6 @@ import SocketIOFileClient from 'socket.io-file-client';
 import {DRAWING,VIEWING,DRAGGING} from '../Constants';
 
 const cookies = new Cookies();
-const styleButton = {
-    position: 'absolute',
-    bottom: '15px',
-    zIndex: '50',
-};
 
 class CanvasBoard extends Component {
     constructor(props) {
@@ -46,12 +41,9 @@ class CanvasBoard extends Component {
         this.updateCanvasHistory = this.updateCanvasHistory.bind(this);
         this.onImageEvent = this.onImageEvent.bind(this);
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
-<<<<<<< HEAD
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
-=======
         this.toDashboard = this.toDashboard.bind(this);
->>>>>>> preliminary back to dashboard button, can click enter to submit, accept images and pdf
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -295,7 +287,11 @@ class CanvasBoard extends Component {
                         newCanvas={this.newCanvas}
                         setCanvas={this.setCanvas}
                         rid={this.props.match.params.id}
+<<<<<<< HEAD
                         color={this.state.bgColor}/>
+=======
+                        toDashboard={this.toDashboard}/>
+>>>>>>> to dashboard button styling
 
                 <div>
                     <Minimap
@@ -353,9 +349,12 @@ class CanvasBoard extends Component {
                             color={this.state.bgColor}/>)}
 =======
                             hideNavbar={this.state.hideNavbar}/>
+<<<<<<< HEAD
 
                     <button onClick={this.toDashboard} style={styleButton}> Back to Dashboard </button>
 >>>>>>> preliminary back to dashboard button, can click enter to submit, accept images and pdf
+=======
+>>>>>>> to dashboard button styling
                 </div>
             </div>
         );

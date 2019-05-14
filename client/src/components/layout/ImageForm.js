@@ -88,6 +88,18 @@ class ImageForm extends Component {
 
     fileSelected(e) {
         var file = e.target.files;
+
+        if (file[0].type.startsWith('application/pdf')) {
+            var input = document.getElementById("file");
+            var reader = new FileReader();
+            reader.readAsBinaryString(input.files[0]);
+            reader.onloadend = function(){
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                console.log('Number of Pages:',count );
+            }
+        }
+
+        console.log(file);
         this.handleFile(file);
     }
 
@@ -137,7 +149,6 @@ class ImageForm extends Component {
                 reader.readAsDataURL(file);
             }
             else if (file.type.startsWith('application/pdf')) {
-                console.log("in pdf");
                 img.classList.add("obj");
                 img.setAttribute('src', pdfImage);
             }
