@@ -26,7 +26,11 @@ class Minimap extends Component {
 
         previewContext.drawImage(this.refs.picture, 0, 0, 192, 108);
         previewContext.drawImage(this.refs.minimap, 0, 0, 192, 108);
-        return previewCanvas.toDataURL('image/png');
+        let data = {
+            url: previewCanvas.toDataURL('image/png'),
+            id: this.props.cid,
+        }
+        return data;
     }
 
     componentWillUnmount() {

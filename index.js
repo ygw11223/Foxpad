@@ -199,7 +199,7 @@ function onConnection(socket){
 
         socket.broadcast.in(rid).emit('preview', data);
         let base64Data = data.url.replace(/^data:image\/png;base64,/, "");
-        fs.writeFile('images/preview' + cid + '.png', base64Data, 'base64', function(err) {
+        fs.writeFile('images/preview' + rid + data.id + '.png', base64Data, 'base64', function(err) {
             if (err) console.log(err);
         });
     });
@@ -262,7 +262,8 @@ function onConnection(socket){
             let data = {
                 w: IMAGES[cid].w,
                 h: IMAGES[cid].h,
-                url: IMAGES[cid].name + level + '.png'
+                url: IMAGES[cid].name + level + '.png',
+                cid: cid,
             };
             // Determine image width and height, fitting into a area of 864x1568
             if (data.w/data.h > 1568/864) {
@@ -365,7 +366,7 @@ function onConnection(socket){
     });
 
     uploader.on('stream', (fileInfo) => {
-        console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
+        //console.log(`${fileInfo.wrote} / ${fileInfo.size} byte(s)`);
     });
 
     function buildImages(filePath, socket) {

@@ -94,9 +94,9 @@ class CanvasBoard extends Component {
     }
 
     broadcastPreview() {
-        let url = this.minimap.generateUrl();
-        this.socket.emit('preivew', {id: this.state.cid, url: url});
-        this.canvasList.updatePreview(this.state.cid, url);
+        let data = this.minimap.generateUrl();
+        this.socket.emit('preivew', data);
+        this.canvasList.updatePreview(data['id'], data['url']);
     }
 
     setCanvas(id) {
@@ -292,7 +292,8 @@ class CanvasBoard extends Component {
                             minimapDraw={this.minimapDraw}
                             minimapImage={this.minimapImage}
                             minimapClearImage={this.minimapClearImage}
-                            displayOwnPosition={this.displayOwnPosition}/>
+                            displayOwnPosition={this.displayOwnPosition}
+                            cid={this.state.cid}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}

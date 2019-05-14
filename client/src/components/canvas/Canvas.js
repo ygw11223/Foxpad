@@ -332,11 +332,9 @@ class Canvas extends Component {
         if (this.modal && this.modal.state.uploading) {
             this.modal.onStreamEnd();
         }
-        if (data !== 'NONE') {
-            if (this.imageHight <= 0 || this.imageWidth <= 0) {
-                this.imageHight = data.h/this.scale;
-                this.imageWidth = data.w/this.scale;
-            }
+        if (data !== 'NONE' && data.cid.substr(-1) == (this.props.cid%10)) {
+            this.imageHight = data.h/this.scale;
+            this.imageWidth = data.w/this.scale;
             this.nextImage.src = data.url;
             this.setState({modal: false});
         }
@@ -346,7 +344,7 @@ class Canvas extends Component {
         this.image.src = this.nextImage.src;
         if (this.nextImage.src !== null) {
             this.imageScale += 1;
-            this.onEmitImg();
+            setTimeout(this.onEmitImg, 500);
         }
     }
 
