@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Button} from 'reactstrap';
 import '../layout/style.css'
 
+const arrow = require('./left_arrow.png');
+
 const CanvasListStyle = {
     height: '100%',
     display: 'flex',
@@ -19,7 +21,7 @@ const CanvasListStyle = {
 const styleButton = {
     alignItems: 'center',
     textAlign: 'center',
-    width: '180px',
+    width: '150px',
     height: '35px',
     lineHeight: '30px',
     fontSize: '20px',
@@ -111,7 +113,7 @@ class CanvasList extends Component {
         return (
             <div style={style} class='canvasList'>
                 <p style={{width: '150px', textAlign: 'center'}}> Canvases </p>
-                <p><button onClick={this.props.toDashboard} style={styleButton}> Dashboard </button></p>
+                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginTop: '7px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
 
                 {this.renderCanvas()}
 

@@ -11,6 +11,15 @@ var labelText = null;
 const deleteIcon = require('./delete.png');
 const pdfImage = require('./pdf.png');
 
+const errorText = {
+    position: 'relative',
+    alignItems: 'center',
+    textAlign: 'center',
+    fontSize: '18px',
+    top: '10px',
+    color: 'red',
+};
+
 class ImageForm extends Component {
     constructor(props, context) {
         super(props, context)
@@ -23,7 +32,8 @@ class ImageForm extends Component {
         this.onStreamBegin = this.onStreamBegin.bind(this);
         this.onStream = this.onStream.bind(this);
         this.onStreamEnd = this.onStreamEnd.bind(this);
-        this.state = {imagePreview: false, uploading: false, percent: 0}
+        this.onError = this.onError.bind(this);
+        this.state = {imagePreview: false, uploading: false, percent: 0, displayError: false}
         this.props.uploader.on('start', this.onStreamBegin);
         this.props.uploader.on('stream', this.onStream);
         this.props.uploader.on('complete', (fileInfo) => {this.fileId = -1;});
@@ -36,6 +46,11 @@ class ImageForm extends Component {
 
     componentDidMount() {
        this.props.onRef(this);
+    }
+
+    onError(pageCount) {
+        pageCount > 15 ? this.setState({displayError: true}) : this.setState({displayError: false});
+        console.log("page count is", pageCount);
     }
 
     onStreamBegin(fileInfo) {
@@ -75,7 +90,7 @@ class ImageForm extends Component {
         preview.appendChild(labelText);
         preview.appendChild(fileButton);
         document.getElementById("file").value = null;
-        this.setState({imagePreview: false, uploading: false, percent: 0});
+        this.setState({imagePreview: false, uploading: false, percent: 0, displayError: false});
     }
 
     onUploadEvent(e) {
@@ -92,13 +107,14 @@ class ImageForm extends Component {
         if (file[0].type.startsWith('application/pdf')) {
             var input = document.getElementById("file");
             var reader = new FileReader();
+            var parent = this;
             reader.readAsBinaryString(input.files[0]);
             reader.onloadend = function(){
                 var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
                 console.log('Number of Pages:',count );
+                parent.onError(count);
             }
         }
-
         console.log(file);
         this.handleFile(file);
     }
@@ -180,7 +196,10 @@ class ImageForm extends Component {
                         <label id="label" for="file">Click to choose from files</label>
                         <input type="file" id="file" accept=".jpg,.png,.jpeg,.pdf,.bmp" style={{display: "none"}} onChange={this.fileSelected}/>
                       </div>
-                      { this.state.imagePreview === true && this.state.uploading === false &&
+                      { this.state.displayError === true &&
+                           <p style={errorText}>PDF too long. Please select a document with less than 15 pages</p>
+                      }
+                      { this.state.imagePreview === true && this.state.uploading === false && this.state.displayError === false &&
                           <input type="submit" id="submit" value="Upload" class="button" />
                       }
                       { this.state.uploading === true &&
