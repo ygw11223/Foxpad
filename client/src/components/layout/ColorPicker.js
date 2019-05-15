@@ -12,7 +12,6 @@ class MyColorPicker extends React.Component {
   handleChangeComplete = (color, event) => {
     this.setState({ color: color.hex });
     this.props.onChangeColor(this.state.color);
-    this.props.updateColor(this.state.color);
   };
 
   render() {

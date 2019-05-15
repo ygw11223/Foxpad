@@ -315,6 +315,7 @@ class CanvasBoard extends Component {
                     {this.state.mode === VIEWING ? (""):(
                         <Sidebar
                                 onRef={ref => (this.sidebar= ref)}
+                                color={this.state.color}
                                 onChangeColor={this.changeColor}
                                 onChangeWidth={this.changeWidth}
                                 onUndo={this.onUndoEvent}
