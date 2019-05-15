@@ -12,6 +12,7 @@ const styleSideBar = {
   borderRadius: '0px 0px 20px 0px',
   overflow: 'hidden',
   transition: '0.5s',
+  touchAction: 'none',
 };
 
 class Sidebar extends React.Component {
