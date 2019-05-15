@@ -135,9 +135,9 @@ class Sidebar extends React.Component {
                 <Button eventKey="zoom-in" id="zoomIn" className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-out" id="zoomOut" className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
 
-                <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.state.color}}></i></Button>
+                <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.props.color}}></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
-                  <ColorPicker updateColor={this.updateColor} onChangeColor={this.props.onChangeColor}/>
+                  <ColorPicker onChangeColor={this.props.onChangeColor}/>
                 </Popover>
 
                 <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="penRight"></i></Button>
