@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
+import Cookies from 'universal-cookie';
 import Modal from '../layout/ImageForm.js'
 import {DRAWING,VIEWING,DRAGGING} from '../Constants';
+
+const cookies = new Cookies();
 
 const styleMouse = {
     zIndex: '3',
@@ -268,7 +271,7 @@ class Canvas extends Component {
         let time = new Date().getTime();
 
         for(var i in mouseList) {
-            if(i === this.props.name || time - mouseList[i]['timestamp'] > 3000)
+            if(i == this.props.name || time - mouseList[i]['timestamp'] > 3000)
                 continue;
 
             this.mctx.beginPath();
@@ -329,7 +332,7 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
-        if (data !== 'NONE' && data.cid.substr(-1) === (this.props.cid%10)) {
+        if (data !== 'NONE' && data.cid.substr(-1) == (this.props.cid%10)) {
             this.imageHight = data.h/this.scale;
             this.imageWidth = data.w/this.scale;
             this.nextImage.src = data.url;
