@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
-import Cookies from 'universal-cookie';
 import Modal from '../layout/ImageForm.js'
 import {DRAWING,VIEWING,DRAGGING} from '../Constants';
-
-const cookies = new Cookies();
 
 const styleMouse = {
     zIndex: '3',
@@ -57,6 +54,9 @@ class Canvas extends Component {
         this.resetStroke = this.resetStroke.bind(this);
         this.updatePosition = this.updatePosition.bind(this);
         this.uploadingFailure =this.uploadingFailure.bind(this);
+        this.onPinchStart = this.onPinchStart.bind(this);
+        this.onPinchMove = this.onPinchMove.bind(this);
+        this.getDistance = this.getDistance.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -82,6 +82,7 @@ class Canvas extends Component {
         this.preOffsetX = -1;
         this.preOffsetY = -1;
         this.preScale = 1024;
+        this.preDis = -1;
     }
 
     updatePosition() {
@@ -243,7 +244,6 @@ class Canvas extends Component {
 
     componentWillMount() {
         this.setState({height: window.innerHeight, width: window.innerWidth});
-
     }
 
     updateDimensions() {
@@ -268,7 +268,7 @@ class Canvas extends Component {
         let time = new Date().getTime();
 
         for(var i in mouseList) {
-            if(i == this.props.name || time - mouseList[i]['timestamp'] > 3000)
+            if(i === this.props.name || time - mouseList[i]['timestamp'] > 3000)
                 continue;
 
             this.mctx.beginPath();
@@ -329,7 +329,7 @@ class Canvas extends Component {
     }
 
     onImageEvent(data) {
-        if (data !== 'NONE' && data.cid.substr(-1) == (this.props.cid%10)) {
+        if (data !== 'NONE' && data.cid.substr(-1) === (this.props.cid%10)) {
             this.imageHight = data.h/this.scale;
             this.imageWidth = data.w/this.scale;
             this.nextImage.src = data.url;
@@ -387,6 +387,26 @@ class Canvas extends Component {
         }));
     }
 
+    mapWindowToCanvas(x, offset) {
+        return x*this.scale+offset;
+    }
+
+    solveOffSet(x,y) {
+        return y - x*this.scale;
+    }
+
+    getDistance(e) {
+        let rect = this.refs.canvas.getBoundingClientRect();
+        let p1_x = e.touches[0].clientX - rect.left;
+        let p1_y = e.touches[0].clientY - rect.top;
+        let p2_x = e.touches[1].clientX - rect.left;
+        let p2_y = e.touches[1].clientY - rect.top;
+        return Math.sqrt((p1_x - p2_x)*(p1_x - p2_x) + (p1_y - p2_y)*(p1_y - p2_y));
+    }
+    onPinchStart(e) {
+        this.preDis = this.getDistance(e);
+    }
+
     onMouseDown(e) {
         this.setState({ active: true });
         let currentX = 0;
@@ -400,6 +420,10 @@ class Canvas extends Component {
         //Since the touch event cannot get the relative position on canvas directly
         //We should compute this coordinate by subtracting offsets of the canvas
         //
+            if(e.touches.length === 2) {
+                this.onPinchStart(e);
+                return ;
+            }
             let rect = this.refs.canvas.getBoundingClientRect();
             currentX = e.touches[0].clientX - rect.left;
             currentY = e.touches[0].clientY - rect.top;
@@ -409,14 +433,6 @@ class Canvas extends Component {
         if(this.props.mode === DRAWING){
             this.props.socket.emit('command', 'new_stroke');
         }
-    }
-
-    mapWindowToCanvas(x, offset) {
-        return x*this.scale+offset;
-    }
-
-    solveOffSet(x,y) {
-        return y - x*this.scale;
     }
 
     onMouseSideMove() {
@@ -468,6 +484,16 @@ class Canvas extends Component {
         }
     }
 
+    onPinchMove(e) {
+        let distance = this.getDistance(e);
+        let direction = distance/this.preDis;
+        if(direction > 1)
+            this.zoom(1, 1.1);
+        else if (direction < 1) {
+            this.zoom(-1,1.1)
+        }
+    }
+
     onMouseMove(e) {
         e.preventDefault();
         let currentX = 0;
@@ -482,6 +508,10 @@ class Canvas extends Component {
                                     w: this.props.lineWidth * this.scale / 2 });
         }
         else if(e.type === "touchmove") {
+            if(e.touches.length === 2) {
+                this.onPinchMove(e);
+                return;
+            }
             let rect = this.refs.canvas.getBoundingClientRect();
             currentX = e.touches[0].clientX - rect.left;
             currentY = e.touches[0].clientY - rect.top;
