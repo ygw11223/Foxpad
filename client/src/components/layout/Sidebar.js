@@ -17,28 +17,18 @@ const styleSideBar = {
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {showUploader: true, popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, color: '#EC1D63', onPen: true, onEraser: false};
+        this.state = {popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, color: '#EC1D63', onPen: true, onEraser: false};
         this.updatePenWidth = this.updatePenWidth.bind(this);
         this.updateEraserWidth = this.updateEraserWidth.bind(this);
         this.updateColor = this.updateColor.bind(this);
         this.onPen = this.onPen.bind(this);
         this.onEraser = this.onEraser.bind(this);
         this.onDrag = this.onDrag.bind(this);
-        this.hideImageButton = this.hideImageButton.bind(this);
-        this.showImageButton = this.showImageButton.bind(this);
         this.renderUploader = this.renderUploader.bind(this);
     }
 
-    hideImageButton() {
-        this.setState({showUploader: false});
-    }
-
-    showImageButton() {
-        this.setState({showUploader: true});
-    }
-
     renderUploader() {
-        if (this.state.showUploader) {
+        if (this.props.showUploader) {
             return(<Button eventKey="upload" id="image" className='tool-button button' onClick={() => this.props.showForm()} > <i className="fas fa-image fa-2x" style={{color: 'white'}}></i></Button>);
         }
     }

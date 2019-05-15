@@ -47,7 +47,7 @@ class ImageForm extends Component {
         // console.log('Streaming... sent ' + fileInfo.sent + ' bytes.');
         // Fake 1 percent for server image processing time.
         var percent = Math.round(fileInfo.sent / fileInfo.size * 100) - 1;
-        if (percent >= this.state.percent + 10) {
+        if (percent >= this.state.percent + 5) {
             this.setState({percent: percent});
         }
     }

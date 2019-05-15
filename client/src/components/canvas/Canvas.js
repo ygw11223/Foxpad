@@ -56,6 +56,7 @@ class Canvas extends Component {
         this.cacheStroke = this.cacheStroke.bind(this);
         this.resetStroke = this.resetStroke.bind(this);
         this.updatePosition = this.updatePosition.bind(this);
+        this.uploadingFailure =this.uploadingFailure.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -343,6 +344,17 @@ class Canvas extends Component {
         if (this.state.modal) {
             this.setState({modal: false});
         }
+    }
+
+    uploadingFailure() {
+        // Finish progress bar when recieved image.
+        if (this.modal && this.modal.state.uploading) {
+            this.modal.onStreamEnd();
+        }
+        if (this.state.modal) {
+            this.setState({modal: false});
+        }
+        alert("Image is invalid.");
     }
 
     onLoadNextImage() {

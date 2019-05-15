@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -81,9 +81,9 @@ class CanvasBoard extends Component {
     onImageEvent(data) {
         if (this.sidebar !== null) {
             if (data === 'NONE') {
-                this.sidebar.showImageButton();
+                this.setState({showUploader: true});
             } else {
-                this.sidebar.hideImageButton();
+                this.setState({showUploader: false});
             }
         }
         this.canvas.onImageEvent(data);
@@ -207,8 +207,10 @@ class CanvasBoard extends Component {
             this.socket.on('viewport_position', this.updateViewportsPosition);
             this.socket.on('canvas_preview', this.broadcastPreview);
             this.socket.on('update', (cmd)=>{
-                if(cmd === 'image_ready') {
+                if (cmd === 'image_ready') {
                     this.canvas.onEmitImg();
+                } else if (cmd === 'image_fail') {
+                    this.canvas.uploadingFailure();
                 }
             });
         }
@@ -320,7 +322,8 @@ class CanvasBoard extends Component {
                                 onZoom={this.onZoom}
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
-                                hideNavbar={this.state.hideNavbar}/>)}
+                                hideNavbar={this.state.hideNavbar}
+                                showUploader={this.state.showUploader}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}

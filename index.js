@@ -402,7 +402,7 @@ function onConnection(socket){
                 socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
                 console.log('Image uploaded.');
             } else {
-                socket.emit('update', 'image_ready');
+                socket.emit('update', 'image_fail');
             }
             STALE_CANVAS[cid] = 2;
         });
@@ -412,7 +412,10 @@ function onConnection(socket){
         console.log('Upload Complete.');
         const cid = socket.canvas_id;
 
-        if (cid === undefined) return;
+        if (cid === undefined) {
+            socket.emit('update', 'image_fail');
+            return;
+        }
 
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
             let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 \"'
@@ -420,7 +423,7 @@ function onConnection(socket){
             exec(file_Exe, function (error, stdout, stderr) {
                 if (error !== null) {
                     console.log('Error when converting pdf: ' + error);
-                    socket.emit('update', 'image_ready');
+                    socket.emit('update', 'image_fail');
                 } else {
                     console.log('Pdf converted: ' + stdout);
                     buildImages('./images/'+cid+'.png', socket);
