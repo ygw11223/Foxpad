@@ -212,3 +212,11 @@
     font-size: 0.75em !important;
     display: none;
 }
+
+.nametext {
+    height: 100%;
+    vertical-align: middle;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

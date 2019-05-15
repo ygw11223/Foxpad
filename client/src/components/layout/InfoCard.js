@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Card, CardText, CardBody, CardTitle} from 'reactstrap';
+import './style.css'
 
 const followIcon = require('./follow.png');
 
@@ -7,9 +8,10 @@ const followIcon = require('./follow.png');
 const InfoCardStyle = {
     height: '100%',
     width: '100%',
-    padding: '25px 25px 0 50px',
+    padding: '0px 25px 0 50px',
     margin: 0,
     borderRadius: '0 0 25px 0',
+    verticalAlign: 'middle',
 };
 
 const cardDivStyle = {
@@ -80,7 +82,7 @@ class InfoCard extends Component {
                 onClick={() => {this.props.lockCard(this.props.name)}}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
-                    <CardBody style={{padding: 10}}>
+                    <CardBody className='nametext' style={{padding: 10}}>
                         <CardText> {this.props.name} </CardText>
                     </CardBody>
                 </Card>
