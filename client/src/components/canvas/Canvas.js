@@ -491,10 +491,11 @@ class Canvas extends Component {
         let distance = this.getDistance(e);
         let direction = distance/this.preDis;
         if(direction > 1)
-            this.zoom(1, 1.1);
+            this.zoom(1, 1.1 );
         else if (direction < 1) {
             this.zoom(-1,1.1)
         }
+        this.preDis = distance;
     }
 
     onMouseMove(e) {
