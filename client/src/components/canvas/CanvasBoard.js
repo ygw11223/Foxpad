@@ -287,11 +287,8 @@ class CanvasBoard extends Component {
                         newCanvas={this.newCanvas}
                         setCanvas={this.setCanvas}
                         rid={this.props.match.params.id}
-<<<<<<< HEAD
-                        color={this.state.bgColor}/>
-=======
+                        color={this.state.bgColor}
                         toDashboard={this.toDashboard}/>
->>>>>>> to dashboard button styling
 
                 <div>
                     <Minimap
@@ -344,17 +341,9 @@ class CanvasBoard extends Component {
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
-<<<<<<< HEAD
                             hideNavbar={this.state.hideNavbar}
                             color={this.state.bgColor}/>)}
-=======
                             hideNavbar={this.state.hideNavbar}/>
-<<<<<<< HEAD
-
-                    <button onClick={this.toDashboard} style={styleButton}> Back to Dashboard </button>
->>>>>>> preliminary back to dashboard button, can click enter to submit, accept images and pdf
-=======
->>>>>>> to dashboard button styling
                 </div>
             </div>
         );
