@@ -43,6 +43,7 @@ class CanvasBoard extends Component {
         this.updateViewportsPosition = this.updateViewportsPosition.bind(this);
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
+        this.toDashboard = this.toDashboard.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -51,6 +52,11 @@ class CanvasBoard extends Component {
 
     displayOwnPosition(x, y, w, h) {
         this.minimap.displayOwnPosition(x, y, w, h);
+    }
+
+    toDashboard(e) {
+        console.log("here");
+        this.setState({toDashboard: true});
     }
 
     updateViewportsPosition(data) {
@@ -266,6 +272,10 @@ class CanvasBoard extends Component {
             }} />
         }
 
+        if (this.state.toDashboard === true) {
+            return <Redirect to={'/dashboard'} />
+        }
+
         var icon = (this.state.hideNavbar === true ? '>' : '<');
 
         return(
@@ -276,7 +286,8 @@ class CanvasBoard extends Component {
                         newCanvas={this.newCanvas}
                         setCanvas={this.setCanvas}
                         rid={this.props.match.params.id}
-                        color={this.state.bgColor}/>
+                        color={this.state.bgColor}
+                        toDashboard={this.toDashboard}/>
 
                 <div>
                     <Minimap
@@ -331,6 +342,7 @@ class CanvasBoard extends Component {
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
                             color={this.state.bgColor}/>)}
+                            hideNavbar={this.state.hideNavbar}/>
                 </div>
             </div>
         );

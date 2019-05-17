@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Button} from 'reactstrap';
 import '../layout/style.css'
 
+const arrow = require('./left_arrow.png');
+
 const CanvasListStyle = {
     height: '100%',
     display: 'flex',
@@ -14,6 +16,20 @@ const CanvasListStyle = {
     zIndex: '5',
     overflow: 'scroll',
     border: 0,
+};
+
+const styleButton = {
+    alignItems: 'center',
+    textAlign: 'center',
+    width: '150px',
+    height: '35px',
+    lineHeight: '30px',
+    fontSize: '20px',
+    zIndex: '5',
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderStyle: 'solid',
+    borderRadius: '6px',
 };
 
 class CanvasList extends Component {
@@ -45,7 +61,10 @@ class CanvasList extends Component {
         var children = [];
         for (var i = 1; i <= this.state.num_canvas; i++) {
             let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)';
-            let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
+            // let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
+            let border = (i === this.state.current_canvas ? '5px solid #5F646A' : 'none');
+            let borderRadius = (i === this.state.current_canvas ? '8px' : 'none');
+
             children.push(
                 <Button
                     style={{
@@ -54,11 +73,12 @@ class CanvasList extends Component {
                         backgroundColor: 'white',
                         backgroundImage: url,
                         padding: 0,
-                        border: 0,
-                        borderColor: 'black',
+                        border: border,
+                        borderRadius: borderRadius,
+                        //borderColor: 'black',
                         margin: '10px 0 10px 0',
                         flexShrink: 0,
-                        boxShadow: boxShadow
+                        // boxShadow: boxShadow
                     }}
                     className={'canvasPreview' + i}
                     onClick={this.props.setCanvas.bind(this, i)}>
@@ -97,6 +117,7 @@ class CanvasList extends Component {
         return (
             <div style={style} class='canvasList'>
                 <p style={{width: '150px', textAlign: 'center'}}> Canvases </p>
+                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginTop: '7px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
 
                 {this.renderCanvas()}
 

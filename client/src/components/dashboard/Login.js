@@ -24,7 +24,8 @@ class Login extends React.Component {
         this.setState({user_name: event.target.value});
     }
 
-    onSubmit() {
+    onSubmit(e) {
+        e.preventDefault();
         cookies.set('cd_user_name', this.state.user_name,  {path: '/'});
         console.log(this.props.location);
         if (this.props.location.state === undefined) {
@@ -52,10 +53,12 @@ class Login extends React.Component {
                         <row>
                             <label for="userName" id="user_name">Hi there!</label>
                             <p id="name_text">Welcome to Collaborative Drawing</p>
-                            <div id="wrappinginput">
-                                <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>
-                                <button type="button" id="submitButton" onClick={this.onSubmit}><img src={arrow} alt="arrow" id="arrow"/></button>
-                            </div>
+                            <form onSubmit={this.onSubmit}>
+                                <div id="wrappinginput">
+                                    <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>
+                                    <button type="submit" id="submitButton"><img src={arrow} alt="arrow" id="arrow"/></button>
+                                </div>
+                            </form>
                         </row>
                     </div>
                 </div>

@@ -107,7 +107,7 @@ class CardStack extends React.Component {
                             margin: 0,
                             fontSize: '10px',
                         }}>————</p>
-                        <CardText>Logined in as: <b>{this.state.name}</b></CardText>
+                        <CardText>Logged in as: <b>{this.state.name}</b></CardText>
                     </CardBody>
                 </Card>
 
