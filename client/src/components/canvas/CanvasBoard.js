@@ -60,7 +60,9 @@ class CanvasBoard extends Component {
     }
 
     updateViewportsPosition(data) {
-        this.minimap.displayUserPosition(data);
+        if (this.minimap) {
+                this.minimap.displayUserPosition(data);
+        }
         if (this.state.following === false) return;
         for (let key in data) {
             if (key === this.state.following) {
@@ -100,10 +102,12 @@ class CanvasBoard extends Component {
     }
 
     broadcastPreview(cid) {
-        let data = this.minimap.generateUrl();
-        if (cid.substr(-1) != data['id'] % 10) return;
-        this.socket.emit('preivew', data);
-        this.canvasList.updatePreview(data['id'], data['url']);
+        if (this.minimap) {
+            let data = this.minimap.generateUrl();
+            if (cid.substr(-1) != data['id'] % 10) return;
+            this.socket.emit('preivew', data);
+            this.canvasList.updatePreview(data['id'], data['url']);
+        }
     }
 
     setCanvas(id) {
@@ -341,8 +345,7 @@ class CanvasBoard extends Component {
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
-                            color={this.state.bgColor}/>)}
-                            hideNavbar={this.state.hideNavbar}/>
+                            color={this.state.bgColor}/>)}/>
                 </div>
             </div>
         );
