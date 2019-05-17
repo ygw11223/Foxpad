@@ -95,7 +95,6 @@ class CanvasBoard extends Component {
 
     broadcastPreview(cid) {
         let data = this.minimap.generateUrl();
-        console.log(cid, data['id'], cid.substr(-1), data['id'] % 10);
         if (cid.substr(-1) != data['id'] % 10) return;
         this.socket.emit('preivew', data);
         this.canvasList.updatePreview(data['id'], data['url']);

@@ -195,8 +195,10 @@ class Canvas extends Component {
         this.ctx.translate(dx,dy);
         this.mctx.translate(dx,dy);
         this.onRedrawEvent();
-        if(this.preOffsetX === this.offsetX && this.preOffsetY === this.offsetY && this.preScale === this.scale)
+        // console.log(this.preOffsetX, this.offsetX, this.preOffsetY, this.offsetY, this.preScale, this.scale);
+        if(this.preOffsetX === this.offsetX && this.preOffsetY === this.offsetY && this.preScale === this.scale) {
             return;
+        }
 
         this.updatePosition();
 
@@ -484,6 +486,8 @@ class Canvas extends Component {
             this.mctx.translate(dx,dy);
             this.onRedrawEvent();
             this.updatePosition();
+            this.preOffsetX = this.offsetX;
+            this.preOffsetY = this.offsetY;
         }
     }
 
@@ -545,6 +549,8 @@ class Canvas extends Component {
             this.mctx.translate(dx,dy);
             this.onRedrawEvent();
             this.updatePosition();
+            this.preOffsetX = this.offsetX;
+            this.preOffsetY = this.offsetY;
         }
         else if (this.state.active && this.props.mode === DRAWING) {
             this.drawLine(this.mapWindowToCanvas(this.preX, this.offsetX),
@@ -638,6 +644,7 @@ class Canvas extends Component {
         }
         this.onRedrawEvent();
         this.updatePosition();
+        this.preScale = this.scale;
     }
 
     onScrollEvent(event) {
