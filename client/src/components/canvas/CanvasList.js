@@ -61,7 +61,10 @@ class CanvasList extends Component {
         var children = [];
         for (var i = 1; i <= this.state.num_canvas; i++) {
             let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)';
-            let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
+            // let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
+            let border = (i === this.state.current_canvas ? '5px solid #5F646A' : 'none');
+            let borderRadius = (i === this.state.current_canvas ? '8px' : 'none');
+
             children.push(
                 <Button
                     style={{
@@ -70,11 +73,12 @@ class CanvasList extends Component {
                         backgroundColor: 'white',
                         backgroundImage: url,
                         padding: 0,
-                        border: 0,
-                        borderColor: 'black',
+                        border: border,
+                        borderRadius: borderRadius,
+                        //borderColor: 'black',
                         margin: '10px 0 10px 0',
                         flexShrink: 0,
-                        boxShadow: boxShadow
+                        // boxShadow: boxShadow
                     }}
                     className={'canvasPreview' + i}
                     onClick={this.props.setCanvas.bind(this, i)}>
