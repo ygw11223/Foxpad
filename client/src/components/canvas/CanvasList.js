@@ -62,27 +62,46 @@ class CanvasList extends Component {
         for (var i = 1; i <= this.state.num_canvas; i++) {
             let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)';
             // let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
-            let border = (i === this.state.current_canvas ? '5px solid #5F646A' : 'none');
-            let borderRadius = (i === this.state.current_canvas ? '8px' : 'none');
+            let style = {};
+            if (i === this.state.current_canvas) {
+                style = {
+                    width: '100%',
+                    backgroundColor: 'gray',
+                    position: 'relative',
+                    left: '-5px',
+                    margin: '5px 0 5px 0',
+                    borderRadius: '5px 5px 5px 5px',
+                    flexShrink: 0,
+                }
+            } else {
+                style = {
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    position: 'relative',
+                    left: '-5px',
+                    margin: '5px 0 5px 0',
+                    borderRadius: '5px 5px 5px 5px',
+                    flexShrink: 0,
+                }
+            }
 
             children.push(
-                <Button
-                    style={{
-                        height: '108px',
-                        width: '192px',
-                        backgroundColor: 'white',
-                        backgroundImage: url,
-                        padding: 0,
-                        border: border,
-                        borderRadius: borderRadius,
-                        //borderColor: 'black',
-                        margin: '10px 0 10px 0',
-                        flexShrink: 0,
-                        // boxShadow: boxShadow
-                    }}
-                    className={'canvasPreview' + i}
-                    onClick={this.props.setCanvas.bind(this, i)}>
-                </Button>
+                <div style={style}>
+                    <Button
+                        style={{
+                            position: 'relative',
+                            left: '15px',
+                            height: '108px',
+                            width: '192px',
+                            backgroundColor: 'white',
+                            backgroundImage: url,
+                            padding: 0,
+                            margin: '5px 0 5px 0',
+                        }}
+                        className={'canvasPreview' + i}
+                        onClick={this.props.setCanvas.bind(this, i)}>
+                    </Button>
+                </div>
             );
         }
         return children;
