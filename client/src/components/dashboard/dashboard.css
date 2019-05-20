@@ -32,7 +32,7 @@
     display: inline-block;
     height: 60px;
     width: auto;
-    background-color: #4C94CD;
+    background-color: #5E9494;
     color: white;
     padding: 13px 25px 13px 25px;
     border-radius: 0 0 20px 0;
@@ -61,7 +61,7 @@
     border-radius: 8px;
     overflow: hidden;
     border-style: dashed;
-    border-color: #4C94CD;
+    border-color: #5E9494;
     border-width: 4px 4px 4px 4px;
     z-index: 2;
 }
@@ -97,7 +97,7 @@
     font-size: 90px;
     margin: 0;
     vertical-align: top;
-    color: #4C94CD;
+    color: #5E9494;
     filter: drop-shadow(7px 6px 3px #71717180);
 }
 
@@ -107,7 +107,7 @@
     bottom: 80px;
     font-size: 28px;
     font-weight: 500;
-    color: #4C94CD;
+    color: #5E9494;
     text-transform: capitalize;
     font-family: 'Roboto', sans-serif;
     filter: drop-shadow(7px 6px 3px #71717180);
@@ -155,7 +155,7 @@
     z-index: -1;
     height: 74px;
     width: 100%;
-    background-color: #4C94CD;
+    background-color: #5E9494;
     filter: blur(1px);
     opacity: 0.83;
 }

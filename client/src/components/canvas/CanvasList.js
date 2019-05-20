@@ -21,10 +21,10 @@ const CanvasListStyle = {
 const styleButton = {
     alignItems: 'center',
     textAlign: 'center',
-    width: '150px',
+    verticalAlign: 'middle',
+    width: '130px',
     height: '35px',
-    lineHeight: '30px',
-    fontSize: '20px',
+    fontSize: '18px',
     zIndex: '5',
     backgroundColor: 'transparent',
     borderColor: 'white',
@@ -35,10 +35,11 @@ const styleButton = {
 class CanvasList extends Component {
     constructor(props) {
         super(props);
-        this.state = {num_canvas: 1, current_canvas: 1};
+        this.state = {num_canvas: 1, current_canvas: 1, members: {}};
         this.renderCanvas = this.renderCanvas.bind(this);
         this.renderButton = this.renderButton.bind(this);
         this.updatePreview = this.updatePreview.bind(this);
+        this.renderColorBar = this.renderColorBar.bind(this);
     }
 
     updatePreview(id, url) {
@@ -47,6 +48,27 @@ class CanvasList extends Component {
         if (canvas) {
             canvas.style.backgroundImage = 'url(' + url + ')';
         }
+    }
+
+    renderColorBar(cid) {
+        let children = [];
+        for (let key in this.state.members) {
+            console.log(key, cid, this.state.members[key])
+            if (key == cid) {
+                for (let i in this.state.members[key]) {
+                    children.push(
+                        <div style={{
+                            backgroundColor: this.state.members[key][i],
+                            width: '5px',
+                            height: '110px',
+                            position: 'relative',
+                            zIndex: '5'
+                        }}>
+                        </div>);
+                }
+            }
+        }
+        return(children);
     }
 
     componentDidMount() {
@@ -58,8 +80,8 @@ class CanvasList extends Component {
     }
 
     renderCanvas() {
-        var children = [];
-        for (var i = 1; i <= this.state.num_canvas; i++) {
+        let children = [];
+        for (let i = 1; i <= this.state.num_canvas; i++) {
             let url = 'url(images/' + 'preview' + this.props.rid + i + '.png)';
             // let boxShadow = (i === this.state.current_canvas ? 'inset 0 0 10px black' : 'none');
             let style = {};
@@ -89,6 +111,14 @@ class CanvasList extends Component {
                 <div style={style}>
                     <Button
                         style={{
+                            borderColor: 'gray',
+                            borderWidth: '0',
+                            boxShadow: 'none',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                            borderRadius: '5px',
+                            overflow: 'hidden',
                             position: 'relative',
                             left: '15px',
                             height: '108px',
@@ -100,6 +130,7 @@ class CanvasList extends Component {
                         }}
                         className={'canvasPreview' + i}
                         onClick={this.props.setCanvas.bind(this, i)}>
+                        {this.renderColorBar(i)}
                     </Button>
                 </div>
             );
@@ -135,8 +166,8 @@ class CanvasList extends Component {
         }
         return (
             <div style={style} class='canvasList'>
-                <p style={{width: '150px', textAlign: 'center'}}> Canvases </p>
-                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginTop: '7px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
+                <p style={{width: '150px', textAlign: 'center', margin: '7px 0 7px 0'}}> Canvases </p>
+                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginTop: '6px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
 
                 {this.renderCanvas()}
 

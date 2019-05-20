@@ -63,6 +63,7 @@ class CanvasBoard extends Component {
         if (this.minimap) {
                 this.minimap.displayUserPosition(data);
         }
+
         if (this.state.following === false) return;
         for (let key in data) {
             if (key === this.state.following) {
@@ -140,6 +141,24 @@ class CanvasBoard extends Component {
             console.log('refresh');
             window.location.reload();
         } else {
+            delete data['.num_canvas'];
+            let colors = {};
+            for (let key in data) {
+                if (key === this.uid) {
+                    data[key] = data[key].color;
+                    continue;
+                }
+                let cid = parseInt(data[key].cid.substr(-1));
+                if (cid === 0) cid = 10;
+                if (colors[cid]) {
+                    colors[cid].push(data[key].color);
+                } else {
+                    colors[cid] = [data[key].color];
+                }
+                data[key] = data[key].color;
+            }
+            this.canvasList.setState({members: colors});
+
             this.cardDeck.state.totalIds = Object.keys(data).length;
             let color = data[this.uid];
             delete data[this.uid];
@@ -191,7 +210,9 @@ class CanvasBoard extends Component {
     }
 
     minimapClearImage() {
-        this.minimap.clearImage();
+        if (this.minimap) {
+            this.minimap.clearImage();
+        }
     }
 
     componentDidMount() {
@@ -277,6 +298,7 @@ class CanvasBoard extends Component {
         }
 
         if (this.state.toDashboard === true) {
+            this.socket.disconnect();
             return <Redirect to={'/dashboard'} />
         }
 

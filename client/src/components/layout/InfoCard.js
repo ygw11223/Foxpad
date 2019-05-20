@@ -15,8 +15,8 @@ const InfoCardStyle = {
 };
 
 const cardDivStyle = {
-    height: 100,
-    width: 150,
+    height: '100px',
+    width: '150px',
     position: 'relative',
     padding: 0,
     margin: 0,
@@ -75,6 +75,7 @@ class InfoCard extends Component {
             ...cardDivStyle,
             left: offset,
             zIndex: 100 - this.props.id, // Allow left card cover right card.
+            boxShadow: '0px 0px 5px #000000',
         }
 
         return (
@@ -82,7 +83,7 @@ class InfoCard extends Component {
                 onClick={() => {this.props.lockCard(this.props.name)}}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
-                    <CardBody className='nametext' style={{padding: 10}}>
+                    <CardBody className='nametext' style={{padding: 5}}>
                         <CardText> {this.props.name} </CardText>
                     </CardBody>
                 </Card>
