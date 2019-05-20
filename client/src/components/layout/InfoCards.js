@@ -62,7 +62,7 @@ class CardStack extends React.Component {
 
     render () {
         let left = this.props.hideNavbar ? '0' : '212px';
-        let width = 225 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0);
+        let width = 226 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0);
         let lastCard = false;
         if (this.state.followName) {
             lastCard = true;
@@ -94,7 +94,7 @@ class CardStack extends React.Component {
             <ul style={style}
                 onMouseOut={this.onMouseOut}>
                 <Card style={mainCardStyle}>
-                    <CardBody style={{padding: '0 0 0 0'}}>
+                    <CardBody style={{padding: '5px 0 0 0'}}>
                         <CardTitle style={{
                             margin: 0,
                             padding: 0,
@@ -126,12 +126,12 @@ const stackStyles = {
     position:'absolute',
     top:'0px',
     display: 'flex',
-    flexDirection: 'row',
     overflow: 'hidden',
+    flexDirection: 'row',
     padding: 0,
     margin: 0,
     borderRadius: '0 0 25px 0',
-    height: 100,
+    height: '100px',
     color: 'white',
     border: 0,
     transition: '0.5s',
@@ -146,6 +146,7 @@ const card1Style = {
     borderRadius: '0 0 25px 0',
     flexShrink: 0,
     border: 0,
+    boxShadow: '0px 0px 5px #000000',
 };
 
 export default CardStack;

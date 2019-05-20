@@ -144,7 +144,10 @@ function onConnection(socket){
 
         let members = {};
         for (let key in SESSION_INFO[rid]) {
-            members[key] = SESSION_INFO[rid][key]['color'];
+            members[key] = {
+                color: SESSION_INFO[rid][key]['color'],
+                cid: SESSION_INFO[rid][key]['canvas_id'],
+            }
         }
         socket.broadcast.in(rid).emit('session_update', members);
         socket.emit('session_update', members);
@@ -350,7 +353,10 @@ function onConnection(socket){
         delete SESSION_INFO[rid][uid];
         let members = {};
         for (let key in SESSION_INFO[rid]) {
-            members[key] = SESSION_INFO[rid][key]['color'];
+            members[key] = {
+                color: SESSION_INFO[rid][key]['color'],
+                cid: SESSION_INFO[rid][key]['canvas_id'],
+            }
         }
         socket.broadcast.in(rid).emit('session_update', members);
         socket.broadcast.in(rid).emit('viewport_position', SESSION_INFO[rid]);
@@ -418,7 +424,7 @@ function onConnection(socket){
         }
 
         if (fileInfo.uploadDir.substr(-4) === '.pdf') {
-            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 \"'
+            let file_Exe = 'montage -mode Concatenate -tile 1x -density 150 -quality 100 -colorspace RGB \"'
                 + fileInfo.uploadDir + '\" ./images/' + cid + '.png';
             exec(file_Exe, function (error, stdout, stderr) {
                 if (error !== null) {
