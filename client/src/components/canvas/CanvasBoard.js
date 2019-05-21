@@ -134,7 +134,7 @@ class CanvasBoard extends Component {
     // Function will be called after server init.
     canvas_update(data) {
         this.canvasList.setState({num_canvas: data['.num_canvas']});
-        this.minimap.displayUserPosition(data);
+        if (this.minimap) this.minimap.displayUserPosition(data);
     }
 
     session_update(data){
@@ -193,21 +193,21 @@ class CanvasBoard extends Component {
     onDrawingEvent(data) {
         this.canvas.cacheStroke(data);
         this.canvas.onDrawingEvent(data);
-        this.minimap.onDrawingEvent(data);
+        if (this.minimap) this.minimap.onDrawingEvent(data);
     }
 
     onRedrawEvent(data_array) {
         this.canvas.resetStroke(data_array);
         this.canvas.onRedrawEvent();
-        this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
+        if (this.minimap) this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
     }
 
     minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
-        this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
+        if (this.minimap) this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
     }
 
     minimapImage(datadata, imgWidth, imgHeight) {
-        this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
+        if (this.minimap) this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
     }
 
     minimapClearImage() {
