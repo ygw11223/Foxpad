@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -219,10 +219,13 @@ class CanvasBoard extends Component {
     componentDidMount() {
         if (cookies.get('cd_user_name') === undefined) {
             return;
-        }
+
         window.addEventListener("orientationchange", function() {
             window.location.reload();
         });
+        if (window.screen.width < 400 && window.screen.height < 650) {
+            this.setState({mobile: true});
+        }
         this.updateCanvasHistory();
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init upon
@@ -328,11 +331,13 @@ class CanvasBoard extends Component {
                         toDashboard={this.toDashboard}/>
 
                 <div>
-                    <Minimap
-                            onRef={ref => (this.minimap= ref)}
-                            cid={this.state.cid}
-                            uid={this.uid}
-                            color={this.state.bgColor}/>
+                    {this.state.mobile === false &&
+                        <Minimap
+                                onRef={ref => (this.minimap= ref)}
+                                cid={this.state.cid}
+                                uid={this.uid}
+                                color={this.state.bgColor}/>
+                    }
 
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
@@ -372,7 +377,8 @@ class CanvasBoard extends Component {
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
-                                showUploader={this.state.showUploader}/>)}
+                                showUploader={this.state.showUploader}
+                                mobile={this.state.mobile}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}

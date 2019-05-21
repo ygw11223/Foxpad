@@ -29,7 +29,7 @@ class Sidebar extends React.Component {
     }
 
     renderUploader() {
-        if (this.props.showUploader) {
+        if (this.props.showUploader && this.props.mobile === false) {
             return(<Button eventKey="upload" id="image" className='tool-button button' onClick={() => this.props.showForm()} > <i className="fas fa-image fa-2x" style={{color: 'white'}}></i></Button>);
         }
     }
@@ -123,6 +123,7 @@ class Sidebar extends React.Component {
     //
     render() {
         var left = this.props.hideNavbar ? '0' : '212px';
+        var display = this.props.mobile ? 'none' : 'block';
         const style = {
             ...styleSideBar,
             left: left,
@@ -132,9 +133,9 @@ class Sidebar extends React.Component {
             <ButtonGroup   vertical id="buttonGroup" style={style}>
 
                 <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
-                <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
-                <Button eventKey="zoom-in" id="zoomIn" className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
-                <Button eventKey="zoom-out" id="zoomOut" className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="undo" id="undo" style={{display: display}} className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="zoom-in" id="zoomIn" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="zoom-out" id="zoomOut" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
 
                 <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.props.color}}></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
