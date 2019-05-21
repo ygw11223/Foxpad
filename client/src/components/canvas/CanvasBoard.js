@@ -223,7 +223,7 @@ class CanvasBoard extends Component {
         window.addEventListener("orientationchange", function() {
             window.location.reload();
         });
-        if (window.screen.width < 400 && window.screen.height < 650) {
+        if (window.screen.width < 1000 && window.screen.height < 1000) {
             this.setState({mobile: true});
         }
         this.updateCanvasHistory();
