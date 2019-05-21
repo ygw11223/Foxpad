@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -216,6 +216,11 @@ class CanvasBoard extends Component {
     }
 
     componentDidMount() {
+        console.log(window.screen);
+        if (window.screen.width < 400 && window.screen.height < 650) {
+            this.setState({mobile: true});
+        }
+
         let id = cookies.get('cd_user_name');
         if (id == undefined) {
             this.setState({toLogin: true});
@@ -316,11 +321,13 @@ class CanvasBoard extends Component {
                         toDashboard={this.toDashboard}/>
 
                 <div>
-                    <Minimap
-                            onRef={ref => (this.minimap= ref)}
-                            cid={this.state.cid}
-                            uid={this.uid}
-                            color={this.state.bgColor}/>
+                    {this.state.mobile === false &&
+                        <Minimap
+                                onRef={ref => (this.minimap= ref)}
+                                cid={this.state.cid}
+                                uid={this.uid}
+                                color={this.state.bgColor}/>
+                    }
 
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
@@ -360,7 +367,8 @@ class CanvasBoard extends Component {
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
-                                showUploader={this.state.showUploader}/>)}
+                                showUploader={this.state.showUploader}
+                                mobile={this.state.mobile}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}
