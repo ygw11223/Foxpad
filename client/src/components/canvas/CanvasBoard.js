@@ -217,7 +217,7 @@ class CanvasBoard extends Component {
 
     componentDidMount() {
         console.log(window.screen);
-        if (window.screen.width < 400 && window.screen.height < 650) {
+        if (window.screen.width < 1000 && window.screen.height < 1000) {
             this.setState({mobile: true});
         }
 
