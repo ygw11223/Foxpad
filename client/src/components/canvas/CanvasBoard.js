@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false, landscape: false,};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -216,18 +216,17 @@ class CanvasBoard extends Component {
     }
 
     componentDidMount() {
-        console.log(document.documentElement);
+        console.log(window.screen.orientation);
+        if (window.screen.orientation.type === 'landscape-primary' || window.screen.orientation.type === 'landscape-secondary') {
+            this.setState({landscape: true});
+        }
+        else {
+            this.setState({landscape: false});
+        }
         if (window.screen.width < 1000 && window.screen.height < 1000) {
             document.documentElement.requestFullscreen().catch(err => {
               alert("Error attempting to enable full-screen mode");
             });
-            window.screen.orientation.lock("landscape")
-            	.then(function() {
-            		alert('Locked');
-            	})
-            	.catch(function(error) {
-            		alert(error);
-            	});
             this.setState({mobile: true});
         }
 
@@ -378,7 +377,8 @@ class CanvasBoard extends Component {
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
                                 showUploader={this.state.showUploader}
-                                mobile={this.state.mobile}/>)}
+                                mobile={this.state.mobile}
+                                landscape={this.state.landscape}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}
