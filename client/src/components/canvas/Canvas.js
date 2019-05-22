@@ -498,11 +498,38 @@ class Canvas extends Component {
         let distance, px,py;
         [distance, px,py] = this.getDistance(e);
         let direction = distance/this.preDis;
-        if(direction > 1.05)
-            this.zoom(1, 1.1,px,py );
-        else if (direction < 0.95,px,py) {
-            this.zoom(-1,1.1)
+        if(direction > 1.03)
+            this.zoom(1, 1.1,px,py);
+        else if (direction < 0.97) {
+            this.zoom(-1,1.1,px,py)
         }
+        let dx =  this.mapWindowToCanvas(px , this.offsetX)
+                    - this.mapWindowToCanvas(this.prePX, this.offsetX);
+        let dy =  this.mapWindowToCanvas(py , this.offsetY)
+                    - this.mapWindowToCanvas(this.prePY, this.offsetY);
+
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) 
+                        > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) 
+                        > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        }
+        if(dx === 0 && dy === 0)
+            return;
+        this.offsetX -= dx;
+        this.offsetY -= dy;
+        this.ctx.translate(dx,dy);
+        this.mctx.translate(dx,dy);
+        this.onRedrawEvent();
+        this.updatePosition();
+        this.preOffsetX = this.offsetX;
+        this.preOffsetY = this.offsetY;
         this.preDis = distance;
         this.prePX = px;
         this.prePY = py;
