@@ -124,11 +124,13 @@ class Sidebar extends React.Component {
     render() {
         var left = this.props.hideNavbar ? '0' : '212px';
         var display = this.props.mobile ? 'none' : 'block';
+        var placement = "right";
         const style = {
             ...styleSideBar,
             left: left,
         }
         if (this.props.mobile && this.props.landscape) {
+            placement = "left";
             style = {
                 ...styleSideBar,
                 top: '0px',
@@ -145,17 +147,17 @@ class Sidebar extends React.Component {
                 <Button eventKey="zoom-out" id="zoomOut" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
 
                 <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.props.color}}></i></Button>
-                <Popover placement="right" hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
                   <ColorPicker onChangeColor={this.props.onChangeColor}/>
                 </Popover>
 
                 <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="penRight"></i></Button>
-                <Popover placement="right" hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={this.onPen}>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={this.onPen}>
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
                 <Button eventKey="eraser" id="eraser" style={{display: display}} className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
-                <Popover placement="right" hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
 
