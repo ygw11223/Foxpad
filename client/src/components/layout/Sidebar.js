@@ -128,12 +128,19 @@ class Sidebar extends React.Component {
             ...styleSideBar,
             left: left,
         }
+        if (this.props.mobile && this.props.landscape) {
+            style = {
+                ...styleSideBar,
+                top: '0px',
+                right: '0px',
+            }
+        }
 
         return (
             <ButtonGroup   vertical id="buttonGroup" style={style}>
 
                 <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
-                <Button eventKey="undo" id="undo" style={{display: display}} className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
+                <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-in" id="zoomIn" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-out" id="zoomOut" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
 
@@ -147,7 +154,7 @@ class Sidebar extends React.Component {
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
-                <Button eventKey="eraser" id="eraser" className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
+                <Button eventKey="eraser" id="eraser" style={{display: display}} className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
                 <Popover placement="right" hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
