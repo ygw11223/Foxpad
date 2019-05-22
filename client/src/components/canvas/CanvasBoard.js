@@ -224,8 +224,16 @@ class CanvasBoard extends Component {
             window.location.reload();
         });
         if (window.screen.width < 1000 && window.screen.height < 1000) {
-            document.documentElement.requestFullscreen();
-            window.screen.orientation.lock("landscape");
+            document.documentElement.requestFullscreen().catch(err => {
+              alert("Error attempting to enable full-screen mode");
+            });
+            window.screen.orientation.lock("landscape")
+            	.then(function() {
+            		alert('Locked');
+            	})
+            	.catch(function(error) {
+            		alert(error);
+            	});
             this.setState({mobile: true});
         }
         this.updateCanvasHistory();
