@@ -224,7 +224,7 @@ class CanvasBoard extends Component {
             window.location.reload();
         });
         if (window.screen.width < 1000 && window.screen.height < 1000) {
-            document.documentElement.requestFullScreen();
+            document.documentElement.requestFullscreen();
             window.screen.orientation.lock("landscape");
             this.setState({mobile: true});
         }
