@@ -129,12 +129,13 @@ class Sidebar extends React.Component {
             ...styleSideBar,
             left: left,
         }
-        if (this.props.mobile && this.props.landscape) {
+        if (this.props.mobile === true && this.props.landscape === true) {
             placement = "left";
             style = {
                 ...styleSideBar,
                 top: '0px',
                 right: '0px',
+                left: 'unset',
             }
         }
 

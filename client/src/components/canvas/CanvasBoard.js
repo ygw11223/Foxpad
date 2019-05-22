@@ -229,13 +229,14 @@ class CanvasBoard extends Component {
         });
         if (window.screen.orientation.type === 'landscape-primary' || window.screen.orientation.type === 'landscape-secondary') {
             this.setState({landscape: true});
+            alert("on landscape");
         }
         else {
             this.setState({landscape: false});
         }
         if (window.screen.width < 1000 && window.screen.height < 1000) {
             document.documentElement.requestFullscreen().catch(err => {
-              alert("Error attempting to enable full-screen mode");
+              console.log("Error attempting to enable full-screen mode");
             });
             this.setState({mobile: true});
         }
