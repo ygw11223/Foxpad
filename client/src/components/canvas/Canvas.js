@@ -86,6 +86,8 @@ class Canvas extends Component {
         this.preOffsetY = -1;
         this.preScale = 1024;
         this.preDis = -1;
+        this.prePX = -1;
+        this.prePY = -1;
     }
 
     updatePosition() {
@@ -406,10 +408,11 @@ class Canvas extends Component {
         let p1_y = e.touches[0].clientY - rect.top;
         let p2_x = e.touches[1].clientX - rect.left;
         let p2_y = e.touches[1].clientY - rect.top;
-        return Math.sqrt((p1_x - p2_x)*(p1_x - p2_x) + (p1_y - p2_y)*(p1_y - p2_y));
+        return [Math.sqrt((p1_x - p2_x)*(p1_x - p2_x) + (p1_y - p2_y)*(p1_y - p2_y)),
+                p1_x + (p2_x - p1_x)/2, p1_y + (p2_y - p1_y)/2];
     }
     onPinchStart(e) {
-        this.preDis = this.getDistance(e);
+        [this.preDis, this.prePX, this.prePY] = this.getDistance(e);
     }
 
     onMouseDown(e) {
@@ -492,14 +495,44 @@ class Canvas extends Component {
     }
 
     onPinchMove(e) {
-        let distance = this.getDistance(e);
+        let distance, px,py;
+        [distance, px,py] = this.getDistance(e);
         let direction = distance/this.preDis;
-        if(direction > 1)
-            this.zoom(1, 1.1 );
-        else if (direction < 1) {
-            this.zoom(-1,1.1)
+        if(direction > 1.03)
+            this.zoom(1, 1.1,px,py);
+        else if (direction < 0.97) {
+            this.zoom(-1,1.1,px,py)
         }
+        let dx =  this.mapWindowToCanvas(px , this.offsetX)
+                    - this.mapWindowToCanvas(this.prePX, this.offsetX);
+        let dy =  this.mapWindowToCanvas(py , this.offsetY)
+                    - this.mapWindowToCanvas(this.prePY, this.offsetY);
+
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) 
+                        > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) 
+                        > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
+        }
+        if(dx === 0 && dy === 0)
+            return;
+        this.offsetX -= dx;
+        this.offsetY -= dy;
+        this.ctx.translate(dx,dy);
+        this.mctx.translate(dx,dy);
+        this.onRedrawEvent();
+        this.updatePosition();
+        this.preOffsetX = this.offsetX;
+        this.preOffsetY = this.offsetY;
         this.preDis = distance;
+        this.prePX = px;
+        this.prePY = py;
     }
 
     onMouseMove(e) {
