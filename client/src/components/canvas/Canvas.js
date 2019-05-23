@@ -137,6 +137,8 @@ class Canvas extends Component {
         this.preX = 50;
         this.preY = 50;
         this.ctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
+        this.mctx.setTransform(1,0,0,1,0,0);
+        this.mctx.clearRect(0,0,this.state.width,this.state.height);
         this.mctx.setTransform(this.scale,0,0,this.scale,-this.offsetX,-this.offsetY);
         this.initializeScale();
         this.updatePosition();

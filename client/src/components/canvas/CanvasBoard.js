@@ -16,7 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -47,7 +47,7 @@ class CanvasBoard extends Component {
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
-        this.uid = cookies.get('cd_user_name');
+        this.uid = null;
     }
 
     displayOwnPosition(x, y, w, h) {
@@ -216,34 +216,31 @@ class CanvasBoard extends Component {
     }
 
     componentDidMount() {
-        let id = cookies.get('cd_user_name');
-        if (id == undefined) {
-            this.setState({toLogin: true});
-        } else {
-            this.updateCanvasHistory();
-            this.uid = id;
-            // On server, we save user and canvas id on the socket object, which
-            // will disappear when connection is lost. So we need to init upon
-            // each connection.
-            this.socket.on('connect', this.onInitCanvas);
-            this.socket.on('drawing', this.onDrawingEvent);
-            this.socket.on('position', this.onPositionEvent);
-            this.socket.on('preview', this.onPreviewEvent);
-            this.socket.on('image', this.onImageEvent);
-            this.socket.on('redraw', this.onRedrawEvent);
-            this.socket.on('session_update', this.session_update);
-            this.socket.on('canvas_update', this.canvas_update);
-            this.socket.on('mouse_position', this.canvas.updateMouseLocation);
-            this.socket.on('viewport_position', this.updateViewportsPosition);
-            this.socket.on('canvas_preview', this.broadcastPreview);
-            this.socket.on('update', (cmd)=>{
-                if (cmd === 'image_ready') {
-                    this.canvas.onEmitImg();
-                } else if (cmd === 'image_fail') {
-                    this.canvas.uploadingFailure();
-                }
-            });
+        if (cookies.get('cd_user_name') === undefined) {
+            return;
         }
+        this.updateCanvasHistory();
+        // On server, we save user and canvas id on the socket object, which
+        // will disappear when connection is lost. So we need to init upon
+        // each connection.
+        this.socket.on('connect', this.onInitCanvas);
+        this.socket.on('drawing', this.onDrawingEvent);
+        this.socket.on('position', this.onPositionEvent);
+        this.socket.on('preview', this.onPreviewEvent);
+        this.socket.on('image', this.onImageEvent);
+        this.socket.on('redraw', this.onRedrawEvent);
+        this.socket.on('session_update', this.session_update);
+        this.socket.on('canvas_update', this.canvas_update);
+        this.socket.on('mouse_position', this.canvas.updateMouseLocation);
+        this.socket.on('viewport_position', this.updateViewportsPosition);
+        this.socket.on('canvas_preview', this.broadcastPreview);
+        this.socket.on('update', (cmd)=>{
+            if (cmd === 'image_ready') {
+                this.canvas.onEmitImg();
+            } else if (cmd === 'image_fail') {
+                this.canvas.uploadingFailure();
+            }
+        });
     }
 
     changeColor(e) {
@@ -290,11 +287,14 @@ class CanvasBoard extends Component {
     }
 
     render(){
-        if (this.state.toLogin === true) {
+        let name = cookies.get('cd_user_name');
+        if (name === undefined) {
             return <Redirect to={{
                 pathname: '/login',
                 state: { fromCanvas: true, room_id: this.props.match.params.id }
             }} />
+        } else {
+            this.uid = name;
         }
 
         if (this.state.toDashboard === true) {
