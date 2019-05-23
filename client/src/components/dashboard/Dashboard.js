@@ -29,7 +29,9 @@ class Dashboard extends Component {
 
         var elapsed = current - previous;
 
-        if (elapsed < msPerMinute) {
+        if (elapsed < 1000) {
+            return 'Just now';
+        } else if (elapsed < msPerMinute) {
             return Math.round(elapsed/1000) + ' seconds';
         } else if (elapsed < msPerHour) {
             return Math.round(elapsed/msPerMinute) + ' minutes';
@@ -61,11 +63,15 @@ class Dashboard extends Component {
         });
 
         for (let i in canvases) {
-            let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png'
+            let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png';
+            let hash = Date.now();
+            if (this.props.location.state && canvases[i][0] == this.props.location.state.room_id) {
+                canvases[i][1] = this.props.location.state.time;
+            }
             cards.push(
                 <div className="dashboardCard"
                     onClick={() => {this.setState({toCanvas: true, id: canvases[i][0]})}}>
-                    <img className='dashboardImg' src={url}/>
+                    <img className='dashboardImg' src={`${url}?${hash}`}/>
                     <div className='dashboardCardFooter'>
                         <div className='footerBackground'></div>
                         <i class="fas fa-history"></i>
@@ -83,6 +89,8 @@ class Dashboard extends Component {
             this.setState({toLogin: true});
         } else {
             let name = cookies.get('cd_user_name');
+            let len_name = name.length - 6;
+            name = name.substr(0, len_name);
             document.getElementById('hello-name').innerHTML = "Hi! " + name;
         }
     }

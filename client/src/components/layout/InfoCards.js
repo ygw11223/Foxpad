@@ -89,6 +89,7 @@ class CardStack extends React.Component {
             ...card1Style,
             background: this.props.color
         };
+        const len_name = this.state.name.length - 6;
 
         return (
             <ul style={style}
@@ -107,7 +108,7 @@ class CardStack extends React.Component {
                             margin: 0,
                             fontSize: '10px',
                         }}>————</p>
-                        <CardText>Logged in as: <b>{this.state.name}</b></CardText>
+                        <CardText>Logged in as: <b>{this.state.name.substr(0, len_name)}</b></CardText>
                     </CardBody>
                 </Card>
 

@@ -3,6 +3,7 @@ import Cookies from 'universal-cookie';
 import  { Route, Redirect } from 'react-router-dom'
 import './login.css'
 
+const hashes = require('short-id');
 const logo = require('./foxy2.png');
 const arrow = require('./right-arrow.png');
 const cookies = new Cookies();
@@ -21,7 +22,7 @@ class Login extends React.Component {
     }
 
     handleChange(event) {
-        this.setState({user_name: event.target.value});
+        this.setState({user_name: event.target.value + hashes.generate()});
     }
 
     onSubmit(e) {
@@ -42,6 +43,9 @@ class Login extends React.Component {
         }
         else if (this.state.toCanvas === true) {
             return <Redirect to={'/canvas/'+this.props.location.state.room_id} />
+        }
+        if (cookies.get('cd_user_name')) {
+            return <Redirect to={'/dashboard'} />
         }
         return (
             <div class="parent-container" id="gradient">

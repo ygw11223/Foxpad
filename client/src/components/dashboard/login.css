@@ -1,97 +1,116 @@
 #user_name, ::placeholder {
-	color: #000000;
+    color: #000000;
 }
 
 .parent-container {
-	width: 100vw;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .wrapper {
-	display: flex;
-	flex-direction: row;
-	/*background-color: grey;*/
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    /*background-color: grey;*/
 }
 img {
-	width: 244px;
-	height: 270px;
-	display: block;
-  	margin-left: auto;
-  	margin-right: auto;
-	align-self: center;
+    width: 244px;
+    height: 270px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    align-self: center;
 }
 .logo-wrapper {
-	flex: auto;
+    flex: auto;
 }
 
 .input-wrapper {
-	display: inline-flex;
-	align-items: center;
-	width: 35rem;
-	color: #5E9494;
+    display: inline-flex;
+    align-items: center;
+    color: #5E9494;
+    width: 90vw;
+    max-width: 400px;
 }
 
 #user_name {
-	font-size: 70px;
-	font-family: 'Roboto', sans-serif;
-	color: #5E9494;
+    font-size: 13vw;
+    font-family: 'Roboto', sans-serif;
+    color: #5E9494;
 }
 
 #userName {
-	margin-top: 20px;
-	padding-left: 15px;
-	border-radius: 24px;
-	box-shadow: 7px 7px 11px 1px rgb(131, 125, 125, 0.5);
-	/* border: 1px solid #4c94ce !important; */
-	align-self: center;
-	border: none;
-	font-size: 20px;
-	height: 45px;
+    margin-top: 15px;
+    padding-left: 15px;
+    border-radius: 24px;
+    box-shadow: 7px 7px 11px 1px rgb(131, 125, 125, 0.5);
+    /* border: 1px solid #4c94ce !important; */
+    align-self: center;
+    border: none;
+    height: 45px;
 }
 
 ::placeholder {
     font-size: 20px;
-	color: #5E9494;
-	opacity: 0.75;
-	font-family: 'Roboto', sans-serif;
+    color: #5E9494;
+    opacity: 0.75;
+    font-family: 'Roboto', sans-serif;
 }
 
 #name_text {
-	margin-top: -15px;
-	margin-left: 3px;
-	font-weight: 500;
-	font-size: 20px;
-	font-family: 'Roboto', sans-serif;
-	color: #5E9494;
+    margin-top: -15px;
+    margin-left: 3px;
+    font-weight: 500;
+    font-size: 5vw;
+    font-family: 'Roboto', sans-serif;
+    color: #5E9494;
+}
+
+@media screen and (min-width: 450px) {
+    #user_name {
+        font-size: 55px;
+        font-family: 'Roboto', sans-serif;
+        color: #5E9494;
+    }
+
+    #name_text {
+        margin-top: -15px;
+        margin-left: 3px;
+        font-weight: 500;
+        font-size: 20px;
+        font-family: 'Roboto', sans-serif;
+        color: #5E9494;
+    }
 }
 
 #wrappinginput {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
 
 #arrow {
-	height: 25px;
-	width: 15px;
-	vertical-align: middle;
-	padding-left: 3px;
-	/* top: 50%;
-	left: 50%; */
+    height: 25px;
+    width: 15px;
+    vertical-align: middle;
+    padding-left: 3px;
+    /* top: 50%;
+    left: 50%; */
 }
 
 #submitButton {
-	border: none;
-	width: 85px;
-	height: 45px;
-	background-color: #5E9494;
-	font-family: 'Roboto', sans-serif;
-	border-radius: 24px;
-	margin-left: 20px;
-	box-shadow: 7px 7px 11px 1px rgb(131, 125, 125, 0.5);
+    border: none;
+    width: 85px;
+    height: 45px;
+    background-color: #5E9494;
+    font-family: 'Roboto', sans-serif;
+    border-radius: 24px;
+    margin-left: 20px;
+    box-shadow: 7px 7px 11px 1px rgb(131, 125, 125, 0.5);
 }
