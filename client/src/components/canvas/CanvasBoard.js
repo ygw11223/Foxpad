@@ -51,11 +51,12 @@ class CanvasBoard extends Component {
     }
 
     displayOwnPosition(x, y, w, h) {
-        this.minimap.displayOwnPosition(x, y, w, h);
+        if (this.minimap) {
+            this.minimap.displayOwnPosition(x, y, w, h);
+        }
     }
 
     toDashboard(e) {
-        console.log("here");
         this.setState({toDashboard: true});
     }
 
@@ -219,6 +220,9 @@ class CanvasBoard extends Component {
         if (cookies.get('cd_user_name') === undefined) {
             return;
         }
+        window.addEventListener("orientationchange", function() {
+            window.location.reload();
+        });
         this.updateCanvasHistory();
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init upon
@@ -241,6 +245,10 @@ class CanvasBoard extends Component {
                 this.canvas.uploadingFailure();
             }
         });
+    }
+
+    componentWillUnmount() {
+        this.updateCanvasHistory();
     }
 
     changeColor(e) {
@@ -299,7 +307,11 @@ class CanvasBoard extends Component {
 
         if (this.state.toDashboard === true) {
             this.socket.disconnect();
-            return <Redirect to={'/dashboard'} />
+            let time = new Date().getTime();
+            return <Redirect to={{
+                pathname: '/dashboard',
+                state: {time: time, room_id: this.props.match.params.id },
+            }} />
         }
 
         var icon = (this.state.hideNavbar === true ? '>' : '<');
