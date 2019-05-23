@@ -12,8 +12,8 @@
 }
 
 #parent {
-    min-width: 400px;
-    margin: 0px 75px 0px 75px;
+    min-width: 300px;
+    margin: 0px 5vw 0px 5vw;
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -21,11 +21,11 @@
 }
 
 #welcome {
-    min-width: 400px;
+    min-width: 300px;
     height: 100px;
     display: flex;
     justify-content: flex-start;
-    margin-left: 100px;
+    margin-left: 5vw;
 }
 
 #hello {
@@ -44,6 +44,7 @@
 }
 
 #header {
+    min-width: 300px;
     margin-top:auto;
     vertical-align: bottom;
     font-size: 50px;

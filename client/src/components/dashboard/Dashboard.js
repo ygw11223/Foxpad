@@ -61,11 +61,12 @@ class Dashboard extends Component {
         });
 
         for (let i in canvases) {
-            let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png'
+            let url = 'canvas/images/' + 'preview' + canvases[i][0] + 1 + '.png';
+            let hash = Date.now();
             cards.push(
                 <div className="dashboardCard"
                     onClick={() => {this.setState({toCanvas: true, id: canvases[i][0]})}}>
-                    <img className='dashboardImg' src={url}/>
+                    <img className='dashboardImg' src={`${url}?${hash}`}/>
                     <div className='dashboardCardFooter'>
                         <div className='footerBackground'></div>
                         <i class="fas fa-history"></i>
