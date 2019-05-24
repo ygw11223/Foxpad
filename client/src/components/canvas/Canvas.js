@@ -613,8 +613,8 @@ class Canvas extends Component {
 
     onMouseUp(e) {
         e.preventDefault();
-        if(e.type === "touchmove" && e.touches.length === 2) {
-            this.props.updateMinimap(true);
+        if(e.type === "touchend") {
+            this.props.updateMinimap(false);
         }
 
         this.setState({ active: false });

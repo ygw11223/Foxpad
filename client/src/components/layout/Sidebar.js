@@ -144,7 +144,7 @@ class Sidebar extends React.Component {
         var borderRadius = '0px 0px 20px 0px';
         var arrow = "fas fa-chevron-right"
         if (this.props.landscape) {
-            top = (window.innerHeight - 300)/2 + 'px';
+            top = (window.innerHeight - 240)/2 + 'px';
             right = '0px';
             left = 'initial';
             placement = 'left';
