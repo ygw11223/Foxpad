@@ -62,7 +62,7 @@ class CardStack extends React.Component {
 
     render () {
         let left = this.props.hideNavbar ? '0' : '212px';
-        let width = 226 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0);
+        let width = 226 + this.state.totalIds*25 + (this.state.hoverId ? 100 : 0) - (this.props.mobile ? 70 : 0);
         let lastCard = false;
         if (this.state.followName) {
             lastCard = true;
@@ -85,9 +85,11 @@ class CardStack extends React.Component {
             width: width,
             left: left
         };
+        let firstWidth = this.props.mobile ? '180px' : '250px';
         const mainCardStyle = {
             ...card1Style,
-            background: this.props.color
+            background: this.props.color,
+            width: firstWidth,
         };
         const len_name = this.state.name.length - 6;
 

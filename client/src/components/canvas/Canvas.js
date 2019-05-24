@@ -228,7 +228,7 @@ class Canvas extends Component {
     }
 
     componentWillUnmount() {
-        this.props.onRef(null)
+        this.props.onRef(null);
     }
 
     componentDidMount() {

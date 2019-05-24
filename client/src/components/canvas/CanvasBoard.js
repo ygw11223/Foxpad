@@ -16,7 +16,9 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false, landscape: false,};
+        let landscape = window.innerHeight < 500 ? true : false;
+        let mobile = (window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500) ? true : false;
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: mobile, landscape: landscape,};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -373,7 +375,8 @@ class CanvasBoard extends Component {
                             hideNavbar={this.state.hideNavbar}
                             socket={this.socket}
                             color={this.state.bgColor}
-                            releaseFollowing={this.releaseFollowing}/>
+                            releaseFollowing={this.releaseFollowing}
+                            mobile={this.state.mobile}/>
 
                     {this.state.mode === VIEWING ? (""):(
                         <Sidebar
@@ -397,6 +400,7 @@ class CanvasBoard extends Component {
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
                             landscape={this.state.landscape}
+                            mobile={this.state.mobile}
                             color={this.state.bgColor}/>)}/>
                 </div>
             </div>
