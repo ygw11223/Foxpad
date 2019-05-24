@@ -44,6 +44,7 @@ class CanvasBoard extends Component {
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
+        this.updateCursorStyle = this.updateCursorStyle.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -246,6 +247,10 @@ class CanvasBoard extends Component {
         }
     }
 
+    updateCursorStyle(styles) {
+        this.canvas.updateCursorStyle(styles);
+    }
+
     changeColor(e) {
         this.setState({color: e})
     }
@@ -323,6 +328,7 @@ class CanvasBoard extends Component {
                             color={this.state.bgColor}/>
 
                     <Canvas style={{cursor: 'none'}}
+                            iconSize={15+this.state.lineWidth}
                             onRef={ref => (this.canvas= ref)}
                             mode={this.state.mode}
                             width={this.state.width}
@@ -360,7 +366,8 @@ class CanvasBoard extends Component {
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
-                                showUploader={this.state.showUploader}/>)}
+                                showUploader={this.state.showUploader}
+                                updateCursorStyle = {this.updateCursorStyle}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}

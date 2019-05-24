@@ -48,6 +48,7 @@ class Sidebar extends React.Component {
     }
 
     onPen() {
+        this.props.updateCursorStyle("pen");
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("penWidth");
         let penArrow = document.getElementById("penRight");
@@ -71,6 +72,7 @@ class Sidebar extends React.Component {
     }
 
     onEraser() {
+        this.props.updateCursorStyle("eraser");
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("eraser");
         let penArrow = document.getElementById("penRight");
@@ -94,6 +96,7 @@ class Sidebar extends React.Component {
     }
 
     onDrag() {
+        this.props.updateCursorStyle("move");
         let buttons = document.getElementsByClassName("tool-button");
         let target = document.getElementById("drag");
         let penArrow = document.getElementById("penRight");

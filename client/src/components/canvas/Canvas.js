@@ -65,6 +65,7 @@ class Canvas extends Component {
         this.onPinchStart = this.onPinchStart.bind(this);
         this.onPinchMove = this.onPinchMove.bind(this);
         this.getDistance = this.getDistance.bind(this);
+        this.updateCursorStyle = this.updateCursorStyle.bind(this);
 
         this.fileInput = React.createRef();
         this.offsetX = 0;
@@ -294,6 +295,17 @@ class Canvas extends Component {
         }
     }
 
+    updateCursorStyle(style) {
+        if (style === "pen"){
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + this.props.iconSize +penName+ ') 0 '+this.props.iconSize+', auto';
+        }
+        else if (style === "eraser") {
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + this.props.iconSize +eraserName+ ') 0 ' + this.props.iconSize+', auto';
+        } else {
+            document.getElementById('mouse-listener').style.cursor = style;
+        }
+    }
+
     drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
         this.ctx.beginPath();
         if (isEraser) {
@@ -478,25 +490,24 @@ class Canvas extends Component {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
             // Position not changed
-            let iconSize = 15 + this.props.lineWidth;
             if(dx === 0 && dy === 0) {
                 if (document.getElementById('mouse-listener')) {
                     if(!this.props.eraser) {
                         if ( this.props.mode === DRAGGING) {
-                            document.getElementById('mouse-listener').style.cursor = 'move'
+                            this.updateCursorStyle("move")
                         } else {
-                            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + iconSize +penName+ ') 0 '+iconSize+', auto';
+                            this.updateCursorStyle("pen")
                         }
                     }
                     else
-                        document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + iconSize +eraserName+ ') 0 ' + iconSize+', auto';
+                        this.updateCursorStyle("eraser")
 
                 }
                 return;
             }
 
             if (document.getElementById('mouse-listener')) {
-                document.getElementById('mouse-listener').style.cursor = 'move';
+                this.updateCursorStyle("move")
             }
             this.offsetX -= dx;
             this.offsetY -= dy;
