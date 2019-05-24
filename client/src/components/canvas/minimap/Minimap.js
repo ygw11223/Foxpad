@@ -1,5 +1,6 @@
 import React, {Component}  from 'react';
 import './minimap.css';
+import {VIEWING} from '../../Constants';
 // minimap ration is 1/8 of original canvas size
 // 16 pixel offset from right edge and bottom edge
 const height = 135;
@@ -144,8 +145,9 @@ class Minimap extends Component {
                 bottom: '8px',
             }
         }
+        var display = (this.props.mode === VIEWING) ? 'none' : 'block';
         return (
-            <div>
+            <div style={{display: display}}>
                 <canvas
                     style={style}
                     ref="minimap"

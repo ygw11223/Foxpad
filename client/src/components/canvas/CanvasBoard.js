@@ -352,7 +352,8 @@ class CanvasBoard extends Component {
                         uid={this.uid}
                         color={this.state.bgColor}
                         landscape={this.state.landscape}
-                        mobile={this.state.mobile}/>
+                        mobile={this.state.mobile}
+                        mode={this.state.mode}/>
 
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
