@@ -432,6 +432,7 @@ class Canvas extends Component {
         //We should compute this coordinate by subtracting offsets of the canvas
         //
             if(e.touches.length === 2) {
+                this.props.updateMinimap(true);
                 this.onPinchStart(e);
                 return ;
             }
@@ -612,6 +613,10 @@ class Canvas extends Component {
 
     onMouseUp(e) {
         e.preventDefault();
+        if(e.type === "touchmove" && e.touches.length === 2) {
+            this.props.updateMinimap(true);
+        }
+
         this.setState({ active: false });
         this.preX = 50;
         this.preY = 50;

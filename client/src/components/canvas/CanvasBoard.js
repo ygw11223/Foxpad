@@ -47,10 +47,15 @@ class CanvasBoard extends Component {
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
         this.handleScreenChange = this.handleScreenChange.bind(this);
+        this.updateMinimap = this.updateMinimap.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = null;
+    }
+
+    updateMinimap(bool) {
+        this.minimap.setState({show: bool});
     }
 
     handleScreenChange() {

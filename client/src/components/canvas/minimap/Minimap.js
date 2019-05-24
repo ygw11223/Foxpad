@@ -11,6 +11,7 @@ const width = 240;
 class Minimap extends Component {
     constructor(props) {
         super(props);
+        this.state = {show: false};
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
@@ -145,7 +146,8 @@ class Minimap extends Component {
                 bottom: '8px',
             }
         }
-        var display = (this.props.mode === VIEWING) ? 'none' : 'block';
+        var display = (this.props.mobile && !this.state.show) ? 'none' :'block';
+        display = (this.props.mode === VIEWING) ? 'none' : display;
         return (
             <div style={{display: display}}>
                 <canvas
