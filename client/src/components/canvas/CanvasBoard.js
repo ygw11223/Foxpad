@@ -16,7 +16,9 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true};
+        let landscape = window.innerHeight < 500 ? true : false;
+        let mobile = (window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500) ? true : false;
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: mobile, landscape: landscape,};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -44,10 +46,24 @@ class CanvasBoard extends Component {
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
+        this.handleScreenChange = this.handleScreenChange.bind(this);
+        this.updateMinimap = this.updateMinimap.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = null;
+    }
+
+    updateMinimap(bool) {
+        this.minimap.setState({show: bool});
+    }
+
+    handleScreenChange() {
+        window.innerHeight < 500 ? this.setState({landscape: true}) : this.setState({landscape: false});
+    }
+
+    handleScreenChange() {
+        window.innerHeight < 450 ? this.setState({landscape: true}) : this.setState({landscape: false});
     }
 
     displayOwnPosition(x, y, w, h) {
@@ -62,7 +78,7 @@ class CanvasBoard extends Component {
 
     updateViewportsPosition(data) {
         if (this.minimap) {
-                this.minimap.displayUserPosition(data);
+            this.minimap.displayUserPosition(data);
         }
 
         if (this.state.following === false) return;
@@ -134,7 +150,7 @@ class CanvasBoard extends Component {
     // Function will be called after server init.
     canvas_update(data) {
         this.canvasList.setState({num_canvas: data['.num_canvas']});
-        this.minimap.displayUserPosition(data);
+        if (this.minimap) this.minimap.displayUserPosition(data);
     }
 
     session_update(data){
@@ -193,21 +209,21 @@ class CanvasBoard extends Component {
     onDrawingEvent(data) {
         this.canvas.cacheStroke(data);
         this.canvas.onDrawingEvent(data);
-        this.minimap.onDrawingEvent(data);
+        if (this.minimap) this.minimap.onDrawingEvent(data);
     }
 
     onRedrawEvent(data_array) {
         this.canvas.resetStroke(data_array);
         this.canvas.onRedrawEvent();
-        this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
+        if (this.minimap) this.minimap.onRedrawEvent(this.canvas.getCachedStroke());
     }
 
     minimapDraw(x0,y0,x1,y1,color, lineWidth, isEraser, emit) {
-        this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
+        if (this.minimap) this.minimap.drawLine(x0,y0,x1,y1,color, lineWidth, isEraser, emit);
     }
 
     minimapImage(datadata, imgWidth, imgHeight) {
-        this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
+        if (this.minimap) this.minimap.onDrawImage(datadata, imgWidth, imgHeight);
     }
 
     minimapClearImage() {
@@ -220,9 +236,16 @@ class CanvasBoard extends Component {
         if (cookies.get('cd_user_name') === undefined) {
             return;
         }
+
         window.addEventListener("orientationchange", function() {
             window.location.reload();
         });
+        if ((window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500)) {
+            document.documentElement.requestFullscreen().catch(err => {
+              console.log("Error attempting to enable full-screen mode");
+            });
+            this.setState({mobile: true});
+        }
         this.updateCanvasHistory();
         // On server, we save user and canvas id on the socket object, which
         // will disappear when connection is lost. So we need to init upon
@@ -329,10 +352,13 @@ class CanvasBoard extends Component {
 
                 <div>
                     <Minimap
-                            onRef={ref => (this.minimap= ref)}
-                            cid={this.state.cid}
-                            uid={this.uid}
-                            color={this.state.bgColor}/>
+                        onRef={ref => (this.minimap= ref)}
+                        cid={this.state.cid}
+                        uid={this.uid}
+                        color={this.state.bgColor}
+                        landscape={this.state.landscape}
+                        mobile={this.state.mobile}
+                        mode={this.state.mode}/>
 
                     <Canvas style={{cursor: 'none'}}
                             iconSize={15+this.state.lineWidth}
@@ -351,7 +377,9 @@ class CanvasBoard extends Component {
                             minimapImage={this.minimapImage}
                             minimapClearImage={this.minimapClearImage}
                             displayOwnPosition={this.displayOwnPosition}
-                            cid={this.state.cid}/>
+                            cid={this.state.cid}
+                            handleScreenChange={this.handleScreenChange}
+                            updateMinimap={this.updateMinimap}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}
@@ -359,7 +387,8 @@ class CanvasBoard extends Component {
                             hideNavbar={this.state.hideNavbar}
                             socket={this.socket}
                             color={this.state.bgColor}
-                            releaseFollowing={this.releaseFollowing}/>
+                            releaseFollowing={this.releaseFollowing}
+                            mobile={this.state.mobile}/>
 
                     {this.state.mode === VIEWING ? (""):(
                         <Sidebar
@@ -373,13 +402,17 @@ class CanvasBoard extends Component {
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
-                                showUploader={this.state.showUploader}/>)}
+                                showUploader={this.state.showUploader}
+                                mobile={this.state.mobile}
+                                landscape={this.state.landscape}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
+                            landscape={this.state.landscape}
+                            mobile={this.state.mobile}
                             color={this.state.bgColor}/>)}/>
                 </div>
             </div>

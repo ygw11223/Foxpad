@@ -1,5 +1,6 @@
 import React, {Component}  from 'react';
 import './minimap.css';
+import {VIEWING} from '../../Constants';
 // minimap ration is 1/8 of original canvas size
 // 16 pixel offset from right edge and bottom edge
 const height = 135;
@@ -10,6 +11,7 @@ const width = 240;
 class Minimap extends Component {
     constructor(props) {
         super(props);
+        this.state = {show: false};
         this.onDrawingEvent = this.onDrawingEvent.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.onRedrawEvent = this.onRedrawEvent.bind(this);
@@ -133,29 +135,46 @@ class Minimap extends Component {
     }
 
     render() {
+        if (this.props.landscape && this.props.mobile) {
+            var style = {
+                left: '8px',
+                bottom: '8px',
+            }
+        } else {
+            var style = {
+                right: '8px',
+                bottom: '8px',
+            }
+        }
+        var display = (this.props.mobile && !this.state.show) ? 'none' :'block';
+        display = (this.props.mode === VIEWING) ? 'none' : display;
         return (
-            <div>
-              <canvas
-                  ref="minimap"
-                  id = "mini"
-                  height = {height}
-                  width  = {width}/>
-              <canvas
-                  ref="picture"
-                  id = "minipicture"
-                  height = {height}
-                  width  = {width}/>
-              <div style={{width: '240px', height: '135px'}} id='minimap_background'></div>
-              <canvas
-                  ref="rectangle_peers"
-                  id = "minirectangle_peers"
-                  height = {height}
-                  width  = {width}/>
-              <canvas
-                  ref="rectangle_own"
-                  id = "minirectangle_own"
-                  height = {height}
-                  width  = {width}/>
+            <div style={{display: display}}>
+                <canvas
+                    style={style}
+                    ref="minimap"
+                    id = "mini"
+                    height = {height}
+                    width  = {width}/>
+                <canvas
+                    style={style}
+                    ref="picture"
+                    id = "minipicture"
+                    height = {height}
+                    width  = {width}/>
+                <div style={{...style, width: '240px', height: '135px'}} id='minimap_background'></div>
+                <canvas
+                    style={style}
+                    ref="rectangle_peers"
+                    id = "minirectangle_peers"
+                    height = {height}
+                    width  = {width}/>
+                <canvas
+                    style={style}
+                    ref="rectangle_own"
+                    id = "minirectangle_own"
+                    height = {height}
+                    width  = {width}/>
             </div>
         );
     }

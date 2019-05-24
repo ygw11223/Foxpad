@@ -56,7 +56,7 @@ class Login extends React.Component {
                     <div class="input-wrapper">
                         <row>
                             <label for="userName" id="user_name">Before we start</label>
-                            <p id="name_text">How do you want other people know you by?</p>
+                            <p id="name_text">How do you want other people to know you by?</p>
                             <form onSubmit={this.onSubmit}>
                                 <div id="wrappinginput">
                                     <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>

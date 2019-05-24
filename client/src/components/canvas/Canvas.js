@@ -234,7 +234,7 @@ class Canvas extends Component {
     }
 
     componentWillUnmount() {
-        this.props.onRef(null)
+        this.props.onRef(null);
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -280,6 +280,7 @@ class Canvas extends Component {
 
     updateDimensions() {
         // when change canvas size, reset scale and offsets
+        this.props.handleScreenChange();
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
@@ -466,6 +467,7 @@ class Canvas extends Component {
         //We should compute this coordinate by subtracting offsets of the canvas
         //
             if(e.touches.length === 2) {
+                this.props.updateMinimap(true);
                 this.onPinchStart(e);
                 return ;
             }
@@ -538,10 +540,28 @@ class Canvas extends Component {
         let distance, px,py;
         [distance, px,py] = this.getDistance(e);
         let direction = distance/this.preDis;
-        if(direction > 1.05)
-            this.zoom(1, 1.1,px,py );
-        else if (direction < 0.95,px,py) {
-            this.zoom(-1,1.1)
+
+        if(direction > 1.03)
+            this.zoom(1, 1.1,px,py);
+        else if (direction < 0.97) {
+            this.zoom(-1,1.1,px,py)
+        }
+        let dx =  this.mapWindowToCanvas(px , this.offsetX)
+                    - this.mapWindowToCanvas(this.prePX, this.offsetX);
+        let dy =  this.mapWindowToCanvas(py , this.offsetY)
+                    - this.mapWindowToCanvas(this.prePY, this.offsetY);
+
+        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx)
+                        > this.canvas_width/2) {
+            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
+        }
+        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
+                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy)
+                        > this.canvas_hight/2) {
+            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
         }
         this.preDis = distance;
         this.prePX = px;
@@ -622,7 +642,13 @@ class Canvas extends Component {
 
     onMouseUp(e) {
         e.preventDefault();
+        if(e.type === "touchend") {
+            this.props.updateMinimap(false);
+        }
+
         this.setState({ active: false });
+        this.preX = 50;
+        this.preY = 50;
     }
 
     zoom(direction, zoom_factor, x, y) {

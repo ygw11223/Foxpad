@@ -1,16 +1,12 @@
 #mini {
   z-index: 4;
   position: absolute;
-  right: 16px;
-  bottom: 16px;
   box-shadow: 0px 0px 20px #888888;
 }
 
 #minipicture {
   z-index: 2;
   position: absolute;
-  right: 16px;
-  bottom: 16px;
   background-color: white;
 }
 
@@ -19,21 +15,15 @@
   background-color: white;
   opacity: 0.3;
   position: absolute;
-  right: 16px;
-  bottom: 16px;
 }
 
 #minirectangle_peers {
   z-index: 4;
   position: absolute;
   opacity: 0.9;
-  right: 16px;
-  bottom: 16px;
 }
 
 #minirectangle_own {
   z-index: 4;
   position: absolute;
-  right: 16px;
-  bottom: 16px;
 }

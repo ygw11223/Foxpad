@@ -25,6 +25,7 @@ const cardDivStyle = {
     flexShrink: 0,
     fontWeight: 'bold',
     transition: '0.5s',
+    touchAction: 'none',
 }
 
 class InfoCard extends Component {
@@ -32,14 +33,29 @@ class InfoCard extends Component {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
         this.renderFollowIcon = this.renderFollowIcon.bind(this);
+        this.onTouch = this.onTouch.bind(this);
     }
 
-    onMouseOver () {
+    onMouseOver (e) {
         if (this.props.color !== 'gray') {
             this.props.updateHoverId(this.props.id);
         } else {
             this.props.updateHoverId(0);
         }
+    }
+
+    onTouch(e) {
+        e.preventDefault();
+        if (this.props.hoverId != this.props.id) {
+            this.props.updateHoverId(this.props.id);
+        } else {
+            this.props.lockCard(this.props.name);
+        }
+    }
+
+    componentDidMount(){
+        let id = this.props.name + 'card';
+        document.getElementById(id).addEventListener('touchstart',  this.onTouch, { passive: false });
     }
 
     renderFollowIcon() {
@@ -80,7 +96,7 @@ class InfoCard extends Component {
         const len_name = this.props.name.length - 6;
 
         return (
-            <div style={styleD} 
+            <div id={this.props.name+'card'} style={styleD} 
                 onClick={() => {this.props.lockCard(this.props.name)}}>
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
