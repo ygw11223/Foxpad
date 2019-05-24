@@ -366,8 +366,7 @@ class CanvasBoard extends Component {
                                 showForm={this.showForm}
                                 onEraser={this.onEraser}
                                 hideNavbar={this.state.hideNavbar}
-                                showUploader={this.state.showUploader}
-                                updateCursorStyle = {this.updateCursorStyle}/>)}
+                                showUploader={this.state.showUploader}/>)}
                     {this.state.mode === VIEWING ? (""):(
                         <Navbar
                             onRef={ref => (this.navbar= ref)}

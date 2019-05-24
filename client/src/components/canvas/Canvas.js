@@ -235,6 +235,23 @@ class Canvas extends Component {
         this.props.onRef(null)
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        let style = 'eraser';
+        if (nextProps.mode === DRAGGING) {
+            style = nextState.active ? "grabbing" : 'grab';
+        } else if (nextProps.mode === VIEWING) {
+            style = 'default';
+        } else if(!nextProps.eraser) {
+            style = "pen";
+        }
+        if (nextProps.iconSize !== this.props.iconSize ||
+            nextProps.mode !== this.props.mode ||
+            nextProps.eraser != this.props.eraser ||
+            nextState.active != this.state.active) {
+            this.updateCursorStyle(style, nextProps.iconSize);
+        }
+    }
+
     componentDidMount() {
         window.addEventListener("resize", this.updateDimensions);
         this.props.onRef(this);
@@ -295,12 +312,13 @@ class Canvas extends Component {
         }
     }
 
-    updateCursorStyle(style) {
+    updateCursorStyle(style, size) {
+        if (!document.getElementById('mouse-listener')) return;
         if (style === "pen"){
-            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + this.props.iconSize +penName+ ') 0 '+this.props.iconSize+', auto';
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + size +penName+ ') 0 '+size+', auto';
         }
         else if (style === "eraser") {
-            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + this.props.iconSize +eraserName+ ') 0 ' + this.props.iconSize+', auto';
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + size + eraserName+ ') 0 ' + size+', auto';
         } else {
             document.getElementById('mouse-listener').style.cursor = style;
         }
@@ -491,24 +509,18 @@ class Canvas extends Component {
             }
             // Position not changed
             if(dx === 0 && dy === 0) {
-                if (document.getElementById('mouse-listener')) {
-                    if(!this.props.eraser) {
-                        if ( this.props.mode === DRAGGING) {
-                            this.updateCursorStyle("move")
-                        } else {
-                            this.updateCursorStyle("pen")
-                        }
-                    }
-                    else
-                        this.updateCursorStyle("eraser")
-
+                let style = 'eraser';
+                if (this.props.mode === DRAGGING) {
+                    style = "grab";
                 }
+                else if(!this.props.eraser) {
+                    style = "pen";
+                }
+                this.updateCursorStyle(style, this.props.iconSize);
                 return;
             }
 
-            if (document.getElementById('mouse-listener')) {
-                this.updateCursorStyle("move")
-            }
+            this.updateCursorStyle("move", this.props.iconSize)
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
