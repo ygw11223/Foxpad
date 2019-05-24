@@ -44,7 +44,6 @@ class CanvasBoard extends Component {
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
-        this.updateCursorStyle = this.updateCursorStyle.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
@@ -245,10 +244,6 @@ class CanvasBoard extends Component {
                 }
             });
         }
-    }
-
-    updateCursorStyle(styles) {
-        this.canvas.updateCursorStyle(styles);
     }
 
     changeColor(e) {
