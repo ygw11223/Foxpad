@@ -335,6 +335,7 @@ class CanvasBoard extends Component {
                             color={this.state.bgColor}/>
 
                     <Canvas style={{cursor: 'none'}}
+                            iconSize={15+this.state.lineWidth}
                             onRef={ref => (this.canvas= ref)}
                             mode={this.state.mode}
                             width={this.state.width}
