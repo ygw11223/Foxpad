@@ -224,6 +224,7 @@ class CanvasBoard extends Component {
     componentDidMount() {
         if (cookies.get('cd_user_name') === undefined) {
             return;
+        }
 
         window.addEventListener("orientationchange", function() {
             window.location.reload();
