@@ -44,10 +44,15 @@ class CanvasBoard extends Component {
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
+        this.handleScreenChange = this.handleScreenChange.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = cookies.get('cd_user_name');
+    }
+
+    handleScreenChange() {
+        window.innerHeight < 450 ? this.setState({landscape: true}) : this.setState({landscape: false});
     }
 
     displayOwnPosition(x, y, w, h) {
@@ -55,13 +60,12 @@ class CanvasBoard extends Component {
     }
 
     toDashboard(e) {
-        console.log("here");
         this.setState({toDashboard: true});
     }
 
     updateViewportsPosition(data) {
         if (this.minimap) {
-                this.minimap.displayUserPosition(data);
+            this.minimap.displayUserPosition(data);
         }
 
         if (this.state.following === false) return;
@@ -216,15 +220,7 @@ class CanvasBoard extends Component {
     }
 
     componentDidMount() {
-        console.log(window.screen.orientation);
-        if (window.screen.orientation.type === 'landscape-primary' || window.screen.orientation.type === 'landscape-secondary') {
-            this.setState({landscape: true});
-            alert("on landscape");
-        }
-        else {
-            this.setState({landscape: false});
-        }
-        if (window.screen.width < 1000 && window.screen.height < 1000) {
+        if (window.screen.width < 800 && window.screen.height < 800) {
             document.documentElement.requestFullscreen().catch(err => {
               console.log("Error attempting to enable full-screen mode");
             });
@@ -355,7 +351,8 @@ class CanvasBoard extends Component {
                             minimapImage={this.minimapImage}
                             minimapClearImage={this.minimapClearImage}
                             displayOwnPosition={this.displayOwnPosition}
-                            cid={this.state.cid}/>
+                            cid={this.state.cid}
+                            handleScreenChange={this.handleScreenChange}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}
@@ -386,6 +383,7 @@ class CanvasBoard extends Component {
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
+                            landscape={this.state.landscape}
                             color={this.state.bgColor}/>)}/>
                 </div>
             </div>

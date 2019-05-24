@@ -31,9 +31,11 @@ class Navbar extends React.Component {
 
     render() {
         let left = this.props.hideNavbar ? '0' : '212px';
+        let top = this.props.landscape ? '150px' : '600px';
         const style = {
             ...styleNavbar,
             left: left,
+            top: top,
             backgroundColor: this.props.color,
         }
         return (

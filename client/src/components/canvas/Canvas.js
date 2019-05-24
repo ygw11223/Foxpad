@@ -253,6 +253,7 @@ class Canvas extends Component {
 
     updateDimensions() {
         // when change canvas size, reset scale and offsets
+        this.props.handleScreenChange();
         this.setState({height: window.innerHeight, width: window.innerWidth});
         this.imageHight *= this.scale;
         this.imageWidth *= this.scale;
