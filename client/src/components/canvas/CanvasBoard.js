@@ -52,7 +52,7 @@ class CanvasBoard extends Component {
     }
 
     handleScreenChange() {
-        window.innerHeight < 450 ? this.setState({landscape: true}) : this.setState({landscape: false});
+        window.innerHeight < 500 ? this.setState({landscape: true}) : this.setState({landscape: false});
     }
 
     displayOwnPosition(x, y, w, h) {
@@ -228,14 +228,7 @@ class CanvasBoard extends Component {
         window.addEventListener("orientationchange", function() {
             window.location.reload();
         });
-        if (window.screen.orientation.type === 'landscape-primary' || window.screen.orientation.type === 'landscape-secondary') {
-            this.setState({landscape: true});
-            alert("on landscape");
-        }
-        else {
-            this.setState({landscape: false});
-        }
-        if (window.screen.width < 1000 && window.screen.height < 1000) {
+        if ((window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500)) {
             document.documentElement.requestFullscreen().catch(err => {
               console.log("Error attempting to enable full-screen mode");
             });
