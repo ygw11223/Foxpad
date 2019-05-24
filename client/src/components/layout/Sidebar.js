@@ -162,7 +162,7 @@ class Sidebar extends React.Component {
 
         return (
             <ButtonGroup   vertical id="buttonGroup" style={style}>
-                <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white', display: display}}></i></Button>
+                <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} style={{display: display}}> <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
                 <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-in" id="zoomIn" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-out" id="zoomOut" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>

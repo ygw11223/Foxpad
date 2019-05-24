@@ -377,7 +377,8 @@ class CanvasBoard extends Component {
                             minimapClearImage={this.minimapClearImage}
                             displayOwnPosition={this.displayOwnPosition}
                             cid={this.state.cid}
-                            handleScreenChange={this.handleScreenChange}/>
+                            handleScreenChange={this.handleScreenChange}
+                            updateMinimap={this.updateMinimap}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}
