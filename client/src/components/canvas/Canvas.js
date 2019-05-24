@@ -513,13 +513,13 @@ class Canvas extends Component {
 
         if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
             dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
-        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) 
+        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx)
                         > this.canvas_width/2) {
             dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
         }
         if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
                 dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
-        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) 
+        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy)
                         > this.canvas_hight/2) {
             dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
         }
@@ -613,6 +613,8 @@ class Canvas extends Component {
     onMouseUp(e) {
         e.preventDefault();
         this.setState({ active: false });
+        this.preX = 50;
+        this.preY = 50;
     }
 
     zoom(direction, zoom_factor, x, y) {

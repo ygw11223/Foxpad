@@ -9,7 +9,6 @@ const styleSideBar = {
   zIndex: '5',
   position:'absolute',
   top:'100px',
-  borderRadius: '0px 0px 20px 0px',
   overflow: 'hidden',
   transition: '0.5s',
   touchAction: 'none',
@@ -115,7 +114,22 @@ class Sidebar extends React.Component {
     }
 
     componentDidMount() {
-       this.props.onRef(this);
+        this.props.onRef(this);
+        var palette = document.getElementById("palette");
+        palette.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            palette.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
+        var penWidth = document.getElementById("penWidth");
+        penWidth.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            penWidth.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
+        var eraser = document.getElementById("eraser");
+        eraser.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            eraser.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
     }
 
     // Todo: Anze
@@ -127,23 +141,22 @@ class Sidebar extends React.Component {
         var placement = 'right';
         var top = '100px';
         var right = 'initial';
-        if (this.props.mobile && this.props.landscape === true) {
-            top = (window.innerHeight - 300)/2;
+        var borderRadius = '0px 0px 20px 0px';
+        var arrow = "fas fa-chevron-right"
+        if (this.props.landscape) {
+            top = (window.innerHeight - 300)/2 + 'px';
             right = '0px';
             left = 'initial';
             placement = 'left';
-            const style = {
-                ...styleSideBar,
-                left: left,
-                top: top + 'px',
-                right: right,
-            }
+            borderRadius = '20px 0px 0px 20px';
+            arrow = "fas fa-chevron-left"
         }
         const style = {
             ...styleSideBar,
             left: left,
             top: top,
             right: right,
+            borderRadius: borderRadius,
         }
 
 
@@ -159,12 +172,12 @@ class Sidebar extends React.Component {
                   <ColorPicker onChangeColor={this.props.onChangeColor}/>
                 </Popover>
 
-                <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="penRight"></i></Button>
+                <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class={arrow} id="penRight"></i></Button>
                 <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={this.onPen}>
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
-                <Button eventKey="eraser" id="eraser" className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
+                <Button eventKey="eraser" id="eraser" className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class={arrow} id="eraserRight"></i></Button>
                 <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
