@@ -133,29 +133,44 @@ class Minimap extends Component {
     }
 
     render() {
+        if (this.props.landscape && this.props.mobile) {
+            var style = {
+                left: '8px',
+                bottom: '8px',
+            }
+        } else {
+            var style = {
+                right: '8px',
+                bottom: '8px',
+            }
+        }
         return (
             <div>
-              <canvas
-                  ref="minimap"
-                  id = "mini"
-                  height = {height}
-                  width  = {width}/>
-              <canvas
-                  ref="picture"
-                  id = "minipicture"
-                  height = {height}
-                  width  = {width}/>
-              <div style={{width: '240px', height: '135px'}} id='minimap_background'></div>
-              <canvas
-                  ref="rectangle_peers"
-                  id = "minirectangle_peers"
-                  height = {height}
-                  width  = {width}/>
-              <canvas
-                  ref="rectangle_own"
-                  id = "minirectangle_own"
-                  height = {height}
-                  width  = {width}/>
+                <canvas
+                    style={style}
+                    ref="minimap"
+                    id = "mini"
+                    height = {height}
+                    width  = {width}/>
+                <canvas
+                    style={style}
+                    ref="picture"
+                    id = "minipicture"
+                    height = {height}
+                    width  = {width}/>
+                <div style={{...style, width: '240px', height: '135px'}} id='minimap_background'></div>
+                <canvas
+                    style={style}
+                    ref="rectangle_peers"
+                    id = "minirectangle_peers"
+                    height = {height}
+                    width  = {width}/>
+                <canvas
+                    style={style}
+                    ref="rectangle_own"
+                    id = "minirectangle_own"
+                    height = {height}
+                    width  = {width}/>
             </div>
         );
     }

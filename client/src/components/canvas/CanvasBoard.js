@@ -346,13 +346,13 @@ class CanvasBoard extends Component {
                         toDashboard={this.toDashboard}/>
 
                 <div>
-                    {this.state.mobile === false &&
-                        <Minimap
-                                onRef={ref => (this.minimap= ref)}
-                                cid={this.state.cid}
-                                uid={this.uid}
-                                color={this.state.bgColor}/>
-                    }
+                    <Minimap
+                        onRef={ref => (this.minimap= ref)}
+                        cid={this.state.cid}
+                        uid={this.uid}
+                        color={this.state.bgColor}
+                        landscape={this.state.landscape}
+                        mobile={this.state.mobile}/>
 
                     <Canvas style={{cursor: 'none'}}
                             onRef={ref => (this.canvas= ref)}
