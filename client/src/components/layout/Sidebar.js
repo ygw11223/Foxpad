@@ -124,15 +124,20 @@ class Sidebar extends React.Component {
     render() {
         var left = this.props.hideNavbar ? '0' : '212px';
         var display = this.props.mobile ? 'none' : 'block';
-        var borderRadius = this.props.landscape ? '15px 0px 0px 15px' : '0px 15px 15px 0px';
         var placement = 'right';
         var top = '100px';
         var right = 'initial';
         if (this.props.mobile && this.props.landscape === true) {
-            top = '0px';
+            top = (window.innerHeight - 300)/2;
             right = '0px';
             left = 'initial';
             placement = 'left';
+            const style = {
+                ...styleSideBar,
+                left: left,
+                top: top + 'px',
+                right: right,
+            }
         }
         const style = {
             ...styleSideBar,
@@ -144,23 +149,23 @@ class Sidebar extends React.Component {
 
         return (
             <ButtonGroup   vertical id="buttonGroup" style={style}>
-                <Button eventKey="drag" id="drag" style={{display: display}} className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
+                <Button eventKey="drag" id="drag" className='tool-button button' onClick={this.onDrag} > <i class={"fas fa-hand-paper fa-2x"} style={{color: 'white'}}></i></Button>
                 <Button eventKey="undo" id="undo" className='tool-button button' onClick={() => this.props.onUndo()} > <i class="fas fa-undo fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-in" id="zoomIn" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(1)} > <i class="fas fa-search-plus fa-2x" style={{color: 'white'}}></i></Button>
                 <Button eventKey="zoom-out" id="zoomOut" style={{display: display}} className='tool-button button' onClick={() => this.props.onZoom(-1)} > <i class="fas fa-search-minus fa-2x" style={{color: 'white'}}></i></Button>
 
                 <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.props.color}}></i></Button>
-                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" style={{borderRadius: borderRadius}} className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
                   <ColorPicker onChangeColor={this.props.onChangeColor}/>
                 </Popover>
 
                 <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="penRight"></i></Button>
-                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" style={{borderRadius: borderRadius}} className="popover" toggle={this.onPen}>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverPenOpen} target="penWidth" trigger="legacy" className="popover" toggle={this.onPen}>
                   <Slider getValue={this.updatePenWidth} value={this.state.penWidth} onChangeWidth={this.props.onChangeWidth}/>
                 </Popover>
 
-                <Button eventKey="eraser" id="eraser" style={{display: display}} className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
-                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" style={{borderRadius: borderRadius}} className="popover" toggle={this.onEraser}>
+                <Button eventKey="eraser" id="eraser" className='tool-button button'><i class={"fas fa-eraser fa-2x"} style={{color: 'white'}}></i><i class="fas fa-chevron-right" id="eraserRight"></i></Button>
+                <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverEraserOpen} target="eraser" trigger="legacy" className="popover" toggle={this.onEraser}>
                   <Slider getValue={this.updateEraserWidth} value={this.state.eraserWidth} onChangeWidth={this.props.onEraser}/>
                 </Popover>
 

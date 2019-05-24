@@ -77,6 +77,7 @@ class InfoCard extends Component {
             zIndex: 100 - this.props.id, // Allow left card cover right card.
             boxShadow: '0px 0px 5px #000000',
         }
+        const len_name = this.props.name.length - 6;
 
         return (
             <div style={styleD} 
@@ -84,7 +85,7 @@ class InfoCard extends Component {
                 <Card style={styleC}
                     onMouseOver={this.onMouseOver}>
                     <CardBody className='nametext' style={{padding: 5}}>
-                        <CardText> {this.props.name} </CardText>
+                        <CardText> {this.props.name.substr(0, len_name)} </CardText>
                     </CardBody>
                 </Card>
                 {this.renderFollowIcon()}

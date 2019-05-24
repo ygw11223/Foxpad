@@ -53,7 +53,6 @@ class CanvasList extends Component {
     renderColorBar(cid) {
         let children = [];
         for (let key in this.state.members) {
-            console.log(key, cid, this.state.members[key])
             if (key == cid) {
                 for (let i in this.state.members[key]) {
                     children.push(

@@ -10,6 +10,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const Set = require("collections/set");
 const randomColor = require('randomcolor');
+const colorBag = ['#4C94CD', '#64B580', '#FE9601', '#CC0063', '#F8E71C', '#86269B', '#00D2F1'];
 
 // Max level of multi-resolution image pyramid.
 const MaxImageLevel = 5;
@@ -36,7 +37,7 @@ app.use('/static', express.static(__dirname + '/client/build'));
 app.use('/canvas/images', express.static(__dirname + '/images'));
 
 // Request for joining an canvas room should be "/room/VALID_ID".
-app.get('/room/*', function (req, res) {
+app.get('/canvas/*', function (req, res) {
     // Get room id.
     var room_id = req.originalUrl.substr(8);
     // Check if room id is valid.
@@ -106,7 +107,8 @@ function onConnection(socket){
             console.log("New room id encountered when init socket.");
         }
         if (!(uid in USER_INFO[rid])) {
-            USER_INFO[rid][uid] = randomColor({luminosity: 'dark'});
+            let color = colorBag[Math.floor(Math.random()*colorBag.length)];
+            USER_INFO[rid][uid] = randomColor({luminosity: 'dark', hue: color});
         }
         if (!(uid in SESSION_INFO[rid])) {
             console.log(uid, "joined", cid);

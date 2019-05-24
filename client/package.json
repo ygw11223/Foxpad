@@ -15,7 +15,8 @@
     "reactstrap": "^7.1.0",
     "socket.io-client": "^2.2.0",
     "socket.io-file-client": "^2.0.2",
-    "universal-cookie": "^3.0.7"
+    "universal-cookie": "^3.0.7",
+    "short-id": "latest"
   },
   "scripts": {
     "start": "react-scripts start",
