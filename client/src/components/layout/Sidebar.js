@@ -115,7 +115,22 @@ class Sidebar extends React.Component {
     }
 
     componentDidMount() {
-       this.props.onRef(this);
+        this.props.onRef(this);
+        var palette = document.getElementById("palette");
+        palette.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            palette.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
+        var penWidth = document.getElementById("penWidth");
+        penWidth.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            penWidth.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
+        var eraser = document.getElementById("eraser");
+        eraser.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            eraser.dispatchEvent(new Event('mousedown'))
+        }, { passive: false });
     }
 
     // Todo: Anze
@@ -128,16 +143,10 @@ class Sidebar extends React.Component {
         var top = '100px';
         var right = 'initial';
         if (this.props.mobile && this.props.landscape === true) {
-            top = (window.innerHeight - 300)/2; 
+            top = (window.innerHeight - 300)/2 + 'px'; 
             right = '0px';
             left = 'initial';
             placement = 'left';
-            const style = {
-                ...styleSideBar,
-                left: left,
-                top: top + 'px',
-                right: right,
-            }
         }
         const style = {
             ...styleSideBar,

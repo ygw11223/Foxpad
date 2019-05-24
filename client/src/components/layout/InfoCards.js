@@ -96,7 +96,7 @@ class CardStack extends React.Component {
         return (
             <ul style={style}
                 onMouseOut={this.onMouseOut}>
-                <Card style={mainCardStyle}>
+                <Card onClick={this.onMouseOut} style={mainCardStyle}>
                     <CardBody style={{padding: '5px 0 0 0'}}>
                         <CardTitle style={{
                             margin: 0,
