@@ -2,8 +2,12 @@ import React, {Component} from 'react';
 import Cookies from 'universal-cookie';
 import Modal from '../layout/ImageForm.js'
 import {DRAWING,VIEWING,DRAGGING} from '../Constants';
-
 const cookies = new Cookies();
+const cursorUrl = 'https://img.icons8.com/';
+const penPre = 'metro/';
+const eraserPre = 'android/';
+const penName = '/000000/edit.png';
+const eraserName = '/000000/eraser.png';
 
 const styleMouse = {
     zIndex: '3',
@@ -11,6 +15,7 @@ const styleMouse = {
     left:'0px',
     top:'0px',
     touchAction: 'none',
+    cursor: 'url(' +  cursorUrl + penPre + '26' +penName+ ') 0 26, auto',
 };
 
 const styleCanvas = {
@@ -473,9 +478,19 @@ class Canvas extends Component {
                 dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
             }
             // Position not changed
+            let iconSize = 15 + this.props.lineWidth;
             if(dx === 0 && dy === 0) {
                 if (document.getElementById('mouse-listener')) {
-                    document.getElementById('mouse-listener').style.cursor = 'default';
+                    if(!this.props.eraser) {
+                        if ( this.props.mode === DRAGGING) {
+                            document.getElementById('mouse-listener').style.cursor = 'move'
+                        } else {
+                            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + iconSize +penName+ ') 0 '+iconSize+', auto';
+                        }
+                    }
+                    else
+                        document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + iconSize +eraserName+ ') 0 ' + iconSize+', auto';
+
                 }
                 return;
             }
@@ -498,38 +513,11 @@ class Canvas extends Component {
         let distance, px,py;
         [distance, px,py] = this.getDistance(e);
         let direction = distance/this.preDis;
-        if(direction > 1.03)
-            this.zoom(1, 1.1,px,py);
-        else if (direction < 0.97) {
-            this.zoom(-1,1.1,px,py)
+        if(direction > 1.05)
+            this.zoom(1, 1.1,px,py );
+        else if (direction < 0.95,px,py) {
+            this.zoom(-1,1.1)
         }
-        let dx =  this.mapWindowToCanvas(px , this.offsetX)
-                    - this.mapWindowToCanvas(this.prePX, this.offsetX);
-        let dy =  this.mapWindowToCanvas(py , this.offsetY)
-                    - this.mapWindowToCanvas(this.prePY, this.offsetY);
-
-        if(this.mapWindowToCanvas(0, this.offsetX - dx) < -this.canvas_width/2) {
-            dx = this.offsetX - this.solveOffSet(0, -this.canvas_width/2);
-        } else if (this.mapWindowToCanvas(this.state.width, this.offsetX - dx) 
-                        > this.canvas_width/2) {
-            dx = this.offsetX - this.solveOffSet(this.state.width, this.canvas_width/2 );
-        }
-        if(this.mapWindowToCanvas(0, this.offsetY - dy) < -this.canvas_hight/2) {
-                dy = this.offsetY - this.solveOffSet(0, -this.canvas_hight/2);
-        } else if (this.mapWindowToCanvas(this.state.height, this.offsetY - dy) 
-                        > this.canvas_hight/2) {
-            dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
-        }
-        if(dx === 0 && dy === 0)
-            return;
-        this.offsetX -= dx;
-        this.offsetY -= dy;
-        this.ctx.translate(dx,dy);
-        this.mctx.translate(dx,dy);
-        this.onRedrawEvent();
-        this.updatePosition();
-        this.preOffsetX = this.offsetX;
-        this.preOffsetY = this.offsetY;
         this.preDis = distance;
         this.prePX = px;
         this.prePY = py;
