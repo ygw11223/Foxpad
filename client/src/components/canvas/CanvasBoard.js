@@ -16,11 +16,7 @@ const cookies = new Cookies();
 class CanvasBoard extends Component {
     constructor(props) {
         super(props);
-<<<<<<< 111560a6c17dc6f9588e9cc933842cf4224686ac
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false};
-=======
-        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, toLogin: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false, landscape: false,};
->>>>>>> change sidebar styling of horizontal device
+        this.state = {color: '#EC1D63', lineWidth: 10, mode: DRAWING, eraser: false, hideNavbar: true, following: false, bgColor: 'blue', cid: 1, showUploader: true, mobile: false, landscape: false,};
         this.changeColor = this.changeColor.bind(this);
         this.changeWidth = this.changeWidth.bind(this);
         this.onUndoEvent = this.onUndoEvent.bind(this);
@@ -48,10 +44,15 @@ class CanvasBoard extends Component {
         this.releaseFollowing = this.releaseFollowing.bind(this);
         this.displayOwnPosition = this.displayOwnPosition.bind(this);
         this.toDashboard = this.toDashboard.bind(this);
+        this.handleScreenChange = this.handleScreenChange.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = null;
+    }
+
+    handleScreenChange() {
+        window.innerHeight < 450 ? this.setState({landscape: true}) : this.setState({landscape: false});
     }
 
     displayOwnPosition(x, y, w, h) {
@@ -66,7 +67,7 @@ class CanvasBoard extends Component {
 
     updateViewportsPosition(data) {
         if (this.minimap) {
-                this.minimap.displayUserPosition(data);
+            this.minimap.displayUserPosition(data);
         }
 
         if (this.state.following === false) return;
@@ -369,7 +370,8 @@ class CanvasBoard extends Component {
                             minimapImage={this.minimapImage}
                             minimapClearImage={this.minimapClearImage}
                             displayOwnPosition={this.displayOwnPosition}
-                            cid={this.state.cid}/>
+                            cid={this.state.cid}
+                            handleScreenChange={this.handleScreenChange}/>
 
                     <InfoCards
                             onRef={ref => (this.cardDeck = ref)}
@@ -400,6 +402,7 @@ class CanvasBoard extends Component {
                             onHideNavbar={this.onHideNavbar}
                             icon={icon}
                             hideNavbar={this.state.hideNavbar}
+                            landscape={this.state.landscape}
                             color={this.state.bgColor}/>)}/>
                 </div>
             </div>
