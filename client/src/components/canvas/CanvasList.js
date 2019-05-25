@@ -19,12 +19,13 @@ const CanvasListStyle = {
 };
 
 const styleButton = {
+    display: 'inline-flex',
+    justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
     verticalAlign: 'middle',
-    width: '130px',
     height: '35px',
-    fontSize: '18px',
+    fontSize: '15px',
     zIndex: '5',
     backgroundColor: 'transparent',
     borderColor: 'white',
@@ -166,7 +167,7 @@ class CanvasList extends Component {
         return (
             <div style={style} class='canvasList'>
                 <p style={{width: '150px', textAlign: 'center', margin: '7px 0 7px 0'}}> Canvases </p>
-                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginTop: '6px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
+                <p><button onClick={this.props.toDashboard} style={styleButton}><img src={arrow} style={{width: '15px', height: '15px', float: 'left', marginRight: '5px'}} alt="arrow" id="arrow"/>Dashboard</button></p>
 
                 {this.renderCanvas()}
 
