@@ -27,7 +27,7 @@ class Login extends React.Component {
 
     onSubmit(e) {
         e.preventDefault();
-        cookies.set('cd_user_name', this.state.user_name,  {path: '/'});
+        cookies.set('foxpad_user_name', this.state.user_name,  {path: '/'});
         console.log(this.props.location);
         if (this.props.location.state === undefined) {
             this.setState({toDashboard: true});
@@ -44,7 +44,7 @@ class Login extends React.Component {
         else if (this.state.toCanvas === true) {
             return <Redirect to={'/canvas/'+this.props.location.state.room_id} />
         }
-        if (cookies.get('cd_user_name')) {
+        if (cookies.get('foxpad_user_name')) {
             return <Redirect to={'/dashboard'} />
         }
         return (

@@ -85,10 +85,10 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
-        if (cookies.get('cd_user_name') == undefined) {
+        if (cookies.get('foxpad_user_name') == undefined) {
             this.setState({toLogin: true});
         } else {
-            let name = cookies.get('cd_user_name');
+            let name = cookies.get('foxpad_user_name');
             let len_name = name.length - 6;
             name = name.substr(0, len_name);
             document.getElementById('hello-name').innerHTML = "Hi! " + name;

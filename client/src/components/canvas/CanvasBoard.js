@@ -233,7 +233,7 @@ class CanvasBoard extends Component {
     }
 
     componentDidMount() {
-        if (cookies.get('cd_user_name') === undefined) {
+        if (cookies.get('foxpad_user_name') === undefined) {
             return;
         }
 
@@ -318,7 +318,7 @@ class CanvasBoard extends Component {
     }
 
     render(){
-        let name = cookies.get('cd_user_name');
+        let name = cookies.get('foxpad_user_name');
         if (name === undefined) {
             return <Redirect to={{
                 pathname: '/login',
