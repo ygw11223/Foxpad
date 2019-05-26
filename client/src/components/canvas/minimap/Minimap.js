@@ -146,6 +146,9 @@ class Minimap extends Component {
                 bottom: '8px',
             }
         }
+        if (this.props.mobile && this.state.show) {
+            this.props.hideNavbar();
+        }
         var display = (this.props.mobile && !this.state.show) ? 'none' :'block';
         display = (this.props.mode === VIEWING) ? 'none' : display;
         return (

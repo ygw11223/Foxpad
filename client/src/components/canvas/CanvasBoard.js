@@ -48,14 +48,22 @@ class CanvasBoard extends Component {
         this.toDashboard = this.toDashboard.bind(this);
         this.handleScreenChange = this.handleScreenChange.bind(this);
         this.updateMinimap = this.updateMinimap.bind(this);
+        this.hideNavbar = this.hideNavbar.bind(this);
 
         this.socket = openSocket();
         this.uploader = new SocketIOFileClient(this.socket);
         this.uid = null;
     }
 
+    hideNavbar() {
+        if (!this.state.hideNavbar) {
+            this.setState({hideNavbar: true});
+        }
+    }
+
     updateMinimap(bool) {
         this.minimap.setState({show: bool});
+        this.navbar.setState({show: !bool});
     }
 
     handleScreenChange() {
@@ -241,9 +249,9 @@ class CanvasBoard extends Component {
             window.location.reload();
         });
         if ((window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500)) {
-            document.documentElement.requestFullscreen().catch(err => {
+            /*document.documentElement.requestFullscreen().catch(err => {
               console.log("Error attempting to enable full-screen mode");
-            });
+            });*/
             this.setState({mobile: true});
         }
         this.updateCanvasHistory();
@@ -358,7 +366,8 @@ class CanvasBoard extends Component {
                         color={this.state.bgColor}
                         landscape={this.state.landscape}
                         mobile={this.state.mobile}
-                        mode={this.state.mode}/>
+                        mode={this.state.mode}
+                        hideNavbar={this.hideNavbar}/>
 
                     <Canvas style={{cursor: 'none'}}
                             iconSize={15+this.state.lineWidth}
