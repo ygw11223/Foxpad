@@ -395,17 +395,17 @@ function onConnection(socket){
                 IMAGES[socket.canvas_id] = {
                     'w': mat.cols,
                     'h': mat.rows,
-                    'name': filePath,
+                    'name': 'images/' + cid,
                 };
                 console.log(IMAGES[socket.canvas_id]);
                 // Hardcoded building up 6 levels from lowest to highest resolution.
                 // TODO : Decide levels based on image size.
-                cv.imwrite(filePath + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
-                cv.imwrite(filePath + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
-                cv.imwrite(filePath + '2.png', mat.pyrDown().pyrDown().pyrDown());
-                cv.imwrite(filePath + '3.png', mat.pyrDown().pyrDown());
-                cv.imwrite(filePath + '4.png', mat.pyrDown());
-                cv.imwrite(filePath + '5.png', mat);
+                cv.imwrite(__dirname + '/images/' + cid + '0.png', mat.pyrDown().pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(__dirname + '/images/' + cid + '1.png', mat.pyrDown().pyrDown().pyrDown().pyrDown());
+                cv.imwrite(__dirname + '/images/' + cid + '2.png', mat.pyrDown().pyrDown().pyrDown());
+                cv.imwrite(__dirname + '/images/' + cid + '3.png', mat.pyrDown().pyrDown());
+                cv.imwrite(__dirname + '/images/' + cid + '4.png', mat.pyrDown());
+                cv.imwrite(__dirname + '/images/' + cid + '5.png', mat);
                 socket.emit('update', 'image_ready');
                 socket.broadcast.in(socket.canvas_id).emit('update', 'image_ready');
                 console.log('Image uploaded.');
