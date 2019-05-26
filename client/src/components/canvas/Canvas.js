@@ -542,9 +542,9 @@ class Canvas extends Component {
         let direction = distance/this.preDis;
 
         if(direction > 1.03)
-            this.zoom(1, 1.1,px,py);
+            this.zoom(1, 1.1, px, py);
         else if (direction < 0.97) {
-            this.zoom(-1,1.1,px,py)
+            this.zoom(-1, 1.1, px, py)
         }
         let dx =  this.mapWindowToCanvas(px , this.offsetX)
                     - this.mapWindowToCanvas(this.prePX, this.offsetX);
@@ -563,6 +563,19 @@ class Canvas extends Component {
                         > this.canvas_hight/2) {
             dy = this.offsetY - this.solveOffSet(this.state.height, this.canvas_hight/2);
         }
+
+        if (dx === 0 && dy === 0) {
+            return;
+        }
+
+        this.offsetX -= dx;
+        this.offsetY -= dy;
+        this.ctx.translate(dx, dy);
+        this.mctx.translate(dx, dy);
+        this.onRedrawEvent();
+        this.updatePosition();
+        this.preOffsetX = this.offsetX;
+        this.preOffsetY = this.offsetY;
         this.preDis = distance;
         this.prePX = px;
         this.prePY = py;
