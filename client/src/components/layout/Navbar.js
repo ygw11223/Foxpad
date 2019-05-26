@@ -17,6 +17,7 @@ const styleNavbar = {
 class Navbar extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {show: true};
     }
 
     componentDidMount() {
@@ -30,14 +31,18 @@ class Navbar extends React.Component {
     render() {
         let left = this.props.hideNavbar ? '0' : '212px';
         let top = this.props.mobile ? '450px' : '600px';
-        top = this.props.landscape ? ((window.innerHeight - 100) / 2) + 'px' : top;
+        top = this.props.landscape ? ((window.innerHeight - 50) / 2) + 'px' : top;
+        var display = (this.props.mobile && this.props.landscape && !this.state.show) ? 'none' :'block';
+
         const style = {
             ...styleNavbar,
             left: left,
             top: top,
             backgroundColor: this.props.color,
             transition: '0.5s',
+            display: display,
         }
+
         return (
             <Button style={style}
                 eventKey="white"

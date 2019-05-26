@@ -56,6 +56,7 @@ class CanvasBoard extends Component {
 
     updateMinimap(bool) {
         this.minimap.setState({show: bool});
+        this.navbar.setState({show: !bool});
     }
 
     handleScreenChange() {
@@ -241,9 +242,9 @@ class CanvasBoard extends Component {
             window.location.reload();
         });
         if ((window.screen.width < 500 && window.screen.height < 900) || (window.screen.width < 900 && window.screen.height < 500)) {
-            document.documentElement.requestFullscreen().catch(err => {
+            /*document.documentElement.requestFullscreen().catch(err => {
               console.log("Error attempting to enable full-screen mode");
-            });
+            });*/
             this.setState({mobile: true});
         }
         this.updateCanvasHistory();
