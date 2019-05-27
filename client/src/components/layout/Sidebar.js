@@ -12,6 +12,7 @@ const styleSideBar = {
   overflow: 'hidden',
   transition: '0.5s',
   touchAction: 'none',
+  filter: 'drop-shadow(2px 3px 16px #74707080)',
 };
 
 class Sidebar extends React.Component {
