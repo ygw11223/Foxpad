@@ -127,7 +127,7 @@ class Canvas extends Component {
         } else {
             this.initialScale = 1;
         }
-        this.zoom(wheel, 1.1);
+        this.zoom(1, 1.1);
     }
 
     initCanvas() {
