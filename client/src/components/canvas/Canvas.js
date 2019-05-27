@@ -127,6 +127,7 @@ class Canvas extends Component {
         } else {
             this.initialScale = 1;
         }
+        this.zoom(1, 1.1);
     }
 
     initCanvas() {
@@ -737,9 +738,9 @@ class Canvas extends Component {
         let wheel = event.deltaY < 0 ? 1 : -1;
 
         if(event.ctrlKey)
-            this.zoom(wheel, 1.1, this.preX, this.preY);
+            this.zoom(wheel, 1.1);
         else {
-            this.zoom(wheel, 1.1)
+            this.zoom(wheel, 1.1, this.preX, this.preY);
         }
     }
 
