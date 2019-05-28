@@ -26,6 +26,16 @@ class Login extends React.Component {
     }
 
     onSubmit(e) {
+        var input = document.getElementById("userName");
+        if (input.value.length === 0) {
+            console.log("checking submit");
+            console.log(input.style);
+            input.style.border = "2px solid #cc0063";
+            input.placeholder = "*Required field";
+            input.classList.add('error');
+            e.preventDefault();
+            return false;
+        }
         e.preventDefault();
         cookies.set('foxpad_user_name', this.state.user_name,  {path: '/'});
         console.log(this.props.location);
@@ -59,7 +69,7 @@ class Login extends React.Component {
                             <p id="name_text">How do you want other people to know you by?</p>
                             <form onSubmit={this.onSubmit}>
                                 <div id="wrappinginput">
-                                    <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange} required/>
+                                    <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>
                                     <button type="submit" id="submitButton"><img src={arrow} alt="arrow" id="arrow"/></button>
                                 </div>
                             </form>
