@@ -250,7 +250,8 @@ class Canvas extends Component {
         if (nextProps.iconSize !== this.props.iconSize ||
             nextProps.mode !== this.props.mode ||
             nextProps.eraser != this.props.eraser ||
-            nextState.active != this.state.active) {
+            nextProps.color != this.props.color ||
+            nextState.active != this.state.active ) {
             this.updateCursorStyle(style, nextProps.iconSize);
         }
     }
