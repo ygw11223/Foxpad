@@ -18,7 +18,7 @@ const styleSideBar = {
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, color: '#EC1D63', onPen: true, onEraser: false};
+        this.state = {popoverPenOpen: false, popoverEraserOpen: false, popoverColorOpen: false, penWidth: 10, eraserWidth: 10, onPen: true, onEraser: false};
         this.updatePenWidth = this.updatePenWidth.bind(this);
         this.updateEraserWidth = this.updateEraserWidth.bind(this);
         this.updateColor = this.updateColor.bind(this);
@@ -43,7 +43,7 @@ class Sidebar extends React.Component {
     }
 
     updateColor(value) {
-        this.setState({color: value});
+        this.props.onChangeColor(value);
         this.onPen();
     }
 
@@ -170,7 +170,7 @@ class Sidebar extends React.Component {
 
                 <Button eventKey="color" id="palette" className='tool-button button'> <i class={"fas fa-circle fa-2x"} style={{color: this.props.color}}></i></Button>
                 <Popover placement={placement} hideArrow="true" isOpen={this.state.popoverColorOpen} target="palette" trigger="legacy" className="colorPopover" toggle={()=>{this.setState({popoverColorOpen: !this.state.popoverColorOpen, popoverEraserOpen: false, popoverPenOpen: false})}}>
-                  <ColorPicker onChangeColor={this.props.onChangeColor}/>
+                  <ColorPicker onChangeColor={this.updateColor}/>
                 </Popover>
 
                 <Button eventKey="penWidth" id="penWidth" className='tool-button button'> <i class="fas fa-pencil-alt fa-2x" style={{color: 'white'}}></i><i class={arrow} id="penRight"></i></Button>
