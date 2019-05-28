@@ -26,6 +26,7 @@ class Login extends React.Component {
     }
 
     onSubmit(e) {
+        e.preventDefault();
         var input = document.getElementById("userName");
         if (input.value.length === 0) {
             console.log("checking submit");
@@ -33,10 +34,8 @@ class Login extends React.Component {
             input.style.border = "2px solid #cc0063";
             input.placeholder = "*Required field";
             input.classList.add('error');
-            e.preventDefault();
             return false;
         }
-        e.preventDefault();
         cookies.set('foxpad_user_name', this.state.user_name,  {path: '/'});
         console.log(this.props.location);
         if (this.props.location.state === undefined) {
