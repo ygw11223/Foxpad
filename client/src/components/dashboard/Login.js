@@ -59,7 +59,7 @@ class Login extends React.Component {
                             <p id="name_text">How do you want other people to know you by?</p>
                             <form onSubmit={this.onSubmit}>
                                 <div id="wrappinginput">
-                                    <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange}/>
+                                    <input type="text" placeholder="Enter name here" s={3} label="userName" id="userName" onChange={this.handleChange} required/>
                                     <button type="submit" id="submitButton"><img src={arrow} alt="arrow" id="arrow"/></button>
                                 </div>
                             </form>
