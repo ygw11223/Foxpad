@@ -252,7 +252,7 @@ class Canvas extends Component {
             nextProps.eraser != this.props.eraser ||
             nextProps.color != this.props.color ||
             nextState.active != this.state.active ) {
-            this.updateCursorStyle(style, nextProps.iconSize);
+            this.updateCursorStyle(style, nextProps.iconSize, nextProps.color);
         }
     }
 
@@ -317,10 +317,10 @@ class Canvas extends Component {
         }
     }
 
-    updateCursorStyle(style, size) {
+    updateCursorStyle(style, size, color) {
         if (!document.getElementById('mouse-listener')) return;
         if (style === "pen"){
-            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + size +'/' + this.props.color.substring(1) + penName+ ') 0 '+size+', auto';
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + size +'/' + color.substring(1) + penName+ ') 0 '+size+', auto';
         }
         else if (style === "eraser") {
             document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + size + eraserName+ ') 0 ' + size+', auto';
@@ -522,11 +522,11 @@ class Canvas extends Component {
                 else if(!this.props.eraser) {
                     style = "pen";
                 }
-                this.updateCursorStyle(style, this.props.iconSize);
+                this.updateCursorStyle(style, this.props.iconSize, this.props.color);
                 return;
             }
 
-            this.updateCursorStyle("move", this.props.iconSize)
+            this.updateCursorStyle("move", this.props.iconSize, this.props.color)
             this.offsetX -= dx;
             this.offsetY -= dy;
             this.ctx.translate(dx,dy);
