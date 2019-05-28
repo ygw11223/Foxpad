@@ -6,7 +6,7 @@ const cookies = new Cookies();
 const cursorUrl = 'https://img.icons8.com/';
 const penPre = 'metro/';
 const eraserPre = 'android/';
-const penName = '/000000/edit.png';
+const penName = '/edit.png';
 const eraserName = '/000000/eraser.png';
 
 const styleMouse = {
@@ -15,7 +15,7 @@ const styleMouse = {
     left:'0px',
     top:'0px',
     touchAction: 'none',
-    cursor: 'url(' +  cursorUrl + penPre + '26' +penName+ ') 0 26, auto',
+    cursor: 'url(' +  cursorUrl + penPre + '26' +'/000000'+penName+ ') 0 26, auto',
 };
 
 const styleCanvas = {
@@ -319,7 +319,7 @@ class Canvas extends Component {
     updateCursorStyle(style, size) {
         if (!document.getElementById('mouse-listener')) return;
         if (style === "pen"){
-            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + size +penName+ ') 0 '+size+', auto';
+            document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + penPre + size +'/' + this.props.color.substring(1) + penName+ ') 0 '+size+', auto';
         }
         else if (style === "eraser") {
             document.getElementById('mouse-listener').style.cursor = 'url(' +  cursorUrl + eraserPre + size + eraserName+ ') 0 ' + size+', auto';
